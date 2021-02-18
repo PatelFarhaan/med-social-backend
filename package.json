@@ -31,6 +31,9 @@
     ]
   },
   "dependencies": {
+    "@admin-bro/express": "^3.1.0",
+    "@admin-bro/sequelize": "^1.2.1",
+    "admin-bro": "^3.4.0",
     "apollo-server": "^2.4.8",
     "apollo-server-express": "^2.4.8",
     "apollo-server-testing": "^2.4.8",
@@ -44,6 +47,7 @@
     "dotenv": "^5.0.0",
     "ejs": "^2.5.7",
     "express": "^4.13.3",
+    "express-formidable": "^1.2.0",
     "express-session": "^1.15.6",
     "express-validator": "^5.1.2",
     "graphql": "^14.2.0",
@@ -81,7 +85,8 @@
     "nodemon": "^1.18.7",
     "prettier": "1.15.2",
     "rewire": "^4.0.1",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "@mapbox/node-pre-gyp": "1.0.0"
   },
   "jest": {
     "automock": false,

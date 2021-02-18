@@ -12,6 +12,11 @@ const socketIo = require('socket.io')
 const { makeExecutableSchema } = require('graphql-tools')
 const { fileLoader, mergeTypes, mergeResolvers } = require('merge-graphql-schemas')
 const { ApolloServer } = require('apollo-server-express')
+const AdminBro = require('admin-bro')
+const AdminBroSequelize = require('@admin-bro/sequelize')
+
+AdminBro.registerAdapter(AdminBroSequelize)
+const AdminBroExpress = require('@admin-bro/express')
 
 const db = require('./db/models/')
 // Top level middleware that will run before any route specific middleware
@@ -87,9 +92,21 @@ const jsonErrorHandler = (err, req, res, next) => {
 apolloServer.applyMiddleware({ app, cors: { origin } })
 
 const initApp = async () => {
-  app.use('/', api({ db, io }))
-  app.use(jsonErrorHandler)
-  return app
+  try {
+    const adminBro = new AdminBro({
+      databases: [db],
+      rootPath: '/admin'
+    })
+
+    const router = await AdminBroExpress.buildRouter(adminBro)
+    app.use(adminBro.options.rootPath, router)
+    app.use('/', api({ db, io }))
+    app.use(jsonErrorHandler)
+    return app
+  } catch (err) {
+    console.warn('err', err)
+    return err
+  }
 }
 
 const bindApp = async appToBind => {
