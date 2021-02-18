@@ -11,7 +11,7 @@ module.exports = () => {
     return next()
   })
 
-  api.get('/api/v1', (req, res) => {
+  api.get('/api/v1', (_req, res) => {
     const protocolVersion = 1
     res.json({ version, protocolVersion })
   })

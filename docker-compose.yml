@@ -19,10 +19,8 @@ services:
       - 9229:9229 # for attaching Chrome's inspector to a running node process (app or mocha)
     depends_on:
       - db
-      - cache
     links:
       - db
-      - cache
     env_file:
       - ./.env
     volumes:
@@ -58,13 +56,6 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: ""
       POSTGRES_HOST_AUTH_METHOD: "trust"
-    networks:
-    - mock_server
-
-  cache:
-    image: redis
-    ports:
-    - 6379:6379
     networks:
     - mock_server
 

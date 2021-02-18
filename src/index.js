@@ -8,6 +8,7 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const compression = require('compression')
+const passport = require('passport')
 const socketIo = require('socket.io')
 const { makeExecutableSchema } = require('graphql-tools')
 const { fileLoader, mergeTypes, mergeResolvers } = require('merge-graphql-schemas')
@@ -18,6 +19,8 @@ const AdminBroSequelize = require('@admin-bro/sequelize')
 AdminBro.registerAdapter(AdminBroSequelize)
 const AdminBroExpress = require('@admin-bro/express')
 
+const { jwtStrategy } = require('./middleware/passport')
+
 const db = require('./db/models/')
 // Top level middleware that will run before any route specific middleware
 const middleware = require('./middleware')
@@ -27,12 +30,6 @@ const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './db/graphql/schema
 const resolvers = mergeResolvers(fileLoader(path.join(__dirname, './db/graphql/resolvers')))
 
 const schemas = makeExecutableSchema({ typeDefs, resolvers })
-
-const apolloServer = new ApolloServer({
-  schema: schemas,
-  resolvers,
-  context: async ({ req }) => ({ req, db })
-})
 
 const app = express()
 app.server = http.createServer(app)
@@ -67,7 +64,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(middleware({ db }))
 
-const jsonErrorHandler = (err, req, res, next) => {
+const jsonErrorHandler = (err, _req, res, next) => {
   if (!err) return next()
   let error
   try {
@@ -88,6 +85,19 @@ const jsonErrorHandler = (err, req, res, next) => {
     }
   })
 }
+
+// jwt authentication
+app.use(passport.initialize())
+passport.use('jwt', jwtStrategy)
+
+const apolloServer = new ApolloServer({
+  schema: schemas,
+  resolvers,
+  context: async ({ req }) => ({
+    req,
+    db
+  })
+})
 
 apolloServer.applyMiddleware({ app, cors: { origin } })
 

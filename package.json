@@ -60,18 +60,20 @@
     "merge-graphql-schemas": "^1.5.8",
     "moment": "^2.22.1",
     "morgan": "^1.8.0",
+    "nanoid": "^3.1.20",
     "nock": "^10.0.6",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
     "pg": "6",
     "pg-hstore": "^2.3.2",
-    "redis": "^2.8.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
     "sequelize": "^5.3.0",
-    "shortid": "^2.2.8",
     "socket.io": "^2.1.1",
     "supertest-session": "^3.3.0"
   },
   "devDependencies": {
+    "@mapbox/node-pre-gyp": "1.0.0",
     "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^3.3.0",
@@ -85,8 +87,7 @@
     "nodemon": "^1.18.7",
     "prettier": "1.15.2",
     "rewire": "^4.0.1",
-    "supertest": "^3.0.0",
-    "@mapbox/node-pre-gyp": "1.0.0"
+    "supertest": "^3.0.0"
   },
   "jest": {
     "automock": false,

@@ -1,4 +1,4 @@
-const shortid = require('shortid')
+const { nanoid } = require('nanoid')
 
 module.exports = {
   // This function takes a Sequelize model and a list of fields
@@ -12,7 +12,7 @@ module.exports = {
         // if the field has a value, leave it alone
         if (!instance[field]) {
           // eslint-disable-next-line no-param-reassign
-          instance[field] = shortid.generate()
+          instance[field] = nanoid()
         }
       })
     }
