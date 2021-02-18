@@ -2,7 +2,7 @@ module.exports = {
   development: {
     username: process.env.RAMBLER_USER,
     password: process.env.RAMBLER_PASSWORD,
-    database: 'columnn_development',
+    database: 'column_development',
     host: process.env.RAMBLER_HOST,
     logging: process.env.PG_LOGGING_ENABLED || false,
     pool: {
@@ -13,7 +13,7 @@ module.exports = {
   test: {
     username: process.env.RAMBLER_USER,
     password: process.env.RAMBLER_PASSWORD,
-    database: 'columnn_test',
+    database: 'column_test',
     host: process.env.RAMBLER_HOST,
     logging: process.env.PG_LOGGING_ENABLED || false,
     pool: {
