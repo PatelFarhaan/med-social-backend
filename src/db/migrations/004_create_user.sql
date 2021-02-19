@@ -10,6 +10,7 @@ CREATE TABLE "User" (
     name character varying(255),
     hash character varying(255),
     "roleId" integer NOT NULL REFERENCES "Role"("id"),
+    "invited_by" integer REFERENCES "User"("id"),
     settings jsonb NOT NULL DEFAULT '{}',
     "username" character varying(150),
     "profile_picture" text,

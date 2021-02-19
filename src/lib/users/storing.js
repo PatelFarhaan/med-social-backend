@@ -7,15 +7,10 @@ const { getTenantSetting } = require('../settings')
 const BCRYPT_SALT_ROUNDS = 10
 
 const signup = async ({ body = {}, User = db.User }) => {
-  const { email, firstName, lastName, password, passwordRepeat, roleId } = body
+  const { email, password, interests, expertises, passwordRepeat, roleId } = body
 
   if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
-  const user = await User.build({
-    email,
-    firstName,
-    lastName,
-    roleId
-  })
+  const user = await User.build(body)
 
   // Check if user email is unique
   if ((await User.count({ where: { email } })) > 0) {
@@ -31,6 +26,16 @@ const signup = async ({ body = {}, User = db.User }) => {
 
   // Save
   const savedUser = await user.save()
+
+  if (interests) {
+    const dbInterests = await db.Interest.findAll({ where: { id: interests } })
+    await savedUser.addInterest(dbInterests)
+  }
+
+  if (expertises) {
+    const dbExpertises = await db.Expertise.findAll({ where: { id: expertises } })
+    await savedUser.addExpertise(dbExpertises)
+  }
 
   return savedUser
 }

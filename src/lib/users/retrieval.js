@@ -44,13 +44,47 @@ const getUsers = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }) => {
     offset: limit * (page - 1),
     distinct: true,
     order,
-    attributes: ['id', 'lookupId', 'email', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'fullName'],
+    attributes: ['id', 'lookupId', 'roleId', 'invited_by', 'email', 'createdAt', 'updatedAt', 'firstName', 'lastName', 'fullName'],
     include: [
       {
         model: db.Role,
         as: 'role',
         attributes: ['id', 'type'],
         required: false
+      },
+      {
+        model: db.User,
+        as: 'invitedBy',
+        attributes: ['id', 'firstName', 'lastName', 'fullName'],
+        required: false
+      },
+      {
+        model: db.Interest,
+        as: 'interests',
+        attributes: ['id', 'name'],
+        required: false,
+        include: [
+          {
+            model: db.Expertise,
+            as: 'expertises',
+            attributes: ['id', 'name'],
+            required: false
+          }
+        ]
+      },
+      {
+        model: db.Expertise,
+        as: 'expertises',
+        attributes: ['id', 'name'],
+        required: false,
+        include: [
+          {
+            model: db.Interest,
+            as: 'interests',
+            attributes: ['id', 'name'],
+            required: false
+          }
+        ]
       }
     ],
     where: {

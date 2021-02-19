@@ -42,6 +42,21 @@ module.exports = (sequelize, DataTypes) => {
       as: 'role',
       foreignKey: 'roleId'
     })
+
+    User.belongsTo(models.User, {
+      foreignKey: 'invited_by',
+      as: 'invitedBy'
+    })
+
+    User.belongsToMany(models.Interest, {
+      through: 'UserInterests',
+      as: 'interests'
+    })
+
+    User.belongsToMany(models.Expertise, {
+      through: models.UserExpertises,
+      as: 'expertises'
+    })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {
