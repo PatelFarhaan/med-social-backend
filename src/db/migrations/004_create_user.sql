@@ -19,6 +19,7 @@ CREATE TABLE "User" (
     "stripe_customer_id" character varying(150),
     payment_method jsonb,
     "notifications_seen_at" timestamptz,
+    "muted_notification_categories" character varying(64) [],
     "profile_description" character varying(150),
     "deactivatedAt" timestamptz,
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
