@@ -1,15 +1,25 @@
+const { tokenTypes } = require('../../../config/constants')
+
 module.exports = (sequelize, DataTypes) => {
   const Session = sequelize.define(
-    'session',
+    'Session',
     {
-      sid: { type: DataTypes.STRING, primaryKey: true },
-      data: { type: DataTypes.JSON },
-      expires: DataTypes.DATE
+      token: { type: DataTypes.STRING, primaryKey: true },
+      expires: DataTypes.DATE,
+      type: { type: DataTypes.ENUM(Object.values(tokenTypes)) },
+      blackListed: { type: DataTypes.BOOLEAN }
     },
     {
       freezeTableName: true
     }
   )
+
+  Session.associate = models => {
+    Session.belongsTo(models.User, {
+      as: 'user',
+      foreignKey: 'userId'
+    })
+  }
 
   return Session
 }

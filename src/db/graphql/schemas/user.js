@@ -2,23 +2,35 @@ const { gql } = require('apollo-server-express')
 
 const userSchema = gql`
   type Query {
-    getUserWithAuth(email: String!, password: String!): User
-    getUserAuthVerification(id: Int): LoggedIn
+    login(email: String!, password: String!): Session
     getUser(id: Int): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
   }
 
   type Mutation {
     updateUser(id: Int, settings: JSON!): User
-  }
-
-  type LoggedIn {
-    isLoggedIn: Boolean!
+    createUser(email: String!, firstName: String!, lastName: String!, password: String!, passwordRepeat: String!, roleId: Int!): Session
+    refreshAuth(refreshToken: String!): Session
   }
 
   type Users {
     list: [User]
     count: Int!
+  }
+
+  type Session {
+    user: User!
+    tokens: Tokens!
+  }
+
+  type Tokens {
+    access: Token
+    refresh: Token
+  }
+
+  type Token {
+    token: String
+    expires: DateTime
   }
 
   type User {
@@ -28,7 +40,11 @@ const userSchema = gql`
     fullName: String
     firstName: String
     lastName: String
-    externalId: String
+    username: String
+    profilePicture: String
+    profileDescription: String
+    isAnonymousUser: Boolean
+    notificationsSeenAt: DateTime
     settings: JSON!
   }
 `

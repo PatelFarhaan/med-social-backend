@@ -16,7 +16,6 @@ Node / ES6+ / Express / Postgres / Redis / Yarn / Apollo + GraphQL
 * JSON Rest API for user management (admin)
 * User encryption using BCrypt
 * Auth via cookies, but a token option exists, see `lib/users/retrieval`
-* Redis if needed (connected in `docker-compose` and mocked for testing, up to you on how to use it, see `lib/cache/index.js`)
 * AirBnB style syntax and ES linting
 * Configuration using environment variables
 * Prettier on precommit to verify your code style is consistent
@@ -78,21 +77,21 @@ Next, install the node modules and start the docker containers.
 
 ```
 yarn install                      # install node modules locally
-docker-compose up                 # start postgres, redis, and app containers
+docker-compose up                 # start postgres, and app containers
 ```
 
 Optional method to start docker containers and run containers in the background.
 
 ```
-docker-compose up --detach        # OPTIONAL: start postgres, redis and app containers and run in background
+docker-compose up --detach        # OPTIONAL: start postgres and app containers and run in background
 ```
 
 Other useful commands via package.json scripts.
 
 ```
 yarn run docker:test              # run unit tests in docker container
-yarn run docker:resetTestDb       # reset the mock_test database in docker container
-yarn run docker:resetDevDb        # reset the mock_development database in docker container
+yarn run docker:resetTestDb       # reset the column_test database in docker container
+yarn run docker:resetDevDb        # reset the column_development database in docker container
 ```
 
 ```
@@ -237,18 +236,6 @@ Find the postgres container then run ```docker inspect <container_id>```
 
 Search for the IP_ADDRESS and that will be your Host variable for Postgres.
 
-
-Next, in another terminal window...
-
-Setup a redis container
-
-This command will create and run the container named `some-redis`:
-
-`docker run --name some-redis -e -d -p 6379:6379 redis`
-
-If the container `some-redis` already exists, then execute the following command:
-
-`docker run -e -d -p 6379:6379 redis`
 
 Next, in another terminal window...
 

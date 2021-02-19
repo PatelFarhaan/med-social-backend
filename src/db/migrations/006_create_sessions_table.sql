@@ -1,15 +1,16 @@
 -- rambler up
 
-CREATE TABLE session (
-  "sid" varchar NOT NULL COLLATE "default",
-	"data" json NOT NULL,
+CREATE TYPE sessionTypes AS ENUM ('ACCESS', 'REFRESH', 'RESET_PASSWORD');
+
+CREATE TABLE "Session" (
+	"token" varchar NOT NULL PRIMARY KEY,
+  "userId" integer NOT NULL REFERENCES "User"("id"),
+  "type" sessionTypes,
 	"expires" timestamp(6) NOT NULL,
+  "blackListed" BOOLEAN DEFAULT FALSE,
   "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
   "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz
-)
-WITH (OIDS=FALSE);
-ALTER TABLE session ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;
-
+);
 
 -- rambler down
 
