@@ -13,15 +13,20 @@ module.exports = (sequelize, DataTypes) => {
       lastName: { type: DataTypes.STRING, field: 'last_name' },
       fullName: { type: DataTypes.STRING },
       hash: { type: DataTypes.STRING },
-      username: { type: DataTypes.STRING, unique: true, validate: { max: 150 } },
+      username: { type: DataTypes.STRING(150), unique: true },
       profilePicture: { type: DataTypes.TEXT, field: 'profile_picture' },
       isAnonymousUser: { type: DataTypes.BOOLEAN, field: 'is_anonymous_user', defaultValue: false },
       invitationLimit: { type: DataTypes.INTEGER, field: 'invitation_limit', defaultValue: 5 },
-      profileDescription: { type: DataTypes.STRING, field: 'profile_description', validate: { max: 150 } },
+      profileDescription: { type: DataTypes.STRING(150), field: 'profile_description' },
       notificationsSeenAt: { type: DataTypes.DATE, field: 'notifications_seen_at' },
       paymentMethod: { type: DataTypes.JSONB, field: 'payment_method' },
-      stripeUserId: { type: DataTypes.STRING, field: 'stripe_user_id', validate: { max: 150 } },
-      stripeCustomerId: { type: DataTypes.STRING, field: 'stripe_customer_id', validate: { max: 150 } },
+      stripeUserId: { type: DataTypes.STRING(150), field: 'stripe_user_id' },
+      stripeCustomerId: { type: DataTypes.STRING(150), field: 'stripe_customer_id' },
+      muted_notification_categories: {
+        type: DataTypes.ARRAY(DataTypes.STRING(64)),
+        allowNull: true,
+        field: 'muted_notification_categories'
+      },
       settings: types.get('settings'),
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt'),
@@ -36,6 +41,21 @@ module.exports = (sequelize, DataTypes) => {
     User.belongsTo(models.Role, {
       as: 'role',
       foreignKey: 'roleId'
+    })
+
+    User.belongsTo(models.User, {
+      foreignKey: 'invited_by',
+      as: 'invitedBy'
+    })
+
+    User.belongsToMany(models.Interest, {
+      through: 'UserInterests',
+      as: 'interests'
+    })
+
+    User.belongsToMany(models.Expertise, {
+      through: models.UserExpertises,
+      as: 'expertises'
     })
   }
   /* eslint-disable no-param-reassign */

@@ -9,7 +9,16 @@ const userSchema = gql`
 
   type Mutation {
     updateUser(id: Int, settings: JSON!): User
-    createUser(email: String!, firstName: String!, lastName: String!, password: String!, passwordRepeat: String!, roleId: Int!): Session
+    createUser(
+      email: String!
+      firstName: String!
+      lastName: String!
+      password: String!
+      passwordRepeat: String!
+      roleId: Int!
+      expertises: [Int]
+      interests: [Int]
+    ): Session
     refreshAuth(refreshToken: String!): Session
   }
 
@@ -46,6 +55,9 @@ const userSchema = gql`
     isAnonymousUser: Boolean
     notificationsSeenAt: DateTime
     settings: JSON!
+    expertises: [Expertise]
+    interests: [Interest]
+    invitedBy: [User]
   }
 `
 
