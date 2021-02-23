@@ -4,7 +4,7 @@ CREATE TYPE sessionTypes AS ENUM ('ACCESS', 'REFRESH', 'RESET_PASSWORD');
 
 CREATE TABLE "Session" (
 	"token" varchar NOT NULL PRIMARY KEY,
-  "userId" integer NOT NULL REFERENCES "User"("id"),
+  "userId" uuid NOT NULL REFERENCES "User"("id"),
   "type" sessionTypes,
 	"expires" timestamp(6) NOT NULL,
   "blackListed" BOOLEAN DEFAULT FALSE,

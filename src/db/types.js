@@ -18,14 +18,22 @@ const defaults = {
     type: sequelize.DataTypes.STRING
   },
   createdAt: {
-    type: sequelize.DataTypes.DATE
+    type: sequelize.DataTypes.DATE,
+    field: 'createdAt'
   },
   deactivatedAt: {
     type: sequelize.DataTypes.DATE,
+    field: 'deactivatedAt',
+    allowNull: true
+  },
+  deletedAt: {
+    type: sequelize.DataTypes.DATE,
+    field: 'deletedAt',
     allowNull: true
   },
   updatedAt: {
-    type: sequelize.DataTypes.DATE
+    type: sequelize.DataTypes.DATE,
+    field: 'updatedAt'
   },
   lockedAt: {
     type: sequelize.DataTypes.DATE

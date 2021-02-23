@@ -19,7 +19,7 @@ const interestSchema = gql`
     id: Int
     name: String
     createdAt: DateTime
-    expertises: [Expertise]
+    expertises(page: Int, limit: Int): [Expertise]
   }
 `
 

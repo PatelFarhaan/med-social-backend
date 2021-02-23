@@ -1,25 +1,14 @@
+const { EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize')
 const db = require('../../db/models')
 
 const LIMIT = 50
 
-const getInterest = async ({ id }) =>
-  db.Interest.findOne({
-    where: {
-      id
-    },
-    include: [
-      {
-        model: db.Expertise,
-        as: 'expertises',
-        attributes: ['id', 'name'],
-        required: false
-      }
-    ],
-    attributes: ['id', 'name', 'createdAt']
-  })
+const getInterest = async ({ id, context }) => db.Interest.findByPk(id, { [EXPECTED_OPTIONS_KEY]: context })
 
-const getInterests = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }) => {
+const getInterests = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, loaderOpts) => {
   let order = [['name', 'ASC']]
+
+  console.log(loaderOpts)
 
   const sortFilters = {
     name: direction => [['name', direction.toUpperCase()]],
@@ -34,14 +23,7 @@ const getInterests = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }) 
     limit,
     offset: limit * (page - 1),
     order,
-    include: [
-      {
-        model: db.Expertise,
-        as: 'expertises',
-        attributes: ['id', 'name'],
-        required: false
-      }
-    ],
+    ...loaderOpts,
     attributes: ['id', 'name', 'createdAt']
   })
 }

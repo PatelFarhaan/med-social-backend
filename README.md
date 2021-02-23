@@ -1,3 +1,51 @@
+# Column Graphql API
+
+## Starting the app
+
+### Dev environment
+
+* Full Docker environment (no dependencies other than docker)
+
+1. `cp .env.example .env`
+2. Build base docker image `docker build -t column/base -f `
+3. `docker-compose up --build` -> This uses the `column/base` image above
+4. `docker-compose logs -f app` (if you want to see logs of the app)
+
+* Semi-docker env (recommended if you have node installed)
+
+1. `cp .env.example .env`
+2. `docker-compose up -d db` -> Launch DB only
+3. `yarn install`
+4. `yarn dev`
+
+## Dev process
+
+1. Create a Model at `db/models`
+2. Create Migration file for that Model (if needed) at `db/migrations`
+3. Create a Service that utilise that Model at `lib/services`
+4. Create a Resolver at `db/graphql/resolvers`
+5. Create a Typedef / Schema at `db/graphql/schemas`
+
+## Very Important
+
+Graphql's biggest problem is `n+1` queries. In this repo, it was solved using the library `dataloader-sequelize`.
+
+To use this library inside the resolver,
+
+```
+...
+
+yourFunction: async (parent, args, { db, context, EXPECTED_OPTIONS_KEY }) => {{
+    ...
+    // db.Model is the model that was being used in the context
+    const list = await db.Model.findAll({ [EXPECTED_OPTIONS_KEY]: context })
+
+    // OR
+    const item = await db.Model.findByPk(args.id, { [EXPECTED_OPTIONS_KEY]: context })
+    ...
+}
+
+```
 
 # Mock Node+GraphQL Server
 
@@ -35,27 +83,6 @@ Node / ES6+ / Express / Postgres / Redis / Yarn / Apollo + GraphQL
 * `src/middleware` - Middleware libs
 * `src/db` - Sequelize Directory (Postgres, Migrations, configs)
 * `src/index.js` - Entrypoint into API (does not bind, so can be used in unit tests)
-
-## API Routes
-
-All routes are name spaced with a v1 version:
-
-```
-POST    /v1/users                                               # Create user (signup)
-POST    /v1/users/sessions                                      # Create session cookies or option of jwt (login)
-GET     /v1/users/self                                          # Get my user info
-DELETE  /v1/users/self                                          # Delete my account
-POST    /v1/users/self                                          # Update my account
-POST    /v1/users/password/forgot                               # Get forgot password token
-GET     /v1/users                                               # Admin: Search/List users
-GET     /v1/users/:user_id                                      # Admin: Get user
-DELETE  /v1/users/:user_id                                      # Admin: Delete user
-POST    /v1/users/:user_id                                      # Admin: Update user
-```
-
-When creating a new route, always use catchErrors HOC in utils/asyncErrorHandler.
-See api/v1/users/index.js to see how its used. Basically wrap it around the request function.
-Will bubble any errors to the response handler.
 
 ## Database Structure
 

@@ -2,7 +2,7 @@
 
 CREATE TABLE "UserInterests" (
     "InterestId" integer NOT NULL REFERENCES "Interest"("id"),
-    "UserId" integer NOT NULL REFERENCES "User"("id"),
+    "UserId" uuid NOT NULL REFERENCES "User"("id"),
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
     "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz
 );
