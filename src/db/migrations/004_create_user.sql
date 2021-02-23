@@ -1,7 +1,8 @@
 -- rambler up
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE "User" (
-    id uuid NOT NULL PRIMARY KEY,
+    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
     "lookupId" character varying(255) UNIQUE,
     email character varying(255) NOT NULL,
     "first_name" character varying(255),
