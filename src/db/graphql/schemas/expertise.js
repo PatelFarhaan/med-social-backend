@@ -3,7 +3,8 @@ const { gql } = require('apollo-server-express')
 const expertiseSchema = gql`
   type Query {
     getExpertise(id: Int): Expertise
-    getExpertises(page: Int, limit: Int, sortBy: String, sortDirection: String): Expertises
+    getExpertises(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Expertises
+    searchExpertises(query: String): [Expertise]
   }
 
   type Mutation {

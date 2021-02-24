@@ -1,0 +1,11 @@
+-- rambler up
+-- USE This for POST CONTENT
+-- ALTER TABLE "Expertise" ADD COLUMN IF NOT EXISTS "ExpertiseName" TSVECTOR;
+-- UPDATE "Expertise" SET "ExpertiseName" = to_tsvector('english', 'name');
+-- CREATE INDEX IF NOT EXISTS expertise_search_idx ON "Expertise" USING gin("ExpertiseName");
+-- CREATE TRIGGER expertise_vector_update BEFORE INSERT OR UPDATE ON "Expertise" FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger("ExpertiseName", 'pg_catalog.english', 'name');
+
+-- rambler down
+-- ALTER TABLE "Expertise" DROP COLUMN "ExpertiseName" TSVECTOR;
+-- DROP INDEX expertise_search_idx ON "Expertise";
+-- DROP TRIGGER expertise_vector_update ON "Expertise";
