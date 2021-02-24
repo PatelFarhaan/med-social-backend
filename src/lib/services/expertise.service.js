@@ -4,7 +4,7 @@ const LIMIT = 50
 
 const getExpertise = async ({ id }, loaderOpts) => db.Expertise.findByPk(id, loaderOpts)
 
-const getExpertises = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, loaderOpts) => {
+const getExpertises = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, includeNonApproved }, loaderOpts) => {
   let order = [['name', 'ASC']]
 
   const sortFilters = {
@@ -16,7 +16,14 @@ const getExpertises = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
     order = sortFilters[sortBy](sortDirection)
   }
 
+  const query = {}
+
+  if (!includeNonApproved) {
+    query.where = { isApproved: true }
+  }
+
   return db.Expertise.findAndCountAll({
+    query,
     limit,
     offset: limit * (page - 1),
     order,

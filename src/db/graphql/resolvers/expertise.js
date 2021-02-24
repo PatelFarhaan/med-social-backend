@@ -16,6 +16,10 @@ module.exports = {
         list: expertises,
         count: expertises.length
       }
+    },
+    searchExpertises: async (_parent, { query }, { db }) => {
+      const expertises = await db.Expertise.search(query)
+      return expertises[0]
     }
   },
   Mutation: {

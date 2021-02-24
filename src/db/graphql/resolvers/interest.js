@@ -16,6 +16,10 @@ module.exports = {
         list: interests,
         count: interests.length
       }
+    },
+    searchInterests: async (_parent, { query }, { db }) => {
+      const interests = await db.Interest.search(query)
+      return interests[0]
     }
   },
   Mutation: {

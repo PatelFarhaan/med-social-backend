@@ -4,6 +4,7 @@ const interestSchema = gql`
   type Query {
     getInterests(page: Int, limit: Int, sortBy: String, sortDirection: String): Interests
     getInterest(id: Int): Interest
+    searchInterests(query: String): [Interest]
   }
 
   type Mutation {

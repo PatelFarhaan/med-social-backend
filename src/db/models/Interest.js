@@ -14,6 +14,18 @@ module.exports = (sequelize, DataTypes) => {
     }
   )
 
+  Interest.search = query => {
+    if (sequelize.options.dialect !== 'postgres') {
+      console.log('Search is only implemented on POSTGRES database')
+      return
+    }
+
+    query = query.toLowerCase()
+
+    // eslint-disable-next-line consistent-return
+    return sequelize.query(`SELECT * FROM "${Interest.tableName}" WHERE LOWER("name") LIKE '%${query}%'`, Interest)
+  }
+
   Interest.associate = models => {
     Interest.belongsToMany(models.Expertise, {
       through: 'Multipotentiality',
