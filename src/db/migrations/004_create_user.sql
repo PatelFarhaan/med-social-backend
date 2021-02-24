@@ -1,7 +1,8 @@
 -- rambler up
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE "User" (
-    id serial NOT NULL PRIMARY KEY,
+    id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
     "lookupId" character varying(255) UNIQUE,
     email character varying(255) NOT NULL,
     "first_name" character varying(255),
@@ -10,7 +11,7 @@ CREATE TABLE "User" (
     name character varying(255),
     hash character varying(255),
     "roleId" integer NOT NULL REFERENCES "Role"("id"),
-    "invited_by" integer REFERENCES "User"("id"),
+    "invited_by" uuid REFERENCES "User"("id"),
     settings jsonb NOT NULL DEFAULT '{}',
     "username" character varying(150),
     "profile_picture" text,

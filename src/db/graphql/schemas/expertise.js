@@ -18,7 +18,7 @@ const expertiseSchema = gql`
   type Expertise {
     id: Int
     name: String!
-    interests: [Interest]
+    interests(page: Int, limit: Int): [Interest]
   }
 
   type Expertises {

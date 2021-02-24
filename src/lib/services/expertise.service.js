@@ -2,23 +2,9 @@ const db = require('../../db/models')
 
 const LIMIT = 50
 
-const getExpertise = async ({ id }) =>
-  db.Expertise.findOne({
-    where: {
-      id
-    },
-    include: [
-      {
-        model: db.Interest,
-        as: 'interests',
-        attributes: ['id', 'name'],
-        required: false
-      }
-    ],
-    attributes: ['id', 'name', 'createdAt']
-  })
+const getExpertise = async ({ id }, loaderOpts) => db.Expertise.findByPk(id, loaderOpts)
 
-const getExpertises = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }) => {
+const getExpertises = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, loaderOpts) => {
   let order = [['name', 'ASC']]
 
   const sortFilters = {
@@ -34,14 +20,7 @@ const getExpertises = async ({ page = 1, limit = LIMIT, sortBy, sortDirection })
     limit,
     offset: limit * (page - 1),
     order,
-    include: [
-      {
-        model: db.Interest,
-        as: 'interests',
-        attributes: ['id', 'name'],
-        required: false
-      }
-    ],
+    ...loaderOpts,
     attributes: ['id', 'name', 'createdAt']
   })
 }

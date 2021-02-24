@@ -2,7 +2,7 @@
 
 CREATE TABLE "UserExpertises" (
     "ExpertiseId" integer NOT NULL REFERENCES "Expertise"("id"),
-    "UserId" integer NOT NULL REFERENCES "User"("id"),
+    "UserId" uuid NOT NULL REFERENCES "User"("id"),
     "totalPoints" integer DEFAULT 0,
     "isPrimary" boolean,
     "isSecondary" boolean,

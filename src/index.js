@@ -15,6 +15,7 @@ const { fileLoader, mergeTypes, mergeResolvers } = require('merge-graphql-schema
 const { ApolloServer } = require('apollo-server-express')
 const AdminBro = require('admin-bro')
 const AdminBroSequelize = require('@admin-bro/sequelize')
+const { createContext, EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize')
 
 AdminBro.registerAdapter(AdminBroSequelize)
 const AdminBroExpress = require('@admin-bro/express')
@@ -93,10 +94,15 @@ passport.use('jwt', jwtStrategy)
 const apolloServer = new ApolloServer({
   schema: schemas,
   resolvers,
-  context: async ({ req }) => ({
-    req,
-    db
-  })
+  context: async ({ req }) => {
+    const context = createContext(db.sequelize)
+    return {
+      req,
+      db,
+      context,
+      EXPECTED_OPTIONS_KEY
+    }
+  }
 })
 
 apolloServer.applyMiddleware({ app, cors: { origin } })
