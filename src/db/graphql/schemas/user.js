@@ -18,6 +18,7 @@ const userSchema = gql`
       roleId: Int!
       expertises: [Int]
       interests: [Int]
+      token: String!
     ): Session
     refreshAuth(refreshToken: String!): Session
   }

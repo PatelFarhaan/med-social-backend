@@ -3,7 +3,7 @@ const moment = require('moment')
 const config = require('../../../config/config')
 const { getUser } = require('../users/retrieval')
 const db = require('../../db/models')
-const { tokenTypes } = require('../../../config/constants')
+const { tokenTypes } = require('../constants/token.constant')
 
 const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
   const payload = {

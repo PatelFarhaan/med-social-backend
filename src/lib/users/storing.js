@@ -3,14 +3,20 @@ const jwt = require('jsonwebtoken')
 
 const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
+const { states } = require('../constants/invitation.constant')
 
 const BCRYPT_SALT_ROUNDS = 10
 
-const signup = async ({ body = {}, User = db.User }) => {
-  const { email, password, interests, expertises, passwordRepeat, roleId } = body
+const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation }) => {
+  const { email, password, interests, expertises, passwordRepeat, roleId = 3, token } = body
 
-  if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
-  const user = await User.build(body)
+  // if (!token) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
+  const invitation = await Invitation.findOne({ where: { token, state: states.APPROVED } })
+
+  if (!invitation) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
+
+  // if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
+  const user = await User.build({ ...body, roleId })
 
   // Check if user email is unique
   if ((await User.count({ where: { email } })) > 0) {
@@ -36,6 +42,9 @@ const signup = async ({ body = {}, User = db.User }) => {
     const dbExpertises = await db.Expertise.findAll({ where: { id: expertises } })
     await savedUser.addExpertise(dbExpertises)
   }
+
+  invitation.state = states.COMPLETED
+  invitation.save()
 
   return savedUser
 }

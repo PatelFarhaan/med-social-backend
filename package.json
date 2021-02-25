@@ -38,6 +38,7 @@
     "apollo-server-express": "^2.4.8",
     "apollo-server-testing": "^2.4.8",
     "babel-eslint": "^10.0.1",
+    "base64url": "^3.0.1",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.13.3",
     "chance": "^1.0.18",
@@ -72,7 +73,8 @@
     "sequelize": "^5.3.0",
     "socket.io": "^2.1.1",
     "stripe": "^8.137.0",
-    "supertest-session": "^3.3.0"
+    "supertest-session": "^3.3.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@mapbox/node-pre-gyp": "1.0.0",
