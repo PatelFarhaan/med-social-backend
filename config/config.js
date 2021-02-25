@@ -17,5 +17,12 @@ module.exports = {
       }
     },
     from: process.env.EMAIL_FROM
+  },
+  stripe: {
+    secret: process.env.STRIPE_SECRET_KEY,
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+    endpointSecret: process.env.STRIPE_ENDPOINT_SECRET,
+    currency: process.env.STRIPE_CURRENCY,
+    applicationFeePercentage: process.env.STRIPE_APPLICATION_FEE_PERCENTAGE
   }
 }
