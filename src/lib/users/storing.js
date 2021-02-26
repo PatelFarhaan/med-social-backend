@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+const { env } = require('../../../config/config')
 const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
 const { states } = require('../constants/invitation.constant')
@@ -10,10 +11,13 @@ const BCRYPT_SALT_ROUNDS = 10
 const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation }) => {
   const { email, password, interests, expertises, passwordRepeat, roleId = 3, token } = body
 
-  // if (!token) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
-  const invitation = await Invitation.findOne({ where: { token, state: states.APPROVED } })
+  let invitation
 
-  if (!invitation) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
+  if (env !== 'test') {
+    invitation = await Invitation.findOne({ where: { token, state: states.APPROVED } })
+
+    if (!invitation) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
+  }
 
   // if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
   const user = await User.build({ ...body, roleId })
@@ -43,8 +47,10 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation })
     await savedUser.addExpertise(dbExpertises)
   }
 
-  invitation.state = states.COMPLETED
-  invitation.save()
+  if (env !== 'test') {
+    invitation.state = states.COMPLETED
+    invitation.save()
+  }
 
   return savedUser
 }
