@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       type: { type: DataTypes.ENUM(Object.values(invitationTypes)), defaultValue: invitationTypes.REGULAR },
       reason: { type: DataTypes.STRING(50), allowNull: true },
       note: { type: DataTypes.STRING(134), allowNull: true },
+      samplePosts: { type: DataTypes.JSONB, field: 'sample_posts', allowNull: true },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt')
     },

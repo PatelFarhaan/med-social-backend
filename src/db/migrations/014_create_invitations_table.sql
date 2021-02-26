@@ -21,6 +21,7 @@ CREATE TABLE "Invitation" (
     "created_by" uuid REFERENCES "User"("id"),
     "approved_by" uuid REFERENCES "User"("id"),
     "expires_at" timestamptz,
+    "sample_posts" jsonb NOT NULL DEFAULT '{}',
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
     "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz
 );

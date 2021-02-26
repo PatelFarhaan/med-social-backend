@@ -6,8 +6,28 @@ const invitationSchema = gql`
     getInvitations(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Invitations
   }
 
+  input SamplePostsInput {
+    title: String
+    content: String
+  }
+
+  enum invitationTypes {
+    REGULAR
+    PAID
+    FELLOW
+  }
+
   type Mutation {
-    requestInvitation(firstName: String!, lastName: String!, email: String!, expertise: String!): Invitation
+    requestInvitation(
+      firstName: String!
+      lastName: String!
+      email: String!
+      expertise: String!
+      note: String
+      special: Boolean
+      samplePosts: [SamplePostsInput]
+      type: invitationTypes
+    ): Invitation
     approveInvitation(email: String!): Invitation
   }
 

@@ -27,21 +27,31 @@ const getInvitations = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }
 }
 
 const createInvitation = async (
-  { firstName, lastName, email, expertise },
+  { firstName, lastName, email, expertise, samplePosts, note, special, type },
   Invitation = db.Invitation,
   User = db.User,
   Expertise = db.Expertise
 ) => {
   const existingUser = await User.findOne({ where: { email } })
   if (existingUser) {
-    throw new Error('User already existing')
+    throw new Error(JSON.stringify({ status: 400, message: 'User already exists' }))
   }
+
+  const existingInvitation = await Invitation.findOne({ where: { email, type } })
+  if (existingInvitation) {
+    throw new Error(JSON.stringify({ status: 400, message: 'Invitation already exists' }))
+  }
+
   let invitation
   try {
     invitation = await Invitation.create({
       firstName,
       lastName,
-      email
+      email,
+      samplePosts,
+      note,
+      special,
+      type
     })
 
     const existingExpertise = await Expertise.findOne({ where: { name: expertise } })
@@ -60,7 +70,7 @@ const createInvitation = async (
 const approveInvitation = async (email, user, Invitation = db.Invitation) => {
   const invitation = await Invitation.findOne({ where: { email } })
   if (!invitation) {
-    throw new Error('Invitation not found')
+    throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
   }
 
   let savedInvitation
