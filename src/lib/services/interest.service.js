@@ -1,5 +1,6 @@
 const { EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize')
 const db = require('../../db/models')
+const logger = require('../utils/logger')
 
 const LIMIT = 50
 
@@ -30,8 +31,13 @@ const getInterests = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, 
 
 const createInterest = async ({ body: { name }, Interest = db.Interest }) => {
   const interest = await Interest.build({ name })
-  // Save
-  const savedInterest = await interest.save()
+  let savedInterest
+  try {
+    savedInterest = await interest.save()
+  } catch (e) {
+    logger.warn(`createInterest ${e}`)
+    throw e
+  }
 
   return savedInterest
 }

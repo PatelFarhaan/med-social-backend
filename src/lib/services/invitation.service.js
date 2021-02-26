@@ -1,5 +1,6 @@
 const db = require('../../db/models')
 const { states } = require('../constants/invitation.constant')
+const logger = require('../utils/logger')
 
 const LIMIT = 50
 
@@ -35,19 +36,23 @@ const createInvitation = async (
   if (existingUser) {
     throw new Error('User already existing')
   }
+  let invitation
+  try {
+    invitation = await Invitation.create({
+      firstName,
+      lastName,
+      email
+    })
 
-  const invitation = await Invitation.create({
-    firstName,
-    lastName,
-    email
-  })
+    const existingExpertise = await Expertise.findOne({ where: { name: expertise } })
 
-  const existingExpertise = await Expertise.findOne({ where: { name: expertise } })
+    const invitationExpertise = existingExpertise || (await Expertise.create({ name: expertise }))
 
-  const invitationExpertise = existingExpertise || (await Expertise.create({ name: expertise }))
-
-  invitation.addExpertise(invitationExpertise)
-  invitation.save()
+    invitation.addExpertise(invitationExpertise)
+    invitation.save()
+  } catch (e) {
+    logger.warn(`createInvitation ${e}`)
+  }
 
   return invitation
 }
@@ -58,7 +63,14 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
     throw new Error('Invitation not found')
   }
 
-  const savedInvitation = await invitation.approve(user)
+  let savedInvitation
+  try {
+    savedInvitation = await invitation.approve(user)
+  } catch (e) {
+    logger.warn(`savedInvitation ${e}`)
+    throw e
+  }
+
   return savedInvitation
 }
 

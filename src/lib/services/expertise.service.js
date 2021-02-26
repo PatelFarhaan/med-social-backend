@@ -1,4 +1,5 @@
 const db = require('../../db/models')
+const logger = require('../utils/logger')
 
 const LIMIT = 50
 
@@ -33,9 +34,15 @@ const getExpertises = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, i
 }
 
 const createExpertise = async ({ body: { name, interests }, Expertise = db.Expertise }) => {
-  const expertise = await Expertise.create({ name })
-  const dbInterests = await db.Interest.findAll({ where: { id: interests } })
-  await expertise.addInterest(dbInterests)
+  let expertise
+  try {
+    expertise = await Expertise.create({ name })
+    const dbInterests = await db.Interest.findAll({ where: { id: interests } })
+    await expertise.addInterest(dbInterests)
+  } catch (e) {
+    logger.warn(`createExpertise: ${e}`)
+    throw e
+  }
   return expertise
 }
 
