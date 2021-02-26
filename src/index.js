@@ -21,6 +21,7 @@ AdminBro.registerAdapter(AdminBroSequelize)
 const AdminBroExpress = require('@admin-bro/express')
 
 const { jwtStrategy } = require('./middleware/passport')
+const logger = require('./lib/utils/logger')
 
 const db = require('./db/models/')
 // Top level middleware that will run before any route specific middleware
@@ -76,7 +77,7 @@ const jsonErrorHandler = (err, _req, res, next) => {
 
   // FIXME: This silences test logs and only sends logs in prod when something goes 'bad'
   if (process.env.NODE_ENV !== 'test' && (!error.status || error.status === 400 || error.status >= 500)) {
-    console.log(`APP ERROR: ${error.message === 'TENANT NOT FOUND' ? 'Bad request' : err.stack}`)
+    logger.info(`APP ERROR: ${error.message === 'RESOURCE NOT FOUND' ? 'Bad request' : err.stack}`)
   }
 
   return res.status(error.status || 400).send({
@@ -127,8 +128,8 @@ const initApp = async () => {
 
 const bindApp = async appToBind => {
   appToBind.server.listen(process.env.MOCK_SERVER_PORT, process.env.MOCK_SERVER_HOST, () => {
-    console.log(`🚀 Server ready at http://localhost:3005`)
-    console.log(`🚀 GraphQL Server ready at http://localhost:3005${apolloServer.graphqlPath}`)
+    logger.info('🚀 Server ready at http://localhost:3005')
+    logger.info(`🚀 GraphQL Server ready at http://localhost:3005${apolloServer.graphqlPath}`)
   })
 }
 

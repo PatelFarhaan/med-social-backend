@@ -74,7 +74,8 @@
     "socket.io": "^2.1.1",
     "stripe": "^8.137.0",
     "supertest-session": "^3.3.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@mapbox/node-pre-gyp": "1.0.0",
