@@ -11,7 +11,8 @@ const getUserDefaults = async () => {
     passwordRepeat: 'hello',
     firstName: 'Sam',
     lastName: 'Dev',
-    roleId: adminRole.id
+    roleId: adminRole.id,
+    token: 'ABCSD'
   }
 }
 

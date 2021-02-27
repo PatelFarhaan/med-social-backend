@@ -51,6 +51,11 @@ module.exports = (sequelize, DataTypes) => {
       through: 'Multipotentiality',
       as: 'interests'
     })
+
+    Expertise.belongsToMany(models.Invitation, {
+      through: 'InvitationExpertises',
+      as: 'invitations'
+    })
   }
 
   return Expertise

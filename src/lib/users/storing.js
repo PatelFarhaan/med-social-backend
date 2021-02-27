@@ -1,16 +1,27 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+const { env } = require('../../../config/config')
 const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
+const { states } = require('../constants/invitation.constant')
+const logger = require('../utils/logger')
 
 const BCRYPT_SALT_ROUNDS = 10
 
-const signup = async ({ body = {}, User = db.User }) => {
-  const { email, password, interests, expertises, passwordRepeat, roleId } = body
+const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation }) => {
+  const { email, password, interests, expertises, passwordRepeat, roleId = 3, token } = body
 
-  if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
-  const user = await User.build(body)
+  let invitation
+
+  if (env !== 'test') {
+    invitation = await Invitation.findOne({ where: { token, state: states.APPROVED } })
+
+    if (!invitation) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
+  }
+
+  // if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
+  const user = await User.build({ ...body, roleId })
 
   // Check if user email is unique
   if ((await User.count({ where: { email } })) > 0) {
@@ -24,19 +35,28 @@ const signup = async ({ body = {}, User = db.User }) => {
   const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS)
   user.hash = await bcrypt.hash(password, salt)
 
-  // Save
-  const savedUser = await user.save()
+  let savedUser
+  try {
+    // Save
+    savedUser = await user.save()
 
-  if (interests) {
-    const dbInterests = await db.Interest.findAll({ where: { id: interests } })
-    await savedUser.addInterest(dbInterests)
+    if (interests) {
+      const dbInterests = await db.Interest.findAll({ where: { id: interests } })
+      await savedUser.addInterest(dbInterests)
+    }
+
+    if (expertises) {
+      const dbExpertises = await db.Expertise.findAll({ where: { id: expertises } })
+      await savedUser.addExpertise(dbExpertises)
+    }
+
+    if (env !== 'test') {
+      invitation.state = states.COMPLETED
+      invitation.save()
+    }
+  } catch (e) {
+    logger.warn(`signup ${e}`)
   }
-
-  if (expertises) {
-    const dbExpertises = await db.Expertise.findAll({ where: { id: expertises } })
-    await savedUser.addExpertise(dbExpertises)
-  }
-
   return savedUser
 }
 
@@ -135,13 +155,22 @@ const updateUser = async (userId, body) => {
   }
 
   rawUser.set(body)
-  await rawUser.save()
+  try {
+    await rawUser.save()
+  } catch (e) {
+    logger.warn(`updateUser ${e}`)
+  }
   return rawUser
 }
 
 const updatePrimaryUserRole = async (userId, roleId) => {
   const user = await db.User.findOne({ where: { id: userId } })
-  await user.update({ roleId })
+  try {
+    await user.update({ roleId })
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+
   return db.User.findOne({
     where: { id: userId },
     include: [

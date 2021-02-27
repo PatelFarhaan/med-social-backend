@@ -3,7 +3,7 @@ const { authenticate, getUsers, exportSafeUser, signup } = require('../../../lib
 const { tokenService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
-const { tokenTypes } = require('../../../../config/constants')
+const { tokenTypes } = require('../../../lib/constants/token.constant')
 
 const getUserSettings = async userSettings => {
   const defaultSettings = await getTenantSettings('user.defaults')

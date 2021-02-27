@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken')
 const includes = require('lodash/includes')
 
 const { getTenantSetting } = require('../settings')
-
 const db = require('../../db/models')
 
 const LIMIT = 20

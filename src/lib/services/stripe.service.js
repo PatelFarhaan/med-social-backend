@@ -2,6 +2,7 @@ const Stripe = require('stripe')
 const {
   stripe: { secretKey, currency, applicationFeePercentage }
 } = require('../../../config/config')
+const logger = require('../utils/logger')
 
 const stripe = Stripe(secretKey)
 
@@ -23,6 +24,7 @@ const createPrice = async column => {
       }
     })
   } catch (e) {
+    logger.warn(`createPrice ${e}`)
     throw e
   }
 }
@@ -31,6 +33,7 @@ const retrivePrice = async stripePriceId => {
   try {
     return stripe.prices.retrieve(stripePriceId)
   } catch (e) {
+    logger.warn(`retrivePrice ${e}`)
     throw e
   }
 }
@@ -47,6 +50,7 @@ const createCustomer = async (user, paymentData) => {
       }
     })
   } catch (e) {
+    logger.warn(`createCustomer ${e}`)
     throw e
   }
 }
@@ -56,6 +60,7 @@ const deleteCustomer = async user => {
     try {
       return stripe.customers.del(user.stripeCustomerId)
     } catch (e) {
+      logger.warn(`deleteCustomer ${e}`)
       throw e
     }
   }
@@ -67,6 +72,7 @@ const deleteStripeConnectedAccount = async user => {
     try {
       return stripe.accounts.del(user.stripeUserId)
     } catch (e) {
+      logger.warn(`deleteStripeConnectedAccount ${e}`)
       throw e
     }
   }
@@ -78,6 +84,7 @@ const deletePaymentMethod = async user => {
     try {
       return stripe.paymentMethods.detach(user.paymentMethod.id)
     } catch (e) {
+      logger.warn(`deletePaymentMethod ${e}`)
       throw e
     }
   }
@@ -103,6 +110,7 @@ const updatePaymentMethod = async (user, paymentData) => {
       paymentData
     }
   } catch (e) {
+    logger.warn(`updatePaymentMethod ${e}`)
     throw e
   }
 }
@@ -125,6 +133,7 @@ const subscribe = async (stripeCustomerId, priceId, stripeUserId) => {
       ]
     })
   } catch (e) {
+    logger.warn(`subscribe ${e}`)
     throw e
   }
 }
@@ -133,6 +142,7 @@ const unsubscribe = async stripeSubscriptionId => {
   try {
     return stripe.subscriptions.del(stripeSubscriptionId)
   } catch (e) {
+    logger.warn(`unsubscribe ${e}`)
     throw e
   }
 }

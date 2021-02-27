@@ -1,0 +1,11 @@
+-- rambler up
+
+CREATE TABLE "InvitationExpertises" (
+    "InvitationId" integer NOT NULL REFERENCES "Invitation"("id"),
+    "ExpertiseId" integer NOT NULL REFERENCES "Expertise"("id"),
+    "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
+    "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz
+);
+
+-- rambler down
+DROP TABLE "InvitationExpertises";
