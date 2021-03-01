@@ -1,6 +1,10 @@
 const db = require('../../db/models')
+const {
+  stripe: { paidSubscriptionPriceId }
+} = require('../../../config/config')
 const { states } = require('../constants/invitation.constant')
 const logger = require('../utils/logger')
+const stripeService = require('./stripe.service')
 
 const LIMIT = 50
 
@@ -37,7 +41,7 @@ const createInvitation = async (
     throw new Error(JSON.stringify({ status: 400, message: 'User already exists' }))
   }
 
-  const existingInvitation = await Invitation.findOne({ where: { email, type } })
+  const existingInvitation = await Invitation.findOne({ where: { email, type, state: states.PENDING } })
   if (existingInvitation) {
     throw new Error(JSON.stringify({ status: 400, message: 'Invitation already exists' }))
   }
@@ -84,9 +88,64 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
   return savedInvitation
 }
 
+const payForApproval = async (paymentMethod, email, Invitation = db.Invitation, Subscription = db.Subscription) => {
+  try {
+    const invitation = await Invitation.findOne({ where: { email, state: states.PENDING } })
+    if (!invitation) {
+      throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
+    }
+
+    const stripeCustomer = await stripeService.createCustomer({ email }, paymentMethod)
+
+    await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
+
+    const stripeSubscription = await stripeService.createSubscription(stripeCustomer.id, paidSubscriptionPriceId)
+
+    if (stripeSubscription.latest_invoice.payment_intent.status !== 'cancelled') {
+      const approvedInvitation = await invitation.approve()
+
+      const subscription = await Subscription.create({
+        paymentMethod,
+        paymentGateway: 'STRIPE',
+        type: 'PAID_INVITATION',
+        customerId: stripeCustomer.id,
+        subscriptionId: stripeSubscription.id,
+        email
+      })
+
+      await approvedInvitation.setSubscription(subscription)
+
+      return {
+        subscription: stripeSubscription,
+        token: approvedInvitation.token
+      }
+    }
+    return {
+      subscription: stripeSubscription,
+      token: null
+    }
+  } catch (e) {
+    logger.info(`payForApproval ${e}`)
+    throw e
+  }
+}
+
+const resendInvitationEmail = async ({ email }, loaderOpts) => {
+  const invitation = await db.Invitation.findOne({ where: { email, state: states.APPROVED } }, loaderOpts)
+  if (!invitation) {
+    throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
+  }
+
+  return {
+    status: 204
+  }
+}
+
 module.exports = {
   createInvitation,
   approveInvitation,
   getInvitations,
-  getInvitation
+  getInvitation,
+  payForApproval,
+  resendInvitationEmail
 }

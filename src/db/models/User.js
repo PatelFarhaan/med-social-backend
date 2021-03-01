@@ -57,6 +57,11 @@ module.exports = (sequelize, DataTypes) => {
       through: models.UserExpertises,
       as: 'expertises'
     })
+
+    User.belongsToMany(models.Subscription, {
+      through: 'UserSubscriptions',
+      as: 'subscriptions'
+    })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {

@@ -26,6 +26,10 @@ module.exports = {
     approveInvitation: async (_parent, { email }, { _req }) => {
       const invitation = await invitationService.approveInvitation(email)
       return exportSafeModel(invitation)
+    },
+    payForApproval: async (_parent, body) => {
+      const invitation = await invitationService.payForApproval(body)
+      return invitation
     }
   },
   Invitation: {

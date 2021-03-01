@@ -7,7 +7,7 @@
 * Full Docker environment (no dependencies other than docker)
 
 1. `cp .env.example .env`
-2. Build base docker image `docker build -t column/base -f `
+2. Build base docker image `docker build -t column/base -f Dockerfile.base .`
 3. `docker-compose up --build` -> This uses the `column/base` image above
 4. `docker-compose logs -f app` (if you want to see logs of the app)
 

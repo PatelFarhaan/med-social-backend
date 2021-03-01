@@ -57,6 +57,10 @@ module.exports = (sequelize, DataTypes) => {
     //   as: 'column'
     // })
 
+    Invitation.belongsTo(models.Subscription, {
+      as: 'subscription'
+    })
+
     Invitation.belongsTo(models.User, {
       as: 'createdBy',
       foreignKey: 'created_by'

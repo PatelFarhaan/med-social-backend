@@ -29,6 +29,98 @@ const invitationSchema = gql`
       type: invitationTypes
     ): Invitation
     approveInvitation(email: String!): Invitation
+    payForApproval(paymentMethod: StripePaymentMethod!, email: String!): Approval
+  }
+
+  input StripeCard {
+    last4: String!
+    exp_month: String!
+    brand: String
+  }
+
+  input StripeBillingDetails {
+    name: String
+  }
+
+  input StripePaymentMethod {
+    id: String!
+    card: StripeCard
+    billing_details: StripeBillingDetails
+  }
+
+  type StripeSubscriptionItemData {
+    id: String
+    object: String
+    created: DateTime
+    currency: String
+  }
+
+  type StripeSubscriptionItem {
+    object: String
+    data: StripeSubscriptionItemData
+  }
+
+  type StripePaymentIntent {
+    id: String
+    object: String
+    amount: Int
+    amount_capturable: Int
+    amount_received: Int
+    application_fee_amount: Int
+    cancelled_at: DateTime
+    cancellation_reason: String
+    capture_method: String
+    client_secret: String
+    confirmationMethod: String
+    created: DateTime
+    currency: String
+    livemode: Boolean
+    payment_method_types: [String]
+    status: String
+    setup_future_usage: String
+  }
+
+  type StripeInvoice {
+    id: String
+    object: String
+    account_country: String
+    account_name: String
+    amount_due: Int
+    amount_paid: Int
+    amount_remaining: Int
+    application_fee_amount: Int
+    attempt_count: Int
+    payment_intent: StripePaymentIntent
+    livemode: Boolean
+    paid: Boolean
+    period_end: DateTime
+    period_start: DateTime
+    status: String
+    total: Int
+    subtotal: Int
+  }
+
+  type StripeSubscription {
+    id: String
+    object: String
+    application_fee_percent: Int
+    billing_cycle_anchor: DateTime
+    collection_method: String
+    created: DateTime
+    current_period_end: DateTime
+    current_period_start: DateTime
+    customer: String
+    default_payment_method: String
+    items: [StripeSubscriptionItem]
+    latest_invoice: StripeInvoice
+    livemode: Boolean
+    start_date: DateTime
+    status: String
+  }
+
+  type Approval {
+    subscription: StripeSubscription
+    token: String
   }
 
   type Invitations {

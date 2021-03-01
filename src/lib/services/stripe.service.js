@@ -1,17 +1,17 @@
 const Stripe = require('stripe')
 const {
-  stripe: { secretKey, currency, applicationFeePercentage }
+  stripe: { secretKey, currency, applicationFeePercentage, endpointSecret }
 } = require('../../../config/config')
 const logger = require('../utils/logger')
 
 const stripe = Stripe(secretKey)
 
-const createPrice = async column => {
+const createPrice = async (column, interval = 'month') => {
   try {
     return stripe.prices.create({
       unit_amount: column.price * 100,
       currency,
-      recurring: { interval: 'month' },
+      recurring: { interval },
       product_data: {
         name: column.name,
         metadata: {
@@ -43,7 +43,7 @@ const createCustomer = async (user, paymentData) => {
     return stripe.customers.create({
       payment_method: paymentData.payment_method_id,
       name: paymentData.payment_name,
-      metadata: { user_id: user.id },
+      // metadata: { user_id: user.id },
       email: user.email,
       invoice_settings: {
         default_payment_method: paymentData.payment_method_id
@@ -115,7 +115,49 @@ const updatePaymentMethod = async (user, paymentData) => {
   }
 }
 
-const attachPaymentMethod = async (user, paymentData) => (user.stripeCustomerId ? createCustomer(user, paymentData) : updatePaymentMethod)
+const attachPaymentMethodToUser = async (user, paymentData) =>
+  user.stripeCustomerId ? createCustomer(user, paymentData) : updatePaymentMethod
+
+const attachPaymentMethod = async (customerId, paymentData) => {
+  try {
+    await stripe.paymentMethods.attach(paymentData.payment_method_id, {
+      customer: customerId
+    })
+  } catch (e) {
+    logger.warn(`updatePaymentMethod ${e}`)
+    throw e
+  }
+}
+
+const listPaymentMethods = async customerId => {
+  try {
+    return stripe.paymentMethods.list({
+      customer: customerId,
+      // Card is the only supported type for now
+      type: 'card'
+    })
+  } catch (e) {
+    logger.warn(`listPaymentMethods ${e}`)
+    throw e
+  }
+}
+
+const createSubscription = async (stripeCustomerId, priceId) => {
+  try {
+    return stripe.subscriptions.create({
+      customer: stripeCustomerId,
+      expand: ['latest_invoice.payment_intent'],
+      items: [
+        {
+          price: priceId
+        }
+      ]
+    })
+  } catch (e) {
+    logger.warn(`subscribe ${e}`)
+    throw e
+  }
+}
 
 const subscribe = async (stripeCustomerId, priceId, stripeUserId) => {
   try {
@@ -147,6 +189,8 @@ const unsubscribe = async stripeSubscriptionId => {
   }
 }
 
+const createEvent = async (body, headers) => stripe.webhooks.constructEvent(body, headers, endpointSecret)
+
 module.exports = {
   createPrice,
   retrivePrice,
@@ -155,7 +199,11 @@ module.exports = {
   deleteStripeConnectedAccount,
   deletePaymentMethod,
   updatePaymentMethod,
-  attachPaymentMethod,
+  attachPaymentMethodToUser,
   subscribe,
-  unsubscribe
+  unsubscribe,
+  attachPaymentMethod,
+  createSubscription,
+  listPaymentMethods,
+  createEvent
 }
