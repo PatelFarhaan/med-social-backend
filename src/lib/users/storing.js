@@ -15,7 +15,7 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
   let invitation
   let subscription
 
-  if (!isSeed && env === 'test') {
+  if (!isSeed && env !== 'test') {
     invitation = await Invitation.findOne({ where: { token, state: states.APPROVED } })
 
     if (!invitation) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
@@ -56,7 +56,7 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
       await savedUser.addExpertise(dbExpertises)
     }
 
-    if (!isSeed && env === 'test') {
+    if (!isSeed && env !== 'test') {
       invitation.state = states.COMPLETED
       await invitation.save()
 
