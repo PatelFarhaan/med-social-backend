@@ -8,7 +8,7 @@
     "docker:test": "docker-compose exec -T app sh -c 'NODE_ENV=test yarn test'",
     "docker:resetTestDb": "docker-compose exec -T app sh -c 'source ./docker/dev/reset-test-db.sh'",
     "docker:resetDevDb": "docker-compose exec -T app sh -c 'source ./docker/dev/reset-dev-db.sh'",
-    "dev": "NODE_ENV=development && nodemon --watch __mocks__ --watch src \"src/run.js\"",
+    "dev": " NODE_ENV=development && CHOKIDAR_USEPOLLING=true nodemon --watch __mocks__ --watch src \"src/run.js\"",
     "clean": "find . -name 'node_modules' -type d -prune | xargs rm -rf",
     "start": "node src/run.js",
     "prepush": "npm run docker:test",

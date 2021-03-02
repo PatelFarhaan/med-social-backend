@@ -1,6 +1,7 @@
 // Resolvers: A map of functions which return data for the schema.
 const { invitationService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
+const logger = require('../../../lib/utils/logger')
 // const { can } = require('./../auth')
 
 module.exports = {
@@ -20,6 +21,7 @@ module.exports = {
   },
   Mutation: {
     requestInvitation: async (_parent, body) => {
+      logger.info(body.type)
       const invitation = await invitationService.createInvitation(body)
       return exportSafeModel(invitation)
     },
