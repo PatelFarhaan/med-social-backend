@@ -1,6 +1,7 @@
 // Resolvers: A map of functions which return data for the schema.
 const { invitationService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
+// const logger = require('../../lib/utils/logger')
 // const { can } = require('./../auth')
 
 module.exports = {
