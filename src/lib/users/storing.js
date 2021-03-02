@@ -1,23 +1,29 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-
 const { env } = require('../../../config/config')
 const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
-const { states } = require('../constants/invitation.constant')
+const { states, invitationTypes } = require('../constants/invitation.constant')
+const { subscriptionStatuses } = require('../constants/subscription.constant')
 const logger = require('../utils/logger')
 
 const BCRYPT_SALT_ROUNDS = 10
 
-const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation }) => {
-  const { email, password, interests, expertises, passwordRepeat, roleId = 3, token } = body
+const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, Subscription = db.Subscription }) => {
+  const { email, password, interests, expertises, passwordRepeat, roleId = 3, token, isSeed = false } = body
 
   let invitation
+  let subscription
 
-  if (env !== 'test') {
+  if (!isSeed && env !== 'test') {
     invitation = await Invitation.findOne({ where: { token, state: states.APPROVED } })
 
     if (!invitation) throw new Error(JSON.stringify({ status: 422, message: 'Need valid token' }))
+
+    if (invitation.type === invitationTypes.PAID) {
+      subscription = await Subscription.findOne({ where: { email, state: subscriptionStatuses.ACTIVE } })
+      if (!subscription) throw new Error(JSON.stringify({ status: 422, message: 'Need valid subscription' }))
+    }
   }
 
   // if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
@@ -50,9 +56,17 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation })
       await savedUser.addExpertise(dbExpertises)
     }
 
-    if (env !== 'test') {
+    if (!isSeed && env !== 'test') {
       invitation.state = states.COMPLETED
-      invitation.save()
+      await invitation.save()
+
+      if (invitation.type === invitationTypes.PAID && subscription) {
+        savedUser.stripeCustomerId = subscription.customerId
+        savedUser.paymentMethod = subscription.paymentMethod
+        await savedUser.save()
+        await subscription.addUser(savedUser)
+        await subscription.save()
+      }
     }
   } catch (e) {
     logger.warn(`signup ${e}`)

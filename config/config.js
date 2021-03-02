@@ -23,6 +23,7 @@ module.exports = {
     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
     endpointSecret: process.env.STRIPE_ENDPOINT_SECRET,
     currency: process.env.STRIPE_CURRENCY,
-    applicationFeePercentage: process.env.STRIPE_APPLICATION_FEE_PERCENTAGE
+    applicationFeePercentage: process.env.STRIPE_APPLICATION_FEE_PERCENTAGE,
+    paidSubscriptionPriceId: process.env.STRIPE_PAID_SUBSCRIPTION_PRICE_ID
   }
 }

@@ -55,7 +55,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(compression())
 
-const origin = ['enterurprodurlhere']
+// TODO: Update origin to production domain
+const origin = ['*']
 if (process.env.NODE_ENV !== 'production') origin.push(process.env.MOCK_WEBCLIENT_HOST || 'http://localhost:8080')
 
 // 3rd party middleware

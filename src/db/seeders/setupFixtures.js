@@ -18,11 +18,18 @@ const defaultAdmin = {
 const createUsers = async () => {
   const [superAdminRole, adminRole, standardRole] = await Promise.all(roleTypes.map(type => db.Role.findOne({ where: { type } })))
 
-  const params = { ...defaultAdmin, roleId: superAdminRole.id, firstName: 'Mock', lastName: 'Admin', passwordRepeat: defaultAdmin.password }
+  const params = {
+    ...defaultAdmin,
+    roleId: superAdminRole.id,
+    firstName: 'Mock',
+    lastName: 'Admin',
+    passwordRepeat: defaultAdmin.password,
+    isSeed: true
+  }
 
   const nonSuperAdminUsers = [
-    { roleId: adminRole.id, email: 'adminguy@imfake.ai', firstName: 'Sam', lastName: 'Gam' },
-    { roleId: standardRole.id, email: 'standard@imfake.ai', firstName: 'Sally', lastName: 'Fields' }
+    { roleId: adminRole.id, email: 'adminguy@imfake.ai', firstName: 'Sam', lastName: 'Gam', isSeed: true },
+    { roleId: standardRole.id, email: 'standard@imfake.ai', firstName: 'Sally', lastName: 'Fields', isSeed: true }
   ]
 
   if (!(await db.User.findOne({ where: { email: 'admin@imfake.ai' } }))) {
@@ -38,7 +45,8 @@ const createUsers = async () => {
       firstName: 'Mock',
       lastName: 'Admin2',
       password: 'admin.mockserver',
-      passwordRepeat: 'admin.mockserver'
+      passwordRepeat: 'admin.mockserver',
+      isSeed: true
     }
   })
 
@@ -53,7 +61,8 @@ const createUsers = async () => {
           lastName,
           password: 'admin.mockserver',
           passwordRepeat: 'admin.mockserver',
-          roleId
+          roleId,
+          isSeed: true
         }
       })
       return user
