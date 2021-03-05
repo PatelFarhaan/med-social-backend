@@ -1,0 +1,13 @@
+extends ../otherEmail
+
+block content
+  div(class="email-an-container")
+    div(class="email-content")
+      h2(class="title") Your request to use Column/ under Nom de Plume has been approved!
+      p Hi #{firstName},
+      p You’re receiving this email because your request to use <strong>Column/</strong> under <strong>Nom de Plume</strong> has been approved.
+      a(class="email__button", href="#{linkToOnboarding}", target="_blank") Get started with Column/ under Nom de Plum
+      div(class="separate-wrap")
+        | We are happy to have you!
+        br
+        strong Column/ Team

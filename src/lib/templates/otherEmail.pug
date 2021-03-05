@@ -1,0 +1,19 @@
+doctype strict
+html(xmlns="https://www.w3.org/1999/xhtml")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width initial-scale=1.0")
+    meta(name="color-scheme", content="only")
+    meta(name="supported-color-schemes", content="light")
+    style
+      include otherEmail.css
+  body
+    div(class="other-email")
+      div(class="other-email__header", style="background-image: url('{{ "/static/images/other-email.png" | absolute_url }}'); background-repeat: no-repeat; background-size: cover;")
+        img(class="other-email__logo", src='{{ "/static/images/logo.png" | absolute_url }}')
+      div(class="other-email__content")
+        p(class="email__name") Dear #{firstName},
+        block content
+        p(class="email__footer-text") Yours sincercly,
+        p(class="email__footer-name") Jason Pontin
+        p(class="email__subtext") Editor in Chief, Column/

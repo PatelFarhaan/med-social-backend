@@ -1,0 +1,13 @@
+extends ../basicEmail
+
+block content
+  div(class="email-background", style="background-image: url('{{ "/static/images/request-confirmed.png" | absolute_url }}'); background-repeat: no-repeat; background-size: cover;")
+    div(class="email-wrapper-outer")
+      div(class="email")
+        p(class="email__name") Dear #{firstName},
+        p(class="email__text") Congratulations! Your invitation to join Column/ is confirmed. We’re excited for you to participate in the conversations.
+        p(class="email__text") Please follow link below to finish signing up.
+        a(class="email__button", href="#{linkToOnboarding}") Click here to start.
+        p(class="email__footer-text gap-top-40") Yours sincerely,
+        p(class="email__footer-name") Jason Pontin
+        p(class="email__subtext") Editor in Chief, Column/

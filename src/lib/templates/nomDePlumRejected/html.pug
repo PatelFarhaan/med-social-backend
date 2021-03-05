@@ -1,0 +1,12 @@
+extends ../basicEmail
+
+block content
+  div(class="email-background", style="background-image: url('{{ "/static/images/invitation.png" | absolute_url }}'); background-repeat: no-repeat; background-size: cover;")
+    div(class="email-wrapper-outer")
+      div(class="email")
+        p(class="email__name") Dear #{firstName},
+        p(class="email__text") Unfortunately, you don’t meet our guidelines for employing a nom de plume. But if you still want to participate in the conversation, we’d like you to be a member under your real name. Please follow link below to finish signing up.
+        a(class="email__button", href="#{linkToOnboarding}") Click here to continue.
+        p(class="email__footer-text gap-top-40") Yours sincerely,
+        p(class="email__footer-name") Jason Pontin
+        p(class="email__subtext") Editor in Chief, Column/
