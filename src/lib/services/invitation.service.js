@@ -5,6 +5,7 @@ const {
 const { states } = require('../constants/invitation.constant')
 const logger = require('../utils/logger')
 const stripeService = require('./stripe.service')
+const emailService = require('./email.service')
 
 const LIMIT = 50
 
@@ -66,6 +67,8 @@ const createInvitation = async (
 
     invitation.addExpertise(invitationExpertise)
     invitation.save()
+
+    await emailService.sendEmail(this.email, { firstName: this.firstName }, 'invitationRequested')
   } catch (e) {
     logger.warn(`createInvitation ${e}`)
   }
