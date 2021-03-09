@@ -1,7 +1,7 @@
 extends ../basicEmail
 
 block content
-  div(class="email-background", style="background-image: url('{{ "/static/images/request-confirmed.png" | absolute_url }}'); background-repeat: no-repeat; background-size: cover;")
+  div(class="email-background", style=`background-image: url('${absoluteUrl}/static/images/request-confirmed.png'); background-repeat: no-repeat; background-size: cover;`)
     div(class="email-wrapper-outer")
       div(class="email")
         p(class="email__name") Dear #{firstName},

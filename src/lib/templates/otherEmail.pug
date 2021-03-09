@@ -9,8 +9,8 @@ html(xmlns="https://www.w3.org/1999/xhtml")
       include otherEmail.css
   body
     div(class="other-email")
-      div(class="other-email__header", style="background-image: url('{{ "/static/images/other-email.png" | absolute_url }}'); background-repeat: no-repeat; background-size: cover;")
-        img(class="other-email__logo", src='{{ "/static/images/logo.png" | absolute_url }}')
+      div(class="other-email__header", style=`background-image: url('${absoluteUrl}/static/images/other-email.png'); background-repeat: no-repeat; background-size: cover;`)
+        img(class="other-email__logo", src=`${absoluteUrl}/static/images/logo.png`)
       div(class="other-email__content")
         p(class="email__name") Dear #{firstName},
         block content

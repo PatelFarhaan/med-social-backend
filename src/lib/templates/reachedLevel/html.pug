@@ -1,0 +1,5 @@
+extends ../otherEmail
+
+block content
+  p(class="email__text") Congratulations. You reached Reputation Level #{level_number} for #{expertise}.
+  a(class="email__button", href="#{actionLink}", target="_blank") Click here to see your profile

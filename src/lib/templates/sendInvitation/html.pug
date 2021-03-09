@@ -1,8 +1,8 @@
 extends ../basicEmail
 
 block content
-  div(class="email-background", style="background-image: url('{{ "/static/images/request-confirmed.png" | absolute_url }}'); background-repeat: no-repeat; background-size: cover;")
-    div(class="email-wrapper-outer", style="background-image: url('{{ "/static/images/invitation-confirmed.png" | absolute_url }}'); background-repeat: no-repeat; background-size: 100% 100%;")
+  div(class="email-background", style=`background-image: url('${absoluteUrl}/static/images/request-confirmed.png'); background-repeat: no-repeat; background-size: cover;`)
+    div(class="email-wrapper-outer", style=`background-image: url('${absoluteUrl}/static/images/invitation-confirmed.png'); background-repeat: no-repeat; background-size: 100% 100%;`)
       div(class="email")
         p(class="email__name") Dear #{firstName},
         p(class="email__text") Your friend #{fromFirstName} who knows a lot about #{expertise} has invited you to join Column/, a new social network for experts to share their expertise, because you can contribute to an intelligent discussion about #{expertise}. (Don’t worry, you can edit this on the site.)

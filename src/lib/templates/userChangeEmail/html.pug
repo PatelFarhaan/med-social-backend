@@ -1,0 +1,6 @@
+extends ../otherEmail
+
+block content
+  p(class="email__text") You asked for email change for this email account&nbsp;
+    strong #{email}
+  a(class="email__button", href="#{changeEmailUrl}", target="_blank") Click here to change your email

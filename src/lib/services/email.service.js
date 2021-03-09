@@ -1,12 +1,12 @@
 const nodemailer = require('nodemailer')
 const aws = require('@aws-sdk/client-ses')
+const path = require('path')
 const Email = require('email-templates')
 const {
   aws: { region },
   env,
   email: { from }
 } = require('../../../config/config')
-const logger = require('../utils/logger')
 
 // configure AWS SDK
 const ses = new aws.SES({
@@ -15,16 +15,16 @@ const ses = new aws.SES({
 })
 
 // create Nodemailer SES transporter
-const transport = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   SES: { ses, aws }
 })
 
-if (env !== 'test') {
-  transport
-    .verify()
-    .then(() => logger.info('Connected to email server'))
-    .catch(() => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'))
-}
+// if (env !== 'test') {
+//   transporter
+//     .verify()
+//     .then(() => logger.info('Connected to email server'))
+//     .catch(() => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'))
+// }
 
 /**
  * Send an email
@@ -34,19 +34,28 @@ if (env !== 'test') {
  * @returns {Promise}
  */
 const sendEmail = async (to, locals, template) => {
+  const root = path.join(process.cwd(), '/src/lib/templates')
   const email = new Email({
     message: {
       from
     },
+    views: {
+      root
+    },
     send: env === 'production',
-    transport:
-      env === 'production'
-        ? transport
-        : {
-            jsonTransport: true
-          },
-    preview: env === 'production' ? null : { open: { app: 'chrome' } }
+    // send: true,
+    transport: transporter,
+    // transport:
+    //   env === 'production'
+    //     ? transporter
+    //     : {
+    //         jsonTransport: true
+    //       },
+    // preview: env === 'production' ? null : { open: { app: 'chrome' } }
+    preview: { open: { app: 'firefox' } }
   })
+
+  const { MOCK_SERVER_HOST, MOCK_SERVER_PORT, MOCK_SERVER_PROTOCOL } = process.env
 
   email
     .send({
@@ -54,13 +63,16 @@ const sendEmail = async (to, locals, template) => {
       message: {
         to
       },
-      locals
+      locals: {
+        absoluteUrl: `${MOCK_SERVER_PROTOCOL}://${MOCK_SERVER_HOST}:${MOCK_SERVER_PORT}`,
+        ...locals
+      }
     })
-    .then(logger.log)
-    .catch(logger.error)
+    .then(console.log)
+    .catch(console.error)
 }
 
 module.exports = {
-  transport,
+  transporter,
   sendEmail
 }
