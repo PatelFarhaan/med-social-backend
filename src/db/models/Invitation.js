@@ -1,9 +1,4 @@
-const { v4: uuidv4 } = require('uuid')
-const base64url = require('base64url')
-
 const types = require('../types')
-
-const { emailService } = require('../../lib/services')
 
 const { states, subscriptionModels, invitationTypes } = require('../../lib/constants/invitation.constant')
 
@@ -36,60 +31,6 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true
     }
   )
-
-  // eslint-disable-next-line func-names
-  Invitation.prototype.approve = async function(_approvedBy, newExpiresAt) {
-    if (newExpiresAt) {
-      this.expiresAt = newExpiresAt
-    }
-    if (this.state === states.PENDING) {
-      this.state = states.APPROVED
-      this.token = base64url(uuidv4())
-      // TODO: Add approved by when you add the authentication
-      // Model.approvedBy = approvedBy
-      this.save()
-      if (this.special) {
-        await emailService.sendEmail(
-          this.email,
-          { firstName: this.firstName, linkedToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding` },
-          'nomDePlumeConfirmed'
-        )
-      } else {
-        await emailService.sendEmail(
-          this.email,
-          { firstName: this.firstName, linkedToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding` },
-          'invitationConfirmed'
-        )
-      }
-    }
-    return this
-  }
-
-  // eslint-disable-next-line func-names
-  Invitation.prototype.reject = async function(_approvedBy) {
-    if (this.special) {
-      this.special = false
-      // TODO: Add approved by when you add the authentication
-      // this.approvedBy = approvedBy
-      this.token = base64url(uuidv4())
-      this.state = states.APPROVED
-      this.save()
-      await emailService.sendEmail(
-        this.email,
-        { firstName: this.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding` },
-        'nomDePlumeRejected'
-      )
-    } else {
-      this.state = states.REJECTED
-      this.save()
-      await emailService.sendEmail(
-        this.email,
-        { firstName: this.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding` },
-        'invitationRejected'
-      )
-    }
-    return this
-  }
 
   Invitation.associate = models => {
     // TODO: Add this when column is available

@@ -5,6 +5,11 @@ const userSchema = gql`
     login(email: String!, password: String!): Session
     getUser(id: Int): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
+    sendEmail: TempEmail
+  }
+
+  type TempEmail {
+    status: String
   }
 
   type Mutation {

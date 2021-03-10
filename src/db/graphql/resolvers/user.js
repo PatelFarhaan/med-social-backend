@@ -1,6 +1,6 @@
 // Resolvers: A map of functions which return data for the schema.
 const { authenticate, getUsers, exportSafeUser, signup } = require('../../../lib/users')
-const { tokenService } = require('../../../lib/services')
+const { tokenService, emailService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
@@ -34,7 +34,13 @@ module.exports = {
         list: users,
         count: users.length
       }
-    })
+    }),
+    sendEmail: async (_parent, _args, { _req }) => {
+      await emailService.sendEmail('jules@columnhq.com', { firstName: 'jules', email: 'jules@columnhq.com' }, 'invitationConfirmed')
+      return {
+        status: 'OK'
+      }
+    }
   },
   Mutation: {
     updateUser: can('superadmin').createResolver(async (_parent, args, { req }) => {

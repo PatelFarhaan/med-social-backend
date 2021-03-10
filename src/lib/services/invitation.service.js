@@ -1,4 +1,7 @@
+const { v4: uuidv4 } = require('uuid')
+const base64url = require('base64url')
 const db = require('../../db/models')
+
 const {
   stripe: { paidSubscriptionPriceId }
 } = require('../../../config/config')
@@ -76,7 +79,7 @@ const createInvitation = async (
   return invitation
 }
 
-const approveInvitation = async (email, user, Invitation = db.Invitation) => {
+const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
   const invitation = await Invitation.findOne({ where: { email } })
   if (!invitation) {
     throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
@@ -84,7 +87,62 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
 
   let savedInvitation
   try {
-    savedInvitation = await invitation.approve(user)
+    // savedInvitation = await invitation.approve(user)
+    if (invitation.state === states.PENDING) {
+      invitation.state = states.APPROVED
+      const token = generateToken()
+      invitation.token = token
+      // TODO: Add approved by when you add the authentication
+      // Model.approvedBy = approvedBy
+      savedInvitation = await invitation.save()
+      if (invitation.special) {
+        await emailService.sendEmail(
+          invitation.email,
+          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          'nomDePlumeConfirmed'
+        )
+      } else {
+        await emailService.sendEmail(
+          invitation.email,
+          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          'invitationConfirmed'
+        )
+      }
+    }
+  } catch (e) {
+    logger.warn(`savedInvitation ${e}`)
+    throw e
+  }
+
+  return savedInvitation
+}
+
+const rejectInvitation = async (email, _user, Invitation = db.Invitation) => {
+  const invitation = await Invitation.findOne({ where: { email } })
+  if (!invitation) {
+    throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
+  }
+
+  let savedInvitation
+  try {
+    if (invitation.special) {
+      invitation.special = false
+      // TODO: Add approved by when you add the authentication
+      // this.approvedBy = approvedBy
+      const token = generateToken()
+      invitation.token = token
+      invitation.state = states.APPROVED
+      savedInvitation = await invitation.save()
+      await emailService.sendEmail(
+        this.email,
+        { firstName: this.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+        'nomDePlumeRejected'
+      )
+    } else {
+      invitation.state = states.REJECTED
+      await invitation.save()
+      await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationRejected')
+    }
   } catch (e) {
     logger.warn(`savedInvitation ${e}`)
     throw e
@@ -146,11 +204,14 @@ const resendInvitationEmail = async ({ email }, loaderOpts) => {
   }
 }
 
+const generateToken = async () => base64url(uuidv4())
+
 module.exports = {
   createInvitation,
   approveInvitation,
   getInvitations,
   getInvitation,
   payForApproval,
-  resendInvitationEmail
+  resendInvitationEmail,
+  rejectInvitation
 }

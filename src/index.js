@@ -107,7 +107,6 @@ const apolloServer = new ApolloServer({
   }
 })
 
-app.use('/static', express.static(path.join(__dirname, '/static')))
 apolloServer.applyMiddleware({ app, cors: { origin } })
 
 const initApp = async () => {
@@ -119,7 +118,7 @@ const initApp = async () => {
 
     const router = await AdminBroExpress.buildRouter(adminBro)
     app.use(adminBro.options.rootPath, router)
-
+    app.use('/static', express.static(path.join(__dirname, '/static')))
     app.use('/', api({ db, io }))
     app.use(jsonErrorHandler)
     return app
