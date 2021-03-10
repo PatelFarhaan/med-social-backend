@@ -26,7 +26,7 @@ COPY --chown=container . /container/
 USER root
 WORKDIR /container
 # RUN npm rebuild bcrypt --build-from-source
-RUN chown -R container:container /container/
+# RUN chown -R container:container /container/
 
 #
 # Run the app

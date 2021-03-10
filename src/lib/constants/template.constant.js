@@ -1,0 +1,25 @@
+const INVITATION_CONFIRMED = 'invitationConfirmed'
+const INVITATION_EXPIRED = 'invitationExpired'
+const INVITATION_REJECTED = 'invitationRejected'
+const INVITATION_REQUESTED = 'invitationRequested'
+const NON_DE_PLUM_CONFIRMED = 'nonDePlumConfirmed'
+const NON_DE_PLUM_REJECTED = 'nonDePlumRejected'
+const NON_DE_PLUM_REQUEST_RECEIVED = 'nonDePlumRequestReceived'
+const REMINDER_INVITATION = 'reminderInvitation'
+const SEND_INVITATION = 'sendInvitation'
+const SEND_INVITATION_ANONYMOUS = 'sendInvitationAnonymous'
+const SEND_INVITATION_ANONYMOUS_REJECTED = 'sendInvitationAnonymousRejected'
+
+module.exports = {
+  INVITATION_CONFIRMED,
+  INVITATION_EXPIRED,
+  INVITATION_REJECTED,
+  INVITATION_REQUESTED,
+  NON_DE_PLUM_CONFIRMED,
+  NON_DE_PLUM_REJECTED,
+  NON_DE_PLUM_REQUEST_RECEIVED,
+  REMINDER_INVITATION,
+  SEND_INVITATION,
+  SEND_INVITATION_ANONYMOUS,
+  SEND_INVITATION_ANONYMOUS_REJECTED
+}

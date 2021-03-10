@@ -1,0 +1,5 @@
+extends ../otherEmail
+
+block content
+  p(class="email__text") Sorry, you dropped to Reputation Level #{levelNumber} for #{expertise}. Keep posting great content to climb again!
+  a(class="email__button", href="#{actionLink}", target="_blank") Click here to see your profile

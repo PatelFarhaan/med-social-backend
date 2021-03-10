@@ -7,17 +7,6 @@ module.exports = {
     refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS || 30,
     resetPasswordExpirationMinutes: 10
   },
-  email: {
-    smtp: {
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      auth: {
-        user: process.env.SMTP_USERNAME,
-        pass: process.env.SMTP_PASSWORD
-      }
-    },
-    from: process.env.EMAIL_FROM
-  },
   stripe: {
     secret: process.env.STRIPE_SECRET_KEY,
     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
@@ -25,5 +14,11 @@ module.exports = {
     currency: process.env.STRIPE_CURRENCY,
     applicationFeePercentage: process.env.STRIPE_APPLICATION_FEE_PERCENTAGE,
     paidSubscriptionPriceId: process.env.STRIPE_PAID_SUBSCRIPTION_PRICE_ID
+  },
+  email: {
+    from: process.env.EMAIL_FROM
+  },
+  aws: {
+    region: process.env.AWS_REGION
   }
 }

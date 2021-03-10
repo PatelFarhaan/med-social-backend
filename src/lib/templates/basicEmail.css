@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@300;400;500&display=swap');
+
+:root {
+    color-scheme: only;
+    supported-color-schemes: light;
+}
+
+@font-face {
+font-family: "AlbertusNova";
+src: url("../../../static/fonts/AlbertusNova.woff") format("woff"),
+    url("../../../static/fonts/AlbertusNova.ttf") format("truetype");
+}
+@font-face {
+font-family: "AtkinsonHyperlegible-Regular";
+src: url("../../../static/fonts/AtkinsonHyperlegible-Regular.woff") format("woff"),
+    url("../../../static/fonts/Atkinson-Hyperlegible-Regular-101.ttf") format("truetype");
+}
+
+@media (min-width: 1px) {
+    .other-email__logo {
+        width: 40px;
+        height: 28px;
+        margin-left: 50px;
+        margin-top: 60px;
+    }
+
+    .email-background {
+        padding: 20px;
+    }
+
+    .email-wrapper-outer {
+        width: 100%;
+        max-width: 590px;
+        margin: 0 auto;
+        background-color: #FDFBF7;
+        border: 1px solid #000000;
+    }
+
+    .email-wrapper-middle {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #000000;
+        margin-top: -5px;
+        margin-left: -5px;
+        margin-bottom: 3px;
+        background: #edece8;
+    }
+
+    .email-wrapper {
+        width: 100%;
+        height: 100%;
+        border: 1px solid #000000;
+        margin-top: -5px;
+        margin-left: -5px;
+        margin-bottom: 3px;
+        background: #fdfbf7;
+    }
+
+    .email {
+        padding: 36px 20px 40px 28px;
+    }
+
+    .email__name {
+        font-family: "AtkinsonHyperlegible-Regular", 'Work Sans', sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+        margin-top: 0;
+        margin-bottom: 32px;
+    }
+
+    .email__footer-text {
+        font-family: "AtkinsonHyperlegible-Regular", 'Work Sans', sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 24px;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+        margin-bottom: 28px;
+    }
+
+    .email__footer-name {
+        font-family: "AlbertusNova", 'Inknut Antiqua', serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 32px;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+        margin-bottom: 0;
+    }
+
+    .email__subtext {
+        font-family: "AlbertusNova", 'Inknut Antiqua', serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 32px;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+        opacity: 0.7;
+        margin-top: 0;
+    }
+
+    .email__text {
+        font-family: "AtkinsonHyperlegible-Regular", 'Work Sans', sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 28px;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+    }
+
+    .email__button {
+        font-family: "AlbertusNova", 'Inknut Antiqua', serif;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 36px;
+        color: #42b9b7 !important;
+        cursor: pointer;
+        text-decoration: none;
+        margin-top: 60px;
+        margin-bottom: 24px;
+        display: block;
+    }
+
+    a[href] {
+        color: #42b9b7 !important;
+    }
+
+    .other-email__header {
+        height: 160px;
+    }
+
+    .other-email__content {
+        padding: 40px;
+    }
+
+    .gap-bottom-40 {
+        margin-bottom: 40px;
+    }
+
+    .gap-top-40 {
+        margin-top: 40px;
+    }
+}
+@media (min-width: 375px) {
+    .other-email__logo {
+        margin-left: 80px;
+        margin-top: 86px;
+    }
+
+    .other-email__header {
+        height: 200px;
+    }
+
+    .other-email__content {
+        padding: 60px 80px 80px;
+    }
+}
+
+.email__button-text {
+color: #42b9b7 !important;
+cursor: pointer;
+text-decoration: none;
+}
+
+@media (min-width: 600px) {
+    .email {
+        padding: 50px;
+    }
+
+    .email-background {
+        padding: 40px;
+    }
+
+    .other-email__logo {
+        margin-top: 86px;
+        margin-left: 112px;
+    }
+
+    .email-background {
+        padding: 60px;
+    }
+
+    .email {
+        padding: 60px;
+    }
+
+    .other-email__content {
+        padding: 60px 120px 90px;
+        max-width: 590px;
+        margin: 0 auto;
+    }
+
+    .email__name {
+        font-size: 24px;
+        line-height: 36px;
+    }
+
+    .email__text {
+        font-size: 24px;
+        line-height: 36px;
+    }
+
+    .email__button {
+        font-size: 24px;
+    }
+
+    .email__footer-text {
+        font-size: 24px;
+    }
+
+    .email__footer-name {
+        font-size: 20px;
+    }
+
+    .email__subtext {
+        font-size: 20px;
+        line-height: 36px;
+    }
+}
+
+@media (prefers-color-scheme: dark ) {
+    .email__name, .email__footer-text, .email__footer-name, .email__subtext, .email__text {
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+    }
+}

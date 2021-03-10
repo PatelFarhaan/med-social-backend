@@ -1,0 +1,12 @@
+extends ../basicEmail
+
+block content
+  div(class="email-background", style=`background-image: url('${absoluteUrl}/static/images/invitation.png'); background-repeat: no-repeat; background-size: cover;`)
+    div(class="email-wrapper-outer")
+      div(class="email")
+        p(class="email__name") Dear #{firstName},
+        p(class="email__text") Thanks for applying to join Column/
+        p(class="email__text") Please be patient with us as we review applications. There’s a waiting list. But we will get to you!
+        p(class="email__footer-text gap-top-40") Yours sincerely,
+        p(class="email__footer-name") Jason Pontin
+        p(class="email__subtext") Editor in Chief, Column/

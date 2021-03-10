@@ -1,0 +1,6 @@
+extends ../otherEmail
+
+block content
+  p(class="email__text") You asked for password reset for this email account&nbsp;
+    strong #{email}
+  a(class="email__button", href="#{resetPasswordUrl}", target="_blank") Click here to reset your password
