@@ -7,7 +7,7 @@ block content
         p(class="email__name") Dear #{firstName},
         p(class="email__text") You received an invitation to join Column/, however, you didn’t accept it in time.
         p(class="email__text") If you want, you can request an invitation by yourself, or ask to be invited again.
-        a(class="email__button gap-bottom-40", href="#{actionLink}") Request an Invitation
+        a(class="email__button gap-bottom-40", href=`${actionLink}`) Request an Invitation
         p(class="email__footer-text gap-top-40") Yours sincerely,
         p(class="email__footer-name") Jason Pontin
         p(class="email__subtext") Editor in Chief, Column/

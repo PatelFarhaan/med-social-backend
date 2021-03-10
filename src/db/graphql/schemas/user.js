@@ -2,14 +2,15 @@ const { gql } = require('apollo-server-express')
 
 const userSchema = gql`
   type Query {
-    login(email: String!, password: String!): Session
+    login(email: String!, password: String, token: String): Session
     getUser(id: Int): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
-    sendEmail: TempEmail
+    getMagicLink(email: String!): DefaultPayload
   }
 
-  type TempEmail {
-    status: String
+  type DefaultPayload {
+    status: Int
+    message: String
   }
 
   type Mutation {

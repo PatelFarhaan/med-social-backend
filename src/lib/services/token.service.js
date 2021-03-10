@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const config = require('../../../config/config')
-const { getUser } = require('../users/retrieval')
+const { getUser, getUserWithoutRole } = require('../users/retrieval')
 const db = require('../../db/models')
 const { tokenTypes } = require('../constants/token.constant')
 
@@ -66,10 +66,25 @@ const generateResetPasswordToken = async email => {
   return resetPasswordToken
 }
 
+const generateMagicLinkToken = async email => {
+  const user = await getUserWithoutRole({ email })
+  if (!user) throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
+  const existingMagicLink = await db.Session.findOne({ email, type: tokenTypes.MAGIC_LINK })
+  if (existingMagicLink) return { token: existingMagicLink.token, user }
+  const expires = moment().add(config.jwt.magicLinkExpirationMinutes, 'minutes')
+  const magicLinkToken = generateToken(user.id, expires, tokenTypes.MAGIC_LINK)
+  await saveToken(magicLinkToken, user.id, expires, tokenTypes.MAGIC_LINK)
+  return {
+    token: magicLinkToken,
+    user
+  }
+}
+
 module.exports = {
   generateToken,
   saveToken,
   verifyToken,
   generateAuthTokens,
-  generateResetPasswordToken
+  generateResetPasswordToken,
+  generateMagicLinkToken
 }
