@@ -6,7 +6,7 @@ block content
       div(class="email")
         p(class="email__name") Dear #{firstName},
         p(class="email__text") Your friend #{fromFirstName} who knows a lot about #{expertise} has invited you to join Column/, a new social network for experts to share their expertise, because you can contribute to an intelligent discussion about #{expertise}. (Don’t worry, you can edit this on the site.)
-        a(class="email__button", href="#{linkToOnboarding}") Click here to Join
+        a(class="email__button", href=`${linkToOnboarding}`) Click here to Join
         p(class="email__subtext") The invitation is good for a week
         p(class="email__footer-text") Yours sincerely,
         p(class="email__footer-name") Jason Pontin

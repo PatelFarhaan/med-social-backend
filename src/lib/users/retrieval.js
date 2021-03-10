@@ -101,6 +101,15 @@ const getUser = async ({ id, email }) => {
   throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
 }
 
+const getUserWithoutRole = async ({ id, email }) => {
+  const query = id ? { id } : { email }
+  const user = await db.User.findOne({ where: query, include: [{ model: db.Role, as: 'role' }] })
+  if (user) {
+    return user
+  }
+  throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
+}
+
 const hasRole = (user, role) => includes(user.roles, role)
 
 const requireRole = (user, role) => {
@@ -114,5 +123,6 @@ module.exports = {
   getUsers,
   getUser,
   hasRole,
-  requireRole
+  requireRole,
+  getUserWithoutRole
 }

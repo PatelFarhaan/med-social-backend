@@ -5,6 +5,7 @@ const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
 const { states, invitationTypes } = require('../constants/invitation.constant')
 const { subscriptionStatuses } = require('../constants/subscription.constant')
+const { tokenTypes } = require('../constants/token.constant')
 const logger = require('../utils/logger')
 
 const BCRYPT_SALT_ROUNDS = 10
@@ -98,6 +99,26 @@ const authenticate = async (email, password) => {
     }
   }
   throw new Error(JSON.stringify({ status: 404, message: 'Incorrect email or password' }))
+}
+
+const authenticateToken = async (email, token) => {
+  if (!email) throw new Error(JSON.stringify({ status: 400, message: 'Email cannot be blank' }))
+  if (!token) throw new Error(JSON.stringify({ status: 400, message: 'Token cannot be blank' }))
+
+  const session = await db.Session.findOne({
+    token,
+    type: tokenTypes.MAGIC_LINK
+  })
+
+  if (!session) throw new Error(JSON.stringify({ status: 404, message: 'Token not found' }))
+
+  const { user } = session
+
+  if (email !== user.email) throw new Error(JSON.stringify({ status: 400, message: 'Incorrect email or token' }))
+  return {
+    ...user.toJSON(),
+    roles: [user.role.type]
+  }
 }
 
 const inviteUser = async (email, role, firstName = '', lastName = '') => {
@@ -205,5 +226,6 @@ module.exports = {
   resetPassword,
   setPassword,
   updateUser,
-  updatePrimaryUserRole
+  updatePrimaryUserRole,
+  authenticateToken
 }

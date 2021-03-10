@@ -1,6 +1,6 @@
 -- rambler up
 
-CREATE TYPE sessionTypes AS ENUM ('ACCESS', 'REFRESH', 'RESET_PASSWORD');
+CREATE TYPE sessionTypes AS ENUM ('ACCESS', 'REFRESH', 'RESET_PASSWORD', 'MAGIC_LINK');
 
 CREATE TABLE "Session" (
 	"token" varchar NOT NULL PRIMARY KEY,

@@ -1,5 +1,5 @@
 // Resolvers: A map of functions which return data for the schema.
-const { authenticate, getUsers, exportSafeUser, signup } = require('../../../lib/users')
+const { authenticate, authenticateToken, getUsers, exportSafeUser, signup } = require('../../../lib/users')
 const { tokenService, emailService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
@@ -12,14 +12,31 @@ const getUserSettings = async userSettings => {
 
 module.exports = {
   Query: {
-    login: async (_parent, { email, password }) => {
-      const rawUser = await authenticate(email, password)
+    login: async (_parent, { token, email, password }) => {
+      let rawUser
+      if (token) {
+        rawUser = await authenticateToken(email, token)
+      } else {
+        rawUser = await authenticate(email, password)
+      }
       const user = exportSafeUser(rawUser)
       const tokens = await tokenService.generateAuthTokens(user)
       user.settings = await getUserSettings(user.settings)
       return {
         user,
         tokens
+      }
+    },
+    getMagicLink: async (_parent, { email }) => {
+      const { user, token } = await tokenService.generateMagicLinkToken(email)
+      await emailService.sendEmail(
+        user.email,
+        { firstName: user.firstName, linkToLogin: `${process.env.MOCK_WEBCLIENT_HOST}/login?token=${token}&email=${user.email}` },
+        'magicLink'
+      )
+      return {
+        status: 200,
+        message: 'Email Sent'
       }
     },
     getUser: can('superadmin').createResolver(async (_parent, _args, { db, req }) => {
@@ -34,13 +51,7 @@ module.exports = {
         list: users,
         count: users.length
       }
-    }),
-    sendEmail: async (_parent, _args, { _req }) => {
-      await emailService.sendEmail('jules@columnhq.com', { firstName: 'jules', email: 'jules@columnhq.com' }, 'invitationConfirmed')
-      return {
-        status: 'OK'
-      }
-    }
+    })
   },
   Mutation: {
     updateUser: can('superadmin').createResolver(async (_parent, args, { req }) => {
