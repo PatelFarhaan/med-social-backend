@@ -6,6 +6,11 @@ const userSchema = gql`
     getUser(id: Int): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
+    socialLogin(token: String!, provider: socialProviders!): Session
+  }
+
+  enum socialProviders {
+    google
   }
 
   type DefaultPayload {
@@ -27,6 +32,8 @@ const userSchema = gql`
       token: String!
     ): Session
     refreshAuth(refreshToken: String!): Session
+    connectSocial(token: String!, provider: socialProviders!): User
+    disconnectSocial(token: String!, provider: socialProviders!): User
   }
 
   type Users {

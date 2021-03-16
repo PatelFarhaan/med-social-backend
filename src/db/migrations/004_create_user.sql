@@ -23,6 +23,9 @@ CREATE TABLE "User" (
     "notifications_seen_at" timestamptz,
     "muted_notification_categories" character varying(64) [],
     "profile_description" character varying(150),
+    "google_user_id" character varying(150),
+    "linkedin_user_id" character varying(150),
+    "twitter_user_id" character varying(150),
     "deactivatedAt" timestamptz,
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
     "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz

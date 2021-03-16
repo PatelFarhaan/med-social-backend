@@ -1,6 +1,6 @@
 // Resolvers: A map of functions which return data for the schema.
 const { authenticate, authenticateToken, getUsers, exportSafeUser, signup } = require('../../../lib/users')
-const { tokenService, emailService } = require('../../../lib/services')
+const { tokenService, emailService, socialService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
@@ -8,6 +8,12 @@ const { tokenTypes } = require('../../../lib/constants/token.constant')
 const getUserSettings = async userSettings => {
   const defaultSettings = await getTenantSettings('user.defaults')
   return Object.assign(defaultSettings, userSettings)
+}
+
+const userProviderAttributes = {
+  google: 'googleUserId',
+  twitter: 'twitterUserId',
+  linkedin: 'linkedinUserId'
 }
 
 module.exports = {
@@ -51,9 +57,38 @@ module.exports = {
         list: users,
         count: users.length
       }
-    })
+    }),
+    socialLogin: async (_parent, { provider, token }, { db }) => {
+      if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
+      const ticket = await socialService.googleTokenVerify(token)
+      const socialId = await ticket.getUserId()
+      const rawUser = await db.User.findOne({ where: { [userProviderAttributes[provider]]: socialId } })
+      const user = exportSafeUser(rawUser)
+      const tokens = await tokenService.generateAuthTokens(user)
+      return {
+        user,
+        tokens
+      }
+    }
   },
   Mutation: {
+    connectSocial: can('standard').createResolver(async (_parent, { provider, token }, { req }) => {
+      // TODO: Add other socials
+      if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
+      const ticket = await socialService.googleTokenVerify(token)
+      const socialId = await ticket.getUserId()
+      const { user } = req
+      user.googleUserId = socialId
+      const savedUser = await user.save()
+      return savedUser
+    }),
+    disconnectSocial: can('standard').createResolver(async (_parent, { provider }, { req }) => {
+      if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
+      const { user } = req
+      user[userProviderAttributes[provider]] = null
+      const savedUser = await user.save()
+      return savedUser
+    }),
     updateUser: can('superadmin').createResolver(async (_parent, args, { req }) => {
       if (args.settings) {
         args.settings = Object.assign(req.User.settings, args.settings)

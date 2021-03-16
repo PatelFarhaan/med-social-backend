@@ -4,9 +4,12 @@ const logger = require('../../lib/utils/logger')
 const db = require('../../db/models')
 const { stripeService, subscriptionService } = require('../../lib/services')
 const { version } = require('./../../../package.json')
+const SocialAuthRoutes = require('./socialAuth.route')
 
 module.exports = () => {
   const api = Router()
+
+  api.use('/auth', SocialAuthRoutes)
 
   api.get('*', async (req, res, next) => {
     if (!/api/.test(req.url)) {
