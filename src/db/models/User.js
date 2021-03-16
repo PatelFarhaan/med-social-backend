@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: sequelize.DataTypes.UUIDV4
+        type: DataTypes.UUIDV4
       },
       lookupId: types.get('lookupId'),
       email: { type: DataTypes.STRING, allowNull: false, validate: { min: 3 } },
