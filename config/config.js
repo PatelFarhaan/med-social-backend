@@ -21,5 +21,20 @@ module.exports = {
   },
   aws: {
     region: process.env.AWS_REGION
+  },
+  googleLogin: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackUrl: process.env.GOOGLE_CALLBACK_URL
+  },
+  linkedinLogin: {
+    clientId: process.env.LINKEDIN_CLIENT_ID,
+    clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+    callbackUrl: process.env.LINKEDIN_CALLBACK_URL
+  },
+  twitterLogin: {
+    clientId: process.env.TWITTER_CLIENT_ID,
+    clientSecret: process.env.TWITTER_CLIENT_SECRET,
+    callbackUrl: process.env.TWITTER_CALLBACK_URL
   }
 }

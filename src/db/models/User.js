@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
       notificationsSeenAt: { type: DataTypes.DATE, field: 'notifications_seen_at' },
       paymentMethod: { type: DataTypes.JSONB, field: 'payment_method' },
       stripeUserId: { type: DataTypes.STRING(150), field: 'stripe_user_id' },
+      googleUserId: { type: DataTypes.STRING(150), field: 'google_user_id' },
+      linkedinUserId: { type: DataTypes.STRING(150), field: 'linkedin_user_id' },
+      twitterUserId: { type: DataTypes.STRING(150), field: 'twitter_user_id' },
       stripeCustomerId: { type: DataTypes.STRING(150), field: 'stripe_customer_id' },
       muted_notification_categories: {
         type: DataTypes.ARRAY(DataTypes.STRING(64)),
