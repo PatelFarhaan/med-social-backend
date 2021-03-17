@@ -35,6 +35,7 @@ module.exports = {
   twitterLogin: {
     clientId: process.env.TWITTER_CLIENT_ID,
     clientSecret: process.env.TWITTER_CLIENT_SECRET,
-    callbackUrl: process.env.TWITTER_CALLBACK_URL
+    callbackUrl: process.env.TWITTER_CALLBACK_URL,
+    frontendCallbackUrl: process.env.TWITTER_FRONTEND_CALLBACK_URL
   }
 }

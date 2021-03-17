@@ -83,7 +83,7 @@ module.exports = {
       return savedUser
     }),
     disconnectSocial: can('standard').createResolver(async (_parent, { provider }, { req }) => {
-      if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
+      if (!['google', 'twitter'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
       const { user } = req
       user[userProviderAttributes[provider]] = null
       const savedUser = await user.save()
