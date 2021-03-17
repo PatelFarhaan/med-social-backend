@@ -1,10 +1,8 @@
 const { OAuth2Client } = require('google-auth-library')
-// const querystring = require('querystring')
-// const http = require('http')
 const {
   googleLogin: { clientId: googleClientId }
   // linkedinLogin: { clientId: linkedinClientId, clientSecret: linkedinClientSecret, callbackUrl: linkedinCallbackUrl },
-  // twitterLogin: { clientId: twitterClientId, clientSecret: twitterClientSecret }
+  // twitterLogin: { clientId: twitterClientId, clientSecret: twitterClientSecret, frotendCallbackUrl: twitterFrontendCallbackUrl }
 } = require('../../../config/config')
 
 // GOOGLE
@@ -26,7 +24,6 @@ const googleTokenVerify = async token =>
 //     client_id: linkedinClientId,
 //     client_secret: linkedinClientSecret
 //   })
-
 //   const options = {
 //     host: 'www.linkedin.com',
 //     path: '/oauth/v2/accessToken',
@@ -58,7 +55,6 @@ const googleTokenVerify = async token =>
 //   req.write(body)
 //   req.end()
 // }
-
 // const insertTodb = async (token, callback) => {
 //   console.log("token", token)
 //   MongoClient.connect(url, function (err, db) {
@@ -69,9 +65,7 @@ const googleTokenVerify = async token =>
 //               //assert.equal(err, null);
 //                console.log("Inserted " +  result.result.n + " documents into the collection ", result.ops[0]._id);
 //               callback(result.ops[0]._id);// is there a better way?
-
 //           });
-
 //   });
 // }
 
