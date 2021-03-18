@@ -89,4 +89,27 @@ router.post('/twitter/login', async (req, res) => {
   )
 })
 
+router.post('/twitter/onboarding', async (req, res) => {
+  request.post(
+    {
+      url: `https://api.twitter.com/oauth/access_token?oauth_verifier`,
+      oauth: {
+        consumer_key: twitterClientId,
+        consumer_secret: twitterClientSecret,
+        token: req.query.oauth_token
+      },
+      form: { oauth_verifier: req.query.oauth_verifier }
+    },
+    async (err, _r, body) => {
+      if (err) {
+        return res.status(400).send({ message: err.message })
+      }
+
+      const bodyString = `{ "${body.replace(/&/g, '", "').replace(/=/g, '": "')}"}`
+      const parsedBody = JSON.parse(bodyString)
+      return res.send(parsedBody)
+    }
+  )
+})
+
 module.exports = router

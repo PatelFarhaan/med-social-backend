@@ -69,6 +69,16 @@ module.exports = {
         user,
         tokens
       }
+    },
+    socialOnboarding: async (_parent, { provider, token }) => {
+      if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
+      const ticket = await socialService.googleTokenVerify(token)
+      const socialId = await ticket.getUserId()
+      const attributes = await ticket.getAttributes()
+      return {
+        id: socialId,
+        attributes
+      }
     }
   },
   Mutation: {
