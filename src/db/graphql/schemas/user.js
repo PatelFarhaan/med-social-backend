@@ -7,6 +7,37 @@ const userSchema = gql`
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
+    socialOnboarding(token: String!, provider: socialProviders!): socialGooglePayload
+  }
+
+  type socialGooglePayload {
+    id: String
+    attributes: socialGoogleAttributes
+  }
+
+  type socialGoogleAttributes {
+    envelope: String
+    payload: socialGooglePayload
+  }
+
+  type socialGooglePayload {
+    iss: String
+    at_has: String
+    email_verified: Boolean
+    sub: String
+    azp: String
+    email: String
+    profile: String
+    picture: String
+    name: String
+    given_name: String
+    family_name: String
+    aud: String
+    hd: String
+    nonce: String
+    iat: Int
+    exp: Int
+    locale: String
   }
 
   enum socialProviders {
