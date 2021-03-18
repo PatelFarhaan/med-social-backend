@@ -7,10 +7,10 @@ const userSchema = gql`
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
-    socialOnboarding(token: String!, provider: socialProviders!): socialGooglePayload
+    socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
   }
 
-  type socialGooglePayload {
+  type socialGoogleOnboarding {
     id: String
     attributes: socialGoogleAttributes
   }
