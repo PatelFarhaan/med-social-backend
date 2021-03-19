@@ -31,6 +31,11 @@ module.exports = (sequelize, DataTypes) => {
       through: 'Multipotentiality',
       as: 'expertises'
     })
+
+    Interest.belongsToMany(models.Column, {
+      through: 'ColumnInterests',
+      as: 'columns'
+    })
   }
 
   return Interest

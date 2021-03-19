@@ -1,5 +1,10 @@
 const types = require('../types')
-const { subscriptionTypes, paymentGateways, subscriptionStatuses } = require('../../lib/constants/subscription.constant')
+const {
+  subscriptionTypes,
+  paymentGateways,
+  subscriptionStatuses,
+  subscriptionCycles
+} = require('../../lib/constants/subscription.constant')
 
 module.exports = (sequelize, DataTypes) => {
   const Subscription = sequelize.define(
@@ -14,7 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       customerId: { type: DataTypes.STRING, field: 'customer_id' },
       subscriptionId: { type: DataTypes.STRING, field: 'subscription_id' },
       email: { type: DataTypes.STRING, allowNull: false, validate: { min: 3 } },
-      state: { type: DataTypes.ENUM(Object.keys(subscriptionStatuses)), defaultValue: subscriptionStatuses.ACTIVE }
+      state: { type: DataTypes.ENUM(Object.keys(subscriptionStatuses)), defaultValue: subscriptionStatuses.ACTIVE },
+      amountPerCycle: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
+      cycle: { type: DataTypes.ENUM(Object.keys(subscriptionCycles)), defaultValue: subscriptionCycles.MONTH },
+      cycleLength: { type: DataTypes.INTEGER, defaultValue: 1 }
     },
     {
       freezeTableName: true
@@ -26,6 +34,8 @@ module.exports = (sequelize, DataTypes) => {
       through: 'UserSubscriptions',
       as: 'users'
     })
+
+    Subscription.belongsTo(models.Column)
   }
 
   // eslint-disable-next-line func-names
