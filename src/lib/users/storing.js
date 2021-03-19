@@ -35,12 +35,11 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
     throw new Error(JSON.stringify({ status: 409, message: 'User with that email already exists' }))
   }
 
-  // Check password and generate hash
-  if (!password || !password.length) throw new Error(JSON.stringify({ status: 400, message: 'Expected password to not be blank' }))
-  if (password !== passwordRepeat) throw new Error(JSON.stringify({ status: 400, message: 'Expected passwords to match' }))
-
-  const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS)
-  user.hash = await bcrypt.hash(password, salt)
+  if (password && passwordRepeat) {
+    if (password !== passwordRepeat) throw new Error(JSON.stringify({ status: 400, message: 'Expected passwords to match' }))
+    const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS)
+    user.hash = await bcrypt.hash(password, salt)
+  }
 
   let savedUser
   try {

@@ -61,6 +61,8 @@ const userSchema = gql`
       expertises: [Int]
       interests: [Int]
       token: String!
+      twitterUserId: String
+      googleUserId: String
     ): Session
     refreshAuth(refreshToken: String!): Session
     connectSocial(token: String!, provider: socialProviders!): User

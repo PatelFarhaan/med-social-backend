@@ -22,13 +22,13 @@ describe('Users', () => {
     await teardownDb()
   })
 
-  test('It should not be able to sign up a user without a password', async () => {
+  test('It should be able to sign up a user without a password', async () => {
     expect.assertions(1)
     const signupParams = await getUserDefaults()
     delete signupParams.password
-    await signup({ body: signupParams }).catch(e => {
-      expect(e.message).toMatch('password to not be blank')
-    })
+    const user = await signup({ body: signupParams })
+    expect(user).not.toBeNull()
+    return user.destroy
   })
 
   test('It should not be able to sign up a user without passwordRepeat', async () => {
