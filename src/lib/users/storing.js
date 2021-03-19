@@ -11,9 +11,7 @@ const logger = require('../utils/logger')
 const BCRYPT_SALT_ROUNDS = 10
 
 const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, Subscription = db.Subscription }) => {
-  const { twitterUserId, googleUserId, email, password, interests, expertises, passwordRepeat, roleId = 3, token, isSeed = false } = body
-  if (!password && !passwordRepeat && (!googleUserId && !twitterUserId))
-    throw new Error(JSON.stringify({ status: 400, message: 'Password or social id is required' }))
+  const { email, password, interests, expertises, passwordRepeat, roleId = 3, token, isSeed = false } = body
 
   let invitation
   let subscription
