@@ -28,7 +28,7 @@ describe('Users', () => {
     delete signupParams.password
     const user = await signup({ body: signupParams })
     expect(user).not.toBeNull()
-    return user.destroy
+    return user.destroy()
   })
 
   test('It should not be able to sign up a user without passwordRepeat', async () => {
