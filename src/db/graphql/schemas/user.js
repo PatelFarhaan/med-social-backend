@@ -67,6 +67,7 @@ const userSchema = gql`
     refreshAuth(refreshToken: String!): Session
     connectSocial(token: String!, provider: socialProviders!): User
     disconnectSocial(token: String!, provider: socialProviders!): User
+    connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
   }
 
   type Users {

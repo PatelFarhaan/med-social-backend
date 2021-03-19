@@ -1,5 +1,5 @@
 // Resolvers: A map of functions which return data for the schema.
-const { subscriptionTypes } = require('../../../lib/constants/subscription.constant')
+const { columnStatuses } = require('../../../lib/constants/column.constant')
 const { columnService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 const { can } = require('./../auth')
@@ -24,20 +24,15 @@ module.exports = {
     }
   },
   Mutation: {
-    createColumn: async (_parent, body) => {
-      const column = await columnService.createColumn({ body })
+    createColumn: can('standard').createResolver(async (_parent, body, { req }) => {
+      const column = await columnService.createColumn({ body }, req.user)
       return exportSafeModel(column)
-    },
+    }),
     subscribeToColumn: can('standard').createResolver(async (_parent, { slug }, { db, req, context, EXPECTED_OPTIONS_KEY }) => {
       const column = await db.Column.findByPk(slug, { [EXPECTED_OPTIONS_KEY]: context })
       if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
-      const { user } = req
-      const subscription = await db.Subscription.create({
-        type: subscriptionTypes.COLUMN,
-        email: user.email
-      })
-      await subscription.addUser(user)
-      await subscription.setColumn(column)
+      if (column.state !== columnStatuses.APPROVED) throw new Error(JSON.stringify({ status: 400, message: 'Column is still for review' }))
+      const subscription = await columnService.subscribeToColumn({ column, user: req.user })
       return exportSafeModel(subscription)
     })
   },

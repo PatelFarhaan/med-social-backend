@@ -8,7 +8,15 @@ const columnSchema = gql`
   }
 
   type Mutation {
-    createColumn(name: String!, description: String!, interests: [Int], type: columnTypes): Column
+    createColumn(
+      name: String!
+      description: String!
+      interests: [Int]
+      expertise: Int
+      type: columnTypes
+      price: Float
+      visibility: columnVisibility
+    ): Column
     subscribeToColumn(slug: String!): Subscription
   }
 
@@ -19,6 +27,11 @@ const columnSchema = gql`
     interests(page: Int, limit: Int): [Interest]
     subscriptions(page: Int, limit: Int): [Subscription]
     type: String
+  }
+
+  enum columnVisibility {
+    PUBLIC
+    PRIVATE
   }
 
   enum columnTypes {
