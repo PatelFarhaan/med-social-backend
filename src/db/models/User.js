@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       freezeTableName: true
     }
   )
-  // TODO: ADD RELATIONSHIPS FOR EXPERTISES, INTERESTS, INVITED_BY
+
   User.associate = models => {
     User.belongsTo(models.Role, {
       as: 'role',

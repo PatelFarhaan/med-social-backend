@@ -1,6 +1,6 @@
 // Resolvers: A map of functions which return data for the schema.
 const { authenticate, authenticateToken, getUsers, exportSafeUser, signup } = require('../../../lib/users')
-const { tokenService, emailService, socialService } = require('../../../lib/services')
+const { tokenService, emailService, socialService, stripeService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
@@ -82,6 +82,15 @@ module.exports = {
     }
   },
   Mutation: {
+    connectPaymentMethod: can('standard').createResolver(async (_parent, { paymentMethod }, { req }) => {
+      const { user } = req
+      const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
+      await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
+      user.stripeCustomerId = stripeCustomer.id
+      user.paymentMethod = paymentMethod
+      const savedUser = await user.save()
+      return savedUser
+    }),
     connectSocial: can('standard').createResolver(async (_parent, { provider, token }, { req }) => {
       // TODO: Add other socials
       if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
