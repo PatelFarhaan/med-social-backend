@@ -25,6 +25,7 @@ const columnSchema = gql`
     name: String!
     description: String!
     interests(page: Int, limit: Int): [Interest]
+    expertise: Expertise
     subscriptions(page: Int, limit: Int): [Subscription]
     type: String
   }

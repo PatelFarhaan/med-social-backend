@@ -55,10 +55,10 @@ module.exports = (sequelize, DataTypes) => {
       as: 'subscriptions'
     })
 
-    // Column.belongsToMany(models.Post, {
-    //   through: 'ColumnPosts',
-    //   as: 'posts'
-    // })
+    Column.belongsToMany(models.Post, {
+      through: 'ColumnPosts',
+      as: 'posts'
+    })
   }
 
   /* eslint-disable no-param-reassign */

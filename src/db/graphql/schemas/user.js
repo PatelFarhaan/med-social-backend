@@ -55,6 +55,7 @@ const userSchema = gql`
       email: String!
       firstName: String!
       lastName: String!
+      username: String!
       password: String
       passwordRepeat: String
       roleId: Int!
