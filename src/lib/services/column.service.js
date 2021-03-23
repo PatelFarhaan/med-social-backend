@@ -41,7 +41,7 @@ const listColumns = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, inc
   })
 }
 
-const createColumn = async ({ body: { interests, expertise, ...columnFields }, user, Column = db.Column }) => {
+const createColumn = async ({ body: { interests, expertise, ...columnFields } }, user, Column = db.Column) => {
   let column
   try {
     column = await Column.create(columnFields)
@@ -53,7 +53,7 @@ const createColumn = async ({ body: { interests, expertise, ...columnFields }, u
     await column.setAuthor(user)
     const dbInterests = await db.Interest.findAll({ where: { id: interests } })
     await column.addInterest(dbInterests)
-    const dbExpertise = await db.Expertise.findAll({ where: { id: expertise } })
+    const dbExpertise = await db.Expertise.findOne({ where: { id: expertise } })
     await column.setExpertise(dbExpertise)
   } catch (e) {
     logger.warn(`createColumn: ${e}`)

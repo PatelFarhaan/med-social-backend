@@ -44,6 +44,10 @@ module.exports = {
     subscriptions: (column, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const col = db.Column.build(exportSafeModel(column))
       return col.getSubscriptions({ include: ['users'], limit, page, [EXPECTED_OPTIONS_KEY]: context })
+    },
+    expertise: (column, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const col = db.Column.build(exportSafeModel(column))
+      return col.getExpertise({ [EXPECTED_OPTIONS_KEY]: context })
     }
   }
 }

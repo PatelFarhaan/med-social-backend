@@ -70,6 +70,18 @@ module.exports = (sequelize, DataTypes) => {
       through: 'UserSubscriptions',
       as: 'subscriptions'
     })
+
+    User.belongsToMany(models.Post, {
+      through: models.PostBookmark,
+      as: 'bookmarks',
+      foreignKey: 'postId'
+    })
+
+    User.belongsToMany(models.Post, {
+      through: models.Vote,
+      as: 'votes',
+      foreignKey: 'postId'
+    })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {
