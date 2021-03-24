@@ -54,7 +54,7 @@ const userSchema = gql`
     createUser(
       email: String!
       firstName: String!
-      lastName: String!
+      lastName: String
       username: String!
       password: String
       passwordRepeat: String

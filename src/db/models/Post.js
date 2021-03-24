@@ -46,7 +46,9 @@ module.exports = (sequelize, DataTypes) => {
     Post.belongsToMany(models.User, {
       through: models.PostBookmark,
       as: 'userBookmarks',
-      foreignKey: 'userId'
+      foreignKey: 'postId',
+      onDelete: 'RESTRICT',
+      hooks: true
     })
 
     Post.belongsTo(models.Post, {
@@ -76,7 +78,9 @@ module.exports = (sequelize, DataTypes) => {
     Post.belongsToMany(models.User, {
       through: models.Vote,
       as: 'userVotes',
-      foreignKey: 'userId'
+      foreignKey: 'postId',
+      onDelete: 'RESTRICT',
+      hooks: true
     })
   }
 

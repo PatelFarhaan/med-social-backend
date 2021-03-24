@@ -74,13 +74,13 @@ module.exports = (sequelize, DataTypes) => {
     User.belongsToMany(models.Post, {
       through: models.PostBookmark,
       as: 'bookmarks',
-      foreignKey: 'postId'
+      foreignKey: 'userId'
     })
 
     User.belongsToMany(models.Post, {
       through: models.Vote,
-      as: 'votes',
-      foreignKey: 'postId'
+      as: 'postVotes',
+      foreignKey: 'userId'
     })
   }
   /* eslint-disable no-param-reassign */
