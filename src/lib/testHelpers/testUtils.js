@@ -3,6 +3,11 @@ const db = require('./../../db/models/')
 const { modelTreeFactory, destroyTree } = require('./crudTestHelpers')
 const { signup, encodeSession } = require('./../users')
 
+const { deleteDefaultInterest } = require('../fixtures/interest.fixture')
+const { deleteDefaultExpertise } = require('../fixtures/expertise.fixture')
+const { deleteDefaultColumn } = require('../fixtures/column.fixture')
+const { deleteDefaultUser } = require('../fixtures/user.fixture')
+
 module.exports = {
   teardownDb: async () =>
     new Promise(resolve =>
@@ -24,6 +29,8 @@ module.exports = {
         })
         .then(() => resolve())
     ),
+  destroyDefaults: async () =>
+    Promise.all([await deleteDefaultUser(), await deleteDefaultColumn(), await deleteDefaultInterest(), await deleteDefaultExpertise()]),
   createTestUserWithSession: async (id, role = 'external') => {
     const email = `${id}@me.com`
     const currentRole = await db.Role.findOne({ where: { type: role } })

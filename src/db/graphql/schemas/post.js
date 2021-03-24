@@ -9,6 +9,13 @@ const postSchema = gql`
 
   type Mutation {
     createPost(column: String, content: String!, isStacked: Boolean, isQuoted: Boolean, stackedPosts: [StackedPostInput]): Post
+    createPostBookmark(id: String!): Post
+    createPostVote(id: String!, type: voteTypes): Post
+  }
+
+  enum voteTypes {
+    UP
+    DOWN
   }
 
   input StackedPostInput {

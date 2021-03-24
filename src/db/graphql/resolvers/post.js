@@ -26,6 +26,14 @@ module.exports = {
     createPost: can('standard').createResolver(async (_parent, body, { req }) => {
       const post = await postService.createPost({ body }, req.user)
       return exportSafeModel(post)
+    }),
+    createPostBookmark: can('standard').createResolver(async (_parent, body, { req }) => {
+      const post = await postService.bookmarkPost({ body }, req.user)
+      return exportSafeModel(post)
+    }),
+    createPostVote: can('standard').createResolver(async (_parent, body, { req }) => {
+      const post = await postService.votePost({ body }, req.user)
+      return exportSafeModel(post)
     })
   },
   Post: {
