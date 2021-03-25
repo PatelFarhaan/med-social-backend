@@ -41,9 +41,34 @@ module.exports = {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getAuthor({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    stackedPosts: (post, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    stackedPosts: async (post, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
-      return dbPost.getStackedChildren({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
+      const children = await dbPost.getStackedChildren({
+        include: ['stackedChildren'],
+        limit,
+        page,
+        [EXPECTED_OPTIONS_KEY]: context
+      })
+
+      return children.map(c => ({ ...exportSafeModel(c), order: c.StackedPost ? c.StackedPost.order : null }))
+    },
+    files: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbPost = db.Post.build(exportSafeModel(post))
+      return dbPost.getFiles({ [EXPECTED_OPTIONS_KEY]: context })
+    }
+  },
+  File: {
+    post: (file, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbFile = db.File.build(exportSafeModel(file))
+      return dbFile.getPost({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    column: (file, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbFile = db.File.build(exportSafeModel(file))
+      return dbFile.getColumn({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    user: (file, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbFile = db.File.build(exportSafeModel(file))
+      return dbFile.getUser({ [EXPECTED_OPTIONS_KEY]: context })
     }
   }
 }

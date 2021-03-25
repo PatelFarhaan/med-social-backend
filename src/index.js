@@ -13,6 +13,7 @@ const socketIo = require('socket.io')
 const { makeExecutableSchema } = require('graphql-tools')
 const { fileLoader, mergeTypes, mergeResolvers } = require('merge-graphql-schemas')
 const { ApolloServer } = require('apollo-server-express')
+const { graphqlUploadExpress } = require('graphql-upload')
 const AdminBro = require('admin-bro')
 const AdminBroSequelize = require('@admin-bro/sequelize')
 const { createContext, EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize')
@@ -93,7 +94,11 @@ const jsonErrorHandler = (err, _req, res, next) => {
 app.use(passport.initialize())
 passport.use('jwt', jwtStrategy)
 
+// 50 MB
+app.use(graphqlUploadExpress({ maxFileSize: 50 * 1024 * 1024, maxFiles: 10 }))
+
 const apolloServer = new ApolloServer({
+  uploads: false,
   schema: schemas,
   resolvers,
   context: async ({ req }) => {

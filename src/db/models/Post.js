@@ -21,12 +21,16 @@ module.exports = (sequelize, DataTypes) => {
   Post.associate = models => {
     Post.belongsToMany(models.Post, {
       through: models.StackedPost,
-      as: 'stackedChildren'
+      as: 'stackedChildren',
+      otherKey: 'stackedChildrenId',
+      foreignKey: 'PostId'
     })
 
     Post.belongsToMany(models.Post, {
       through: models.StackedPost,
-      as: 'post'
+      as: 'posts',
+      otherKey: 'PostId',
+      foreignKey: 'stackedChildrenId'
     })
 
     Post.belongsToMany(models.Post, {
@@ -82,6 +86,8 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'RESTRICT',
       hooks: true
     })
+
+    Post.hasMany(models.File, { as: 'files' })
   }
 
   Post.addHook('beforeCreate', instance => {

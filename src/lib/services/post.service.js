@@ -1,5 +1,6 @@
 const db = require('../../db/models')
 const logger = require('../utils/logger')
+const uploadService = require('./upload.service')
 
 const LIMIT = 50
 
@@ -18,12 +19,19 @@ const listPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, _colu
   }
 
   return db.Post.findAndCountAll({
+    where: {
+      isStacked: false
+    },
+    // include: {
+    //   model: db.Post,
+    //   as: 'stackedChildren'
+    // },
     // include: {
     //   model: db.Column,
     //   as: 'column',
     //   where: {
     //     slug: {
-    //       [db.sequelize.Op.eq]: column
+    //       $eq: column
     //     }
     //   }
     // },
@@ -34,18 +42,29 @@ const listPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, _colu
   })
 }
 
-const createPost = async ({ body: { column, stackedPosts, ...postFields } }, user, Post = db.Post) => {
+const createPost = async ({ body: { column, stackedPosts = [], files = [], ...postFields } }, user, Post = db.Post, Column = db.Column) => {
   let post
   try {
     post = await Post.create(postFields)
     await post.setAuthor(user)
+    const existingColumn = await Column.findByPk(column)
+    if (!existingColumn) throw new Error(JSON.stringify({ status: 404, message: 'Column not found' }))
     await post.setColumn(column)
-    if (postFields.isStacked) {
+    if (stackedPosts.length > 0) {
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
           post.createStackedChild({ content: stackedPost.content, isStacked: true }, { through: { order: index } })
         )
       )
+    }
+    if (files.length > 0) {
+      const uploadedFiles = (await Promise.all(files)).map(uploadService.processUploadS3)
+      const savedFiles = (await Promise.all(uploadedFiles)).map(async file => post.createFile(file))
+      // eslint-disable-next-line no-unused-vars
+      const saveAssociations = (await Promise.all(savedFiles)).map(async file => {
+        await file.setUser(user)
+        await file.setColumn(column)
+      })
     }
   } catch (e) {
     logger.warn(`createPost: ${e}`)

@@ -21,7 +21,8 @@
     "lint": "eslint src",
     "lint:watch": "esw -w src/",
     "test": "jest src --runInBand --coverage",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "semiDocker": "docker-compose down && sed -i '' 's/RAMBLER_HOST=localhost/RAMBLER_HOST=db/' '.env' && docker-compose up -d --build && docker-compose stop app && sed -i '' 's/RAMBLER_HOST=db/RAMBLER_HOST=localhost/' '.env'"
   },
   "lint-staged": {
     "*.js": [
@@ -38,6 +39,7 @@
     "apollo-server": "^2.4.8",
     "apollo-server-express": "^2.4.8",
     "apollo-server-testing": "^2.4.8",
+    "aws-sdk": "^2.871.0",
     "babel-eslint": "^10.0.1",
     "base64url": "^3.0.1",
     "bcrypt": "^5.0.0",
@@ -59,6 +61,7 @@
     "graphql-iso-date": "^3.6.1",
     "graphql-tools": "^4.0.4",
     "graphql-type-json": "^0.2.4",
+    "graphql-upload": "^11.0.0",
     "helmet": "^3.12.0",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.13",

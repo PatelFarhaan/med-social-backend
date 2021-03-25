@@ -11,8 +11,7 @@ const defaultPostValue = {
   content: 'Test 2',
   isQuoted: false,
   isStacked: false,
-  columnSlug: 'test-column'
-  // stackedPosts: [{ content: 'test 11' }, { content: 'test 12' }, { content: 'test 13' }]
+  column: 'test-column'
 }
 
 describe('Post Service', () => {
@@ -45,6 +44,23 @@ describe('Post Service', () => {
       expect(author.id).toBe(user.id)
       const stackedChilrenCount = await post.countStackedChildren()
       expect(stackedChilrenCount).toBe(0)
+    })
+
+    test('It should create a stacked post when valid parameters are passed', async () => {
+      const post = await postService.createPost(
+        {
+          body: {
+            ...defaultPostValue,
+            isStacked: true,
+            stackedPosts: [{ content: 'test 11' }, { content: 'test 12' }, { content: 'test 13' }]
+          }
+        },
+        user
+      )
+      const author = await post.getAuthor()
+      expect(author.id).toBe(user.id)
+      const stackedChilrenCount = await post.countStackedChildren()
+      expect(stackedChilrenCount).toBe(3)
     })
   })
 
