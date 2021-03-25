@@ -5,7 +5,7 @@ CREATE TYPE columnStatuses AS ENUM ('PENDING', 'APPROVED', 'REJECTED', 'REVIEWED
 CREATE TYPE columnTypes AS ENUM ('PAID', 'FREE');
 
 CREATE TABLE "Column" (
-    "slug" character varying(60) NOT NULL PRIMARY KEY,
+    "slug" character varying(255) NOT NULL PRIMARY KEY,
     "name" character varying(42) NOT NULL UNIQUE,
     "description" character varying(280) NOT NULL,
     "price" decimal(10,2) DEFAULT 0,

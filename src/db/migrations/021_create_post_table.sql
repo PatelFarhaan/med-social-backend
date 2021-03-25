@@ -6,7 +6,7 @@ CREATE TABLE "Post" (
     "is_quoted" BOOLEAN DEFAULT FALSE,
     "votes" integer NOT NULL DEFAULT 0,
     "author_id" uuid REFERENCES "User"("id"),
-    "columnSlug" character varying(60)REFERENCES "Column"("slug"),
+    "columnSlug" character varying(255)REFERENCES "Column"("slug"),
     "quoted_post" integer REFERENCES "Post"("id"),
     "parent_id" integer REFERENCES "Post"("id"),
     "root_id" integer REFERENCES "Post"("id"),

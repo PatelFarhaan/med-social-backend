@@ -20,7 +20,10 @@ module.exports = {
     from: process.env.EMAIL_FROM
   },
   aws: {
-    region: process.env.AWS_REGION
+    region: process.env.AWS_REGION,
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    s3Bucket: process.env.AWS_S3_BUCKET
   },
   googleLogin: {
     clientId: process.env.GOOGLE_CLIENT_ID,
