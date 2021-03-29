@@ -4,9 +4,23 @@ const uploadService = require('./upload.service')
 
 const LIMIT = 50
 
-const getPost = async ({ slug }, loaderOpts) => db.Post.findByPk(slug, loaderOpts)
+const getPost = async ({ id, hierarchy = true }, loaderOpts) =>
+  db.Post.findOne({
+    where: { id },
+    include: {
+      model: db.Post,
+      as: 'descendents',
+      hierarchy,
+      include: {
+        model: db.User,
+        as: 'author',
+        attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture']
+      }
+    },
+    ...loaderOpts
+  })
 
-const listPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, _column }, loaderOpts) => {
+const listPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, column, hierarchy }, loaderOpts) => {
   let order = [['createdAt', 'ASC']]
 
   const sortFilters = {
@@ -18,23 +32,36 @@ const listPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, _colu
     order = sortFilters[sortBy](sortDirection)
   }
 
+  const columnInclude = {
+    model: db.Column,
+    as: 'column',
+    where: {
+      slug: column
+    }
+  }
+
+  const includeChildren = hierarchy
+    ? [
+        columnInclude,
+        {
+          model: db.Post,
+          as: 'descendents',
+          hierarchy,
+          include: {
+            model: db.User,
+            as: 'author',
+            attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture']
+          }
+        }
+      ]
+    : [columnInclude]
+
   return db.Post.findAndCountAll({
     where: {
-      isStacked: false
+      isStacked: false,
+      isComment: false
     },
-    // include: {
-    //   model: db.Post,
-    //   as: 'stackedChildren'
-    // },
-    // include: {
-    //   model: db.Column,
-    //   as: 'column',
-    //   where: {
-    //     slug: {
-    //       $eq: column
-    //     }
-    //   }
-    // },
+    include: includeChildren,
     limit,
     offset: limit * (page - 1),
     order,
@@ -53,7 +80,10 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
     if (stackedPosts.length > 0) {
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
-          post.createStackedChild({ content: stackedPost.content, isStacked: true }, { through: { order: index } })
+          post.createStackedChild(
+            { content: stackedPost.content, isStacked: true, author_id: user.id, columnSlug: column },
+            { through: { order: index } }
+          )
         )
       )
     }
@@ -71,6 +101,20 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
     throw new Error(JSON.stringify({ status: 400, message: e }))
   }
   return post
+}
+
+const createComment = async ({ body: { postId, content = '' } }, user, Post = db.Post) => {
+  let comment
+  try {
+    const DBpost = await Post.findByPk(postId)
+    if (!DBpost) throw new Error(JSON.stringify({ status: 404, message: 'Post not found' }))
+    const column = await DBpost.getColumn()
+    comment = await DBpost.createChild({ content, isComment: true, author_id: user.id, columnSlug: column.slug })
+  } catch (e) {
+    logger.warn(`createComment: ${e}`)
+    throw new Error(JSON.stringify({ status: 400, message: e }))
+  }
+  return comment
 }
 
 const updateVoteValue = async (voteType, post) => {
@@ -129,5 +173,6 @@ module.exports = {
   listPosts,
   createPost,
   votePost,
-  bookmarkPost
+  bookmarkPost,
+  createComment
 }

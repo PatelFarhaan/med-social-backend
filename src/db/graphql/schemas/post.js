@@ -2,8 +2,8 @@ const { gql } = require('apollo-server-express')
 
 const postSchema = gql`
   type Query {
-    getPost(id: Int!): Column
-    listPosts(column: String, page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
+    getPost(id: Int!, hierarchy: Boolean): Post
+    listPosts(column: String, page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
     searchPosts(query: String): [Post]
   }
 
@@ -16,6 +16,7 @@ const postSchema = gql`
       stackedPosts: [StackedPostInput]
       files: [Upload]
     ): Post
+    createComment(content: String!, postId: Int!): Post
     createPostBookmark(id: String!): Post
     createPostVote(id: String!, type: voteTypes): Post
   }
@@ -39,8 +40,9 @@ const postSchema = gql`
     createdAt: DateTime
     votes: Int
     order: Int
-    stackedPosts: [Post]
-    comments: [Post]
+    stackedPosts(limit: Int, page: Int, hierarchy: Boolean): [Post]
+    children: String
+    hierarchyLevel: Int
     files: [File]
   }
 
