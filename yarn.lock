@@ -6315,6 +6315,11 @@ is-generator-fn@^1.0.0:
   resolved "https://registry.yarnpkg.com/is-generator-fn/-/is-generator-fn-1.0.0.tgz#969d49e1bb3329f6bb7f09089be26578b2ddd46a"
   integrity sha1-lp1J4bszKfa7fwkIm+JleLLd1Go=
 
+is-generator@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/is-generator/-/is-generator-1.0.3.tgz#c14c21057ed36e328db80347966c693f886389f3"
+  integrity sha1-wUwhBX7TbjKNuANHlmxpP4hjifM=
+
 is-glob@^2.0.0, is-glob@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/is-glob/-/is-glob-2.0.1.tgz#d096f926a3ded5600f3fdfd91198cb0888c2d863"
@@ -9964,6 +9969,13 @@ semver-diff@^2.0.0:
   dependencies:
     semver "^5.0.3"
 
+semver-select@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/semver-select/-/semver-select-1.1.0.tgz#14c1ade188343dcc2ffcd305545828015475b012"
+  integrity sha1-FMGt4Yg0Pcwv/NMFVFgoAVR1sBI=
+  dependencies:
+    semver "^5.0.3"
+
 "semver@2 || 3 || 4 || 5", semver@^5.0.3, semver@^5.1.0, semver@^5.3.0, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.0.tgz#790a7cf6fea5459bac96110b29b60412dc8ff96b"
@@ -10014,6 +10026,15 @@ send@0.17.1:
     on-finished "~2.3.0"
     range-parser "~1.2.1"
     statuses "~1.5.0"
+
+sequelize-hierarchy@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/sequelize-hierarchy/-/sequelize-hierarchy-2.0.4.tgz#2f5564904f5ee159ae2272c299c8acf30ebd4789"
+  integrity sha512-3eVGxB3Yir6HHRZFr6/QeYEpSoqgLFOXx8aMi9B/rnYV4m2rKm6V6FhdaGki5o/gHMJgPyEq9RNYG58mpKsRVA==
+  dependencies:
+    is-generator "^1.0.3"
+    lodash "^4.17.11"
+    semver-select "^1.1.0"
 
 sequelize-pool@^2.3.0:
   version "2.3.0"

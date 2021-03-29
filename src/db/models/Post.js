@@ -9,12 +9,14 @@ module.exports = (sequelize, DataTypes) => {
       content: { type: DataTypes.TEXT, allowNull: false },
       isStacked: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_stacked', defaultValue: false },
       isQuoted: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_quoted', defaultValue: false },
+      isComment: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_comment', defaultValue: false },
       votes: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt')
     },
     {
-      freezeTableName: true
+      freezeTableName: true,
+      hierarchy: true
     }
   )
 
@@ -33,20 +35,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'stackedChildrenId'
     })
 
-    Post.belongsToMany(models.Post, {
-      through: models.PostTreePath,
-      as: 'ancestor'
-    })
-
-    Post.belongsToMany(models.Post, {
-      through: models.PostTreePath,
-      as: 'descendant'
-    })
-
-    Post.hasMany(models.PostTreePath, {
-      as: 'rootPost'
-    })
-
     Post.belongsToMany(models.User, {
       through: models.PostBookmark,
       as: 'userBookmarks',
@@ -58,16 +46,6 @@ module.exports = (sequelize, DataTypes) => {
     Post.belongsTo(models.Post, {
       as: 'quotedPost',
       foreignKey: 'quoted_post'
-    })
-
-    Post.belongsTo(models.Post, {
-      as: 'parent',
-      foreignKey: 'parent_id'
-    })
-
-    Post.belongsTo(models.Post, {
-      as: 'root',
-      foreignKey: 'root_id'
     })
 
     Post.belongsTo(models.Column, {

@@ -22,7 +22,8 @@
     "lint:watch": "esw -w src/",
     "test": "jest src --runInBand --coverage",
     "test:watch": "jest --watchAll",
-    "semiDocker": "docker-compose down && sed -i '' 's/RAMBLER_HOST=localhost/RAMBLER_HOST=db/' '.env' && docker-compose up -d --build && docker-compose stop app && sed -i '' 's/RAMBLER_HOST=db/RAMBLER_HOST=localhost/' '.env'"
+    "semiDocker": "npm run build:docker && docker-compose stop app && sed -i '' 's/RAMBLER_HOST=db/RAMBLER_HOST=localhost/' '.env'",
+    "build:docker": "docker-compose down && sed -i '' 's/RAMBLER_HOST=localhost/RAMBLER_HOST=db/' '.env' && docker-compose up -d --build"
   },
   "lint-staged": {
     "*.js": [
@@ -81,6 +82,7 @@
     "request-promise": "^4.2.2",
     "sanitize-html": "^2.3.3",
     "sequelize": "^5.3.0",
+    "sequelize-hierarchy": "^2.0.4",
     "slugify": "^1.4.7",
     "socket.io": "^2.1.1",
     "stripe": "^8.137.0",
