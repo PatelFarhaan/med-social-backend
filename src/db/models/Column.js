@@ -59,6 +59,8 @@ module.exports = (sequelize, DataTypes) => {
       through: 'ColumnPosts',
       as: 'posts'
     })
+
+    Column.hasMany(models.ReportedContent)
   }
 
   /* eslint-disable no-param-reassign */

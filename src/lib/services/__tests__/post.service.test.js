@@ -31,7 +31,7 @@ describe('Post Service', () => {
     ;[column] = await createDefaultColumn()
     await column.setExpertise(expertise)
     await column.setAuthor(user)
-    column.addInterest(interest)
+    await column.addInterest(interest)
   })
 
   describe('Post', () => {
@@ -75,7 +75,7 @@ describe('Post Service', () => {
       await db.Vote.destroy({ where: {} })
     })
 
-    test('It should create a vote for a post wh2en valid parameters are passed', async () => {
+    test('It should create a vote for a post when valid parameters are passed', async () => {
       const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP' } }, user)
       const postVotes = await post.getUserVotes()
       expect(postVotes.length).toBe(1)
@@ -112,10 +112,6 @@ describe('Post Service', () => {
       await db.PostBookmark.destroy({ where: {} })
     })
 
-    afterEach(async () => {
-      await db.Post.destroy({ where: { content: 'Test 2' } })
-    })
-
     test('It should create a bookmark for a post when valid parameters are passed', async () => {
       const post = await postService.bookmarkPost({ body: { id: defaultPost.id } }, user)
       const postBookmarks = await post.getUserBookmarks()
@@ -126,6 +122,62 @@ describe('Post Service', () => {
       const post = await postService.bookmarkPost({ body: { id: defaultPost.id } }, user)
       const postBookmarks = await post.getUserBookmarks()
       expect(postBookmarks.length).toBe(1)
+    })
+  })
+
+  describe('Delete Post', () => {
+    let defaultPost
+    beforeEach(async () => {
+      defaultPost = await db.Post.create({ ...defaultPostValue, author_id: user.id })
+    })
+
+    afterEach(async () => {
+      await db.Post.destroy({ where: { content: 'Test 2' } })
+      await db.PostBookmark.destroy({ where: {} })
+    })
+
+    test('It should delete the post when valid parameters are passed', async () => {
+      const response = await postService.deletePost({ body: { id: defaultPost.id } }, user)
+      expect(response.status).toBe(204)
+      expect(response.message).toBe('Post deleted successfully')
+      const dbPostCount = await db.Post.count()
+      expect(dbPostCount).toBe(0)
+    })
+  })
+
+  describe('Edit Post', () => {
+    let defaultPost
+    beforeEach(async () => {
+      defaultPost = await db.Post.create({ ...defaultPostValue, author_id: user.id })
+    })
+
+    afterEach(async () => {
+      await db.Post.destroy({ where: { content: 'Test 2' } })
+      await db.PostBookmark.destroy({ where: {} })
+    })
+
+    test('It should edit the post when valid parameters are passed', async () => {
+      const newContent = 'New Content'
+      const editedPost = await postService.editPost({ body: { id: defaultPost.id, content: newContent } }, user)
+      expect(editedPost.content).toBe(newContent)
+    })
+
+    test('It should throw and error if the post does not exist', async () => {
+      const newContent = 'New Content'
+      await postService.editPost({ body: { id: 9999, content: newContent } }, user).catch(e => {
+        const parsedError = JSON.parse(e.message)
+        expect(parsedError.message).toBe('Post not found')
+        expect(parsedError.status).toBe(404)
+      })
+    })
+
+    test('It should throw an error if the user is not the author of the post', async () => {
+      const newContent = 'New Content'
+      await postService.editPost({ body: { id: defaultPost.id, content: newContent } }, { id: 'sdasd' }).catch(e => {
+        const parsedError = JSON.parse(e.message)
+        expect(parsedError.status).toBe(400)
+        expect(parsedError.message).toBe('Post can only be edited by the author')
+      })
     })
   })
 })

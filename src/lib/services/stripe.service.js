@@ -4,7 +4,7 @@ const {
 } = require('../../../config/config')
 const logger = require('../utils/logger')
 
-const stripe = Stripe(secretKey)
+const stripe = new Stripe(secretKey)
 
 const createPrice = async (column, interval = 'month') => {
   try {

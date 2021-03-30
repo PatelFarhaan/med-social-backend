@@ -32,8 +32,20 @@ module.exports = {
       const column = await db.Column.findByPk(slug, { [EXPECTED_OPTIONS_KEY]: context })
       if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
       if (column.state !== columnStatuses.APPROVED) throw new Error(JSON.stringify({ status: 400, message: 'Column is still for review' }))
-      const subscription = await columnService.subscribeToColumn({ column, user: req.user })
+      const subscription = await columnService.subscribeToColumn({ body: { column } }, req.user)
       return exportSafeModel(subscription)
+    }),
+    unsubscribeToColumn: can('standard').createResolver(async (_parent, { slug }, { db, req, context, EXPECTED_OPTIONS_KEY }) => {
+      const column = await db.Column.findByPk(slug, { [EXPECTED_OPTIONS_KEY]: context })
+      if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
+      return columnService.unsubscribeToColumn({ body: { column } }, req.user)
+    }),
+    banUser: can('standard').createResolver(async (_parent, { slug, bannedUserId }, { db, req, context, EXPECTED_OPTIONS_KEY }) => {
+      const column = await db.Column.findByPk(slug, { [EXPECTED_OPTIONS_KEY]: context })
+      if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
+      const bannedUser = await db.User.findByPk(bannedUserId, { [EXPECTED_OPTIONS_KEY]: context })
+      if (!bannedUser) throw new Error(JSON.stringify({ status: 404, message: 'User does not exist' }))
+      return columnService.banUser({ body: { column, bannedUser } }, req.user)
     })
   },
   Column: {
@@ -48,6 +60,10 @@ module.exports = {
     expertise: (column, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const col = db.Column.build(exportSafeModel(column))
       return col.getExpertise({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    bannedMembers: (column, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const col = db.Column.build(exportSafeModel(column))
+      return col.getBannedMembers({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
     }
   }
 }
