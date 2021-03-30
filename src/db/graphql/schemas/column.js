@@ -18,6 +18,8 @@ const columnSchema = gql`
       visibility: columnVisibility
     ): Column
     subscribeToColumn(slug: String!): Subscription
+    unsubscribeToColumn(slug: String!): DefaultPayload
+    banUser(slug: String!, bannedUserId: String!): DefaultPayload
   }
 
   type Column {
@@ -28,6 +30,7 @@ const columnSchema = gql`
     expertise: Expertise
     subscriptions(page: Int, limit: Int): [Subscription]
     type: String
+    bannedMembers(page: Int, limit: Int): [User]
   }
 
   enum columnVisibility {

@@ -4,6 +4,7 @@ const { tokenService, emailService, socialService, stripeService } = require('..
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
+const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 
 const getUserSettings = async userSettings => {
   const defaultSettings = await getTenantSettings('user.defaults')
@@ -79,7 +80,11 @@ module.exports = {
         id: socialId,
         attributes
       }
-    }
+    },
+    searchByUsername: can('standard').createResolver(async (_parent, { query }, { db }) => {
+      const rawUsers = await db.User.search(query)
+      return rawUsers.rows.map(expertise => exportSafeModel(expertise))
+    })
   },
   Mutation: {
     connectPaymentMethod: can('standard').createResolver(async (_parent, { paymentMethod }, { req }) => {

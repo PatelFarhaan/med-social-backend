@@ -82,6 +82,8 @@ module.exports = (sequelize, DataTypes) => {
       as: 'postVotes',
       foreignKey: 'userId'
     })
+
+    User.hasMany(models.ReportedContent)
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {
@@ -97,6 +99,18 @@ module.exports = (sequelize, DataTypes) => {
     if (!instance.firstName) fullname = null
     instance.fullname = fullname
   })
+
+  User.search = query => {
+    if (sequelize.options.dialect !== 'postgres') {
+      console.log('Search is only implemented on POSTGRES database')
+      return
+    }
+
+    query = query.toLowerCase()
+
+    // eslint-disable-next-line consistent-return
+    return sequelize.query(`SELECT username, firstName, lastName FROM User WHERE AND "username" LIKE '%${query}%'`, User)
+  }
 
   tokenize(User, 'lookupId')
 

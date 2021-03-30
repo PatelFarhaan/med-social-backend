@@ -27,6 +27,10 @@ module.exports = {
       const post = await postService.createPost({ body }, req.user)
       return exportSafeModel(post)
     }),
+    editPost: can('standard').createResolver(async (_parent, body, { req }) => {
+      const post = await postService.editPost({ body }, req.user)
+      return exportSafeModel(post)
+    }),
     createComment: can('standard').createResolver(async (_parent, body, { req }) => {
       const comment = await postService.createComment({ body }, req.user)
       return exportSafeModel(comment)
@@ -38,7 +42,10 @@ module.exports = {
     createPostVote: can('standard').createResolver(async (_parent, body, { req }) => {
       const post = await postService.votePost({ body }, req.user)
       return exportSafeModel(post)
-    })
+    }),
+    deletePost: can('standard').createResolver(async (_parent, body, { req }) => postService.deletePost({ body }, req.user)),
+    reportPost: can('standard').createResolver(async (_parent, body, { req }) => postService.reportPost({ body }, req.user)),
+    reviewPost: can('admin').createResolver(async (_parent, body, { req }) => postService.reviewPost({ body }, req.user))
   },
   Post: {
     author: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {

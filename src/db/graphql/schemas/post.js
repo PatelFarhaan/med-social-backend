@@ -16,9 +16,18 @@ const postSchema = gql`
       stackedPosts: [StackedPostInput]
       files: [Upload]
     ): Post
-    createComment(content: String!, postId: Int!): Post
+    createComment(content: String!, id: Int!): Post
     createPostBookmark(id: String!): Post
-    createPostVote(id: String!, type: voteTypes): Post
+    deletePost(id: Int!): DefaultPayload
+    createPostVote(id: Int!, type: voteTypes): Post
+    editPost(id: Int!, content: String!): Post
+    reportPost(id: Int!, reason: String!): DefaultPayload
+    reviewPost(id: Int!, state: reportedContentStatuses!): DefaultPayload
+  }
+
+  enum reportedContentStatuses {
+    APPROVED
+    REJECTED
   }
 
   enum voteTypes {

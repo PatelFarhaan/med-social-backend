@@ -3,11 +3,12 @@ const { gql } = require('apollo-server-express')
 const userSchema = gql`
   type Query {
     login(email: String!, password: String, token: String): Session
-    getUser(id: Int): User
+    getUser(id: String!): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
+    searchByUsername(query: String): [User]
   }
 
   type socialGoogleOnboarding {
@@ -44,13 +45,8 @@ const userSchema = gql`
     google
   }
 
-  type DefaultPayload {
-    status: Int
-    message: String
-  }
-
   type Mutation {
-    updateUser(id: Int, settings: JSON!): User
+    updateUser(id: String, settings: JSON!): User
     createUser(
       email: String!
       firstName: String!

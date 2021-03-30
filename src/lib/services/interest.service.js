@@ -9,8 +9,6 @@ const getInterest = async ({ id, context }) => db.Interest.findByPk(id, { [EXPEC
 const getInterests = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, loaderOpts) => {
   let order = [['name', 'ASC']]
 
-  console.log(loaderOpts)
-
   const sortFilters = {
     name: direction => [['name', direction.toUpperCase()]],
     createdAt: direction => [['createdAt', direction.toUpperCase()]]
