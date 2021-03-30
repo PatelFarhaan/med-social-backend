@@ -2,6 +2,7 @@ const db = require('../../db/models')
 const logger = require('../utils/logger')
 const uploadService = require('./upload.service')
 const { isStringJSON } = require('../utils/isStringJSON')
+const { reportedContentStatuses } = require('../constants/reportedContent.constant')
 
 const LIMIT = 50
 
@@ -104,6 +105,10 @@ const reviewReportedPost = async ({ body: { id, state } }, user, ReportedContent
   DBreportedContent.state = state
   DBreportedContent.approvedById = user.id
   const savedReportedPost = await DBreportedContent.save()
+  if (state === reportedContentStatuses.APPROVED) {
+    const originalPost = await DBreportedContent.getPost()
+    await originalPost.destroy()
+  }
   return {
     status: 204,
     message: 'Reviewed reported post successfully',
