@@ -87,10 +87,10 @@ const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
 
   let savedInvitation
   try {
-    // savedInvitation = await invitation.approve(user)
     if (invitation.state === states.PENDING) {
       invitation.state = states.APPROVED
-      const token = generateToken()
+      const token = await generateToken()
+      console.warn('token', token)
       invitation.token = token
       // TODO: Add approved by when you add the authentication
       // Model.approvedBy = approvedBy
@@ -117,6 +117,44 @@ const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
   return savedInvitation
 }
 
+// const inviteUserToColumn = async ({ body: { firstName, lastName, email, column } }, user, Invitation = db.Invitation) => {
+//   const invitation = await Invitation.findOne({ where: { email } })
+//   if (!invitation) {
+//     throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
+//   }
+
+//   let savedInvitation
+//   try {
+//     // savedInvitation = await invitation.approve(user)
+//     if (invitation.state === states.PENDING) {
+//       invitation.state = states.APPROVED
+//       const token = generateToken()
+//       invitation.token = token
+//       // TODO: Add approved by when you add the authentication
+//       // Model.approvedBy = approvedBy
+//       savedInvitation = await invitation.save()
+//       if (invitation.special) {
+//         await emailService.sendEmail(
+//           invitation.email,
+//           { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+//           'nomDePlumeConfirmed'
+//         )
+//       } else {
+//         await emailService.sendEmail(
+//           invitation.email,
+//           { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+//           'invitationConfirmed'
+//         )
+//       }
+//     }
+//   } catch (e) {
+//     logger.warn(`savedInvitation ${e}`)
+//     throw e
+//   }
+
+//   return savedInvitation
+// }
+
 const rejectInvitation = async (email, _user, Invitation = db.Invitation) => {
   const invitation = await Invitation.findOne({ where: { email } })
   if (!invitation) {
@@ -129,7 +167,7 @@ const rejectInvitation = async (email, _user, Invitation = db.Invitation) => {
       invitation.special = false
       // TODO: Add approved by when you add the authentication
       // this.approvedBy = approvedBy
-      const token = generateToken()
+      const token = await generateToken()
       invitation.token = token
       invitation.state = states.APPROVED
       savedInvitation = await invitation.save()
@@ -204,6 +242,25 @@ const resendInvitationEmail = async ({ email }, loaderOpts) => {
   }
 }
 
+const updateSamplePosts = async ({ email, samplePosts }, loaderOpts) => {
+  const invitation = await db.Invitation.findOne({ where: { email, state: states.PENDING } }, loaderOpts)
+  if (!invitation) throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
+  if (invitation.samplePosts.length > 0) throw new Error(JSON.stringify({ status: 400, message: 'Invitation sample posts already exists' }))
+
+  try {
+    invitation.samplePosts = samplePosts
+    await invitation.save()
+  } catch (e) {
+    logger.info(`updateSamplePosts ${e}`)
+    throw e
+  }
+
+  return {
+    status: 204,
+    message: 'Successfully updated sample posts'
+  }
+}
+
 const generateToken = async () => base64url(uuidv4())
 
 module.exports = {
@@ -213,5 +270,7 @@ module.exports = {
   getInvitation,
   payForApproval,
   resendInvitationEmail,
-  rejectInvitation
+  rejectInvitation,
+  updateSamplePosts
+  // inviteUserToColumn
 }

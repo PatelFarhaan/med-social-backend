@@ -30,6 +30,7 @@ const invitationSchema = gql`
     ): Invitation
     approveInvitation(email: String!): Invitation
     payForApproval(paymentMethod: StripePaymentMethod!, email: String!): Approval
+    applyForFellowship(email: String!, samplePosts: [SamplePostsInput]): DefaultPayload
   }
 
   input StripeCard {
