@@ -31,7 +31,8 @@ module.exports = {
     payForApproval: async (_parent, body) => {
       const invitation = await invitationService.payForApproval(body)
       return invitation
-    }
+    },
+    applyForFellowship: async (_parent, body) => invitationService.updateSamplePosts(body)
   },
   Invitation: {
     expertises: (invitation, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {

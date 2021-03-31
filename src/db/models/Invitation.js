@@ -33,10 +33,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   Invitation.associate = models => {
-    // TODO: Add this when column is available
-    // Invitation.belongsTo(models.Column, {
-    //   as: 'column'
-    // })
+    Invitation.belongsTo(models.Column)
 
     Invitation.belongsTo(models.Subscription, {
       as: 'subscription'

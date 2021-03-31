@@ -20,6 +20,7 @@ CREATE TABLE "Invitation" (
     "type" invitationTypes,
     "created_by" uuid REFERENCES "User"("id"),
     "approved_by" uuid REFERENCES "User"("id"),
+    "ColumnSlug" character varying(255) REFERENCES "Column"("slug"),
     "subscriptionId" integer REFERENCES "Subscription"("id"),
     "expires_at" timestamptz,
     "sample_posts" jsonb NOT NULL DEFAULT '{}',

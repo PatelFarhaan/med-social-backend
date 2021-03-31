@@ -36,7 +36,7 @@
     "@admin-bro/express": "^3.1.0",
     "@admin-bro/sequelize": "^1.2.1",
     "@aws-sdk/client-ses": "^3.7.0",
-    "admin-bro": "^3.4.0",
+    "admin-bro": "^3.4.0-beta.9",
     "apollo-server": "^2.4.8",
     "apollo-server-express": "^2.4.8",
     "apollo-server-testing": "^2.4.8",
