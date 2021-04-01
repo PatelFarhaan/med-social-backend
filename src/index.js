@@ -128,7 +128,7 @@ const initApp = async () => {
     app.use(jsonErrorHandler)
     return app
   } catch (err) {
-    console.warn('err', err)
+    logger.warn('err', err)
     return err
   }
 }

@@ -4,6 +4,7 @@ const { createDefaultUser } = require('../../fixtures/user.fixture')
 const { createDefaultInterest } = require('../../fixtures/interest.fixture')
 const { createDefaultExpertise } = require('../../fixtures/expertise.fixture')
 const { createDefaultColumn } = require('../../fixtures/column.fixture')
+const { reputationSources } = require('../../constants/reputation.constant')
 
 const { postService } = require('../index')
 
@@ -11,6 +12,7 @@ const defaultPostValue = {
   content: 'Test 2',
   isQuoted: false,
   isStacked: false,
+  columnSlug: 'test-column',
   column: 'test-column'
 }
 
@@ -67,12 +69,13 @@ describe('Post Service', () => {
   describe('Post Vote', () => {
     let defaultPost
     beforeEach(async () => {
-      defaultPost = await db.Post.create(defaultPostValue)
+      defaultPost = await db.Post.create({ ...defaultPostValue, author_id: user.id })
     })
 
     afterEach(async () => {
       await db.Post.destroy({ where: { content: 'Test 2' } })
       await db.Vote.destroy({ where: {} })
+      await db.Reputation.destroy({ where: {} })
     })
 
     test('It should create a vote for a post when valid parameters are passed', async () => {
@@ -81,6 +84,8 @@ describe('Post Service', () => {
       expect(postVotes.length).toBe(1)
       expect(post.votes).toBe(1)
       expect(postVotes[0].Vote.type).toBe('UP')
+      const reputationCount = await db.Reputation.count({ PostId: post.id, source: reputationSources.VOTED })
+      expect(reputationCount).toBe(1)
     })
 
     test('It should delete the vote for a post if it already exists', async () => {
@@ -89,6 +94,8 @@ describe('Post Service', () => {
       const postVotes = await post.getUserVotes()
       expect(postVotes.length).toBe(0)
       expect(post.votes).toBe(0)
+      const reputationCount = await db.Reputation.count({ PostId: post.id, source: reputationSources.VOTED })
+      expect(reputationCount).toBe(0)
     })
 
     test('It should update the original vote for the post if it has a different vote type and create a new one', async () => {
@@ -98,30 +105,38 @@ describe('Post Service', () => {
       expect(postVotes.length).toBe(1)
       expect(postVotes[0].Vote.type).toBe('DOWN')
       expect(post.votes).toBe(-1)
+      const reputationCount = await db.Reputation.count({ PostId: post.id, source: reputationSources.VOTED })
+      expect(reputationCount).toBe(1)
     })
   })
 
   describe('Post Bookmark', () => {
     let defaultPost
     beforeEach(async () => {
-      defaultPost = await db.Post.create(defaultPostValue)
+      defaultPost = await db.Post.create({ ...defaultPostValue, author_id: user.id })
     })
 
     afterEach(async () => {
       await db.Post.destroy({ where: { content: 'Test 2' } })
       await db.PostBookmark.destroy({ where: {} })
+      await db.Reputation.destroy({ where: {} })
     })
 
     test('It should create a bookmark for a post when valid parameters are passed', async () => {
       const post = await postService.bookmarkPost({ body: { id: defaultPost.id } }, user)
       const postBookmarks = await post.getUserBookmarks()
       expect(postBookmarks.length).toBe(1)
+      const reputationCount = await db.Reputation.count({ PostId: post.id, authorId: user.id, source: reputationSources.BOOKMARKED })
+      expect(reputationCount).toBe(1)
     })
 
     test('It should delete the bookmark for a post if it already exists', async () => {
+      await db.PostBookmark.create({ userId: user.id, postId: defaultPost.id })
       const post = await postService.bookmarkPost({ body: { id: defaultPost.id } }, user)
       const postBookmarks = await post.getUserBookmarks()
-      expect(postBookmarks.length).toBe(1)
+      expect(postBookmarks.length).toBe(0)
+      const reputationCount = await db.Reputation.count({ PostId: post.id, authorId: user.id, source: reputationSources.BOOKMARKED })
+      expect(reputationCount).toBe(0)
     })
   })
 
