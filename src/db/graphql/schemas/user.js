@@ -65,6 +65,7 @@ const userSchema = gql`
     connectSocial(token: String!, provider: socialProviders!): User
     disconnectSocial(token: String!, provider: socialProviders!): User
     connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
+    uploadProfilePicture(file: Upload): User
   }
 
   type Users {
