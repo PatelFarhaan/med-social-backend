@@ -54,7 +54,9 @@ module.exports = (sequelize, DataTypes) => {
 
     Invitation.belongsToMany(models.Expertise, {
       through: 'InvitationExpertises',
-      as: 'expertises'
+      as: 'expertises',
+      onDelete: 'CASCADE',
+      hooks: true
     })
   }
 
