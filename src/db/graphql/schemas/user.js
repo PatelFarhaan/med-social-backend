@@ -87,6 +87,15 @@ const userSchema = gql`
     expires: DateTime
   }
 
+  type UserExpertise {
+    id: Int
+    totalPoints: Int
+    isPrimary: Boolean
+    isSecondary: Boolean
+    user: User
+    expertise: Expertise
+  }
+
   type User {
     id: Int
     email: String!
@@ -103,6 +112,7 @@ const userSchema = gql`
     expertises: [Expertise]
     interests: [Interest]
     invitedBy: [User]
+    userExpertises: [UserExpertise]
   }
 `
 

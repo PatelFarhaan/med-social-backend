@@ -3,6 +3,8 @@ const logger = require('../utils/logger')
 const uploadService = require('./upload.service')
 const { isStringJSON } = require('../utils/isStringJSON')
 const { reportedContentStatuses } = require('../constants/reportedContent.constant')
+const { calculatePoints } = require('./reputation.service')
+const { reputationSources } = require('../constants/reputation.constant')
 
 const LIMIT = 50
 
@@ -119,11 +121,9 @@ const reviewReportedPost = async ({ body: { id, state } }, user, ReportedContent
 const createPost = async ({ body: { column, stackedPosts = [], files = [], ...postFields } }, user, Post = db.Post, Column = db.Column) => {
   let post
   try {
-    post = await Post.create(postFields)
-    await post.setAuthor(user)
     const existingColumn = await Column.findByPk(column)
     if (!existingColumn) throw new Error({ status: 404, message: 'Column not found' })
-    await post.setColumn(column)
+    post = await Post.create({ ...postFields, columnSlug: column, author_id: user.id })
     if (stackedPosts.length > 0) {
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
@@ -134,6 +134,9 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
         )
       )
     }
+    const columnExpertise = await existingColumn.getExpertise()
+    await calculatePoints(user, columnExpertise, reputationSources.POSTED, post, existingColumn, user)
+
     if (files.length > 0) {
       const uploadedFiles = (await Promise.all(files)).map(uploadService.processUploadS3)
       const savedFiles = (await Promise.all(uploadedFiles)).map(async file => post.createFile(file))
@@ -186,28 +189,52 @@ const createComment = async ({ body: { id, content = '' } }, user, Post = db.Pos
 const updateVoteValue = async (voteType, post) => {
   if (voteType === 'UP') {
     await post.increment('votes', { by: 1 })
-  } else {
-    await post.decrement('votes', { by: 1 })
+    return 1
   }
+  await post.decrement('votes', { by: 1 })
+  return -1
 }
 
-const votePost = async ({ body: { id, type } }, user, Post = db.Post, Vote = db.Vote) => {
+const votePost = async (
+  { body: { id, type } },
+  user,
+  Post = db.Post,
+  Vote = db.Vote,
+  Reputation = db.Reputation,
+  UserExpertise = db.UserExpertise
+) => {
   let post
   try {
+    let voteValue = 0
     post = await Post.findByPk(id)
     if (!post) throw new Error({ status: 404, message: 'Post not found' })
     const existingVote = await Vote.findOne({ where: { postId: post.id, userId: user.id } })
+    const postAuthor = await post.getAuthor()
+    const postColumn = await post.getColumn()
+    const columnExpertise = await postColumn.getExpertise()
     if (existingVote) {
+      const userExpertise = await UserExpertise.findOne({ where: { UserId: postAuthor.id, ExpertiseId: columnExpertise.id } })
+      await Reputation.destroy({
+        where: {
+          PostId: post.id,
+          authorId: user.id,
+          UserExpertiseId: userExpertise.id,
+          ColumnSlug: postColumn.slug,
+          source: reputationSources.VOTED
+        }
+      })
       if (existingVote.type === type) {
         await existingVote.destroy()
       } else {
         existingVote.type = type
         await existingVote.save()
-        await updateVoteValue(type, post)
+        voteValue = await updateVoteValue(type, post)
+        await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
       }
     } else {
       await post.addUserVote(user, { through: { type } })
       await updateVoteValue(type, post)
+      await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
     }
   } catch (e) {
     logger.warn(`votePost: ${e}`)
@@ -217,16 +244,37 @@ const votePost = async ({ body: { id, type } }, user, Post = db.Post, Vote = db.
   return post
 }
 
-const bookmarkPost = async ({ body: { id } }, user, Post = db.Post, PostBookmark = db.PostBookmark) => {
+const bookmarkPost = async (
+  { body: { id } },
+  user,
+  Post = db.Post,
+  PostBookmark = db.PostBookmark,
+  UserExpertise = db.UserExpertise,
+  Reputation = db.Reputation
+) => {
   let post
   try {
     post = await Post.findByPk(id)
     if (!post) throw new Error({ status: 404, message: 'Post not found' })
     const existingBookmark = await PostBookmark.findOne({ where: { postId: post.id, userId: user.id } })
+    const postAuthor = await post.getAuthor()
+    const postColumn = await post.getColumn()
+    const columnExpertise = await postColumn.getExpertise()
     if (existingBookmark) {
       await existingBookmark.destroy()
+      const userExpertise = await UserExpertise.findOne({ where: { UserId: postAuthor.id, ExpertiseId: columnExpertise.id } })
+      await Reputation.destroy({
+        where: {
+          PostId: post.id,
+          UserExpertiseId: userExpertise.id,
+          ColumnSlug: postColumn.slug,
+          source: reputationSources.BOOKMARKED,
+          authorId: user.id
+        }
+      })
     } else {
       await post.addUserBookmark(user)
+      await calculatePoints(postAuthor, columnExpertise, reputationSources.BOOKMARKED, post, postColumn, user)
     }
   } catch (e) {
     logger.warn(`votePost: ${e.message}`)

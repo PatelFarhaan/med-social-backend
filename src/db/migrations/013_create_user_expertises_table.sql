@@ -1,6 +1,7 @@
 -- rambler up
 
-CREATE TABLE "UserExpertises" (
+CREATE TABLE "UserExpertise" (
+    id serial NOT NULL PRIMARY KEY,
     "ExpertiseId" integer NOT NULL REFERENCES "Expertise"("id"),
     "UserId" uuid NOT NULL REFERENCES "User"("id"),
     "totalPoints" integer DEFAULT 0,
@@ -11,4 +12,4 @@ CREATE TABLE "UserExpertises" (
 );
 
 -- rambler down
-DROP TABLE "UserExpertises";
+DROP TABLE "UserExpertise";

@@ -62,8 +62,13 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     User.belongsToMany(models.Expertise, {
-      through: models.UserExpertises,
+      through: models.UserExpertise,
       as: 'expertises'
+    })
+
+    User.hasMany(models.UserExpertise, {
+      as: 'userExpertises',
+      foreignKey: 'UserId'
     })
 
     User.belongsToMany(models.Subscription, {

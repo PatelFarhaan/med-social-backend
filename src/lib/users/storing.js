@@ -7,6 +7,8 @@ const { states, invitationTypes } = require('../constants/invitation.constant')
 const { subscriptionStatuses } = require('../constants/subscription.constant')
 const { tokenTypes } = require('../constants/token.constant')
 const logger = require('../utils/logger')
+const { calculatePoints } = require('../services/reputation.service')
+const { reputationSources } = require('../constants/reputation.constant')
 
 const BCRYPT_SALT_ROUNDS = 10
 
@@ -54,6 +56,7 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
     if (expertises) {
       const dbExpertises = await db.Expertise.findAll({ where: { id: expertises } })
       await savedUser.addExpertise(dbExpertises)
+      await calculatePoints(savedUser, dbExpertises[0], reputationSources.ONBOARDED)
     }
 
     if (!isSeed && env !== 'test') {

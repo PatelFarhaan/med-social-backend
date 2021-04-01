@@ -142,5 +142,21 @@ module.exports = {
         throw new Error(JSON.stringify({ status: 401, message: 'Please authenticate' }))
       }
     }
+  },
+  User: {
+    userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+    }
+  },
+  UserExpertise: {
+    user: (userExpertise, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUserExpertise = db.UserExpertise.build(userExpertise)
+      return dbUserExpertise.getUser({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    expertise: (userExpertise, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUserExpertise = db.UserExpertise.build(userExpertise)
+      return dbUserExpertise.getExpertise({ [EXPECTED_OPTIONS_KEY]: context })
+    }
   }
 }
