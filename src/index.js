@@ -20,6 +20,7 @@ const { createContext, EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize')
 
 AdminBro.registerAdapter(AdminBroSequelize)
 const AdminBroExpress = require('@admin-bro/express')
+const invitationAdmin = require('./admin/invitation/invitation.admin')
 
 const { jwtStrategy } = require('./middleware/passport')
 const logger = require('./lib/utils/logger')
@@ -118,6 +119,12 @@ const initApp = async () => {
   try {
     const adminBro = new AdminBro({
       databases: [db],
+      resources: [
+        {
+          resource: db.sequelize.models.Invitation,
+          options: invitationAdmin
+        }
+      ],
       rootPath: '/admin'
     })
 
@@ -128,7 +135,7 @@ const initApp = async () => {
     app.use(jsonErrorHandler)
     return app
   } catch (err) {
-    console.warn('err', err)
+    logger.warn('err', err)
     return err
   }
 }
