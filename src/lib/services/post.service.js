@@ -10,6 +10,8 @@ const { notify } = require('./notification.service')
 
 const LIMIT = 50
 
+const POSTS_SINGLE_PAGE = (slug, post) => `/columns/${slug}/posts/${post}`
+
 const getPost = async ({ id, hierarchy = true }, loaderOpts) =>
   db.Post.findOne({
     where: { id },
@@ -201,7 +203,8 @@ const votePost = async (
   Post = db.Post,
   Vote = db.Vote,
   Reputation = db.Reputation,
-  UserExpertise = db.UserExpertise
+  UserExpertise = db.UserExpertise,
+  Notification = db.Notification
 ) => {
   let post
   try {
@@ -223,18 +226,51 @@ const votePost = async (
           source: reputationSources.VOTED
         }
       })
+      await Notification.destroy({
+        where: {
+          PostId: post.id,
+          authorId: user.id
+        }
+      })
       if (existingVote.type === type) {
         await existingVote.destroy()
       } else {
         existingVote.type = type
         await existingVote.save()
         voteValue = await updateVoteValue(type, post)
+        // TODO: Refactor this after the 0.5 release to adhere with DRY
         await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
+        if (voteValue > 0 && postAuthor.id !== user.id) {
+          await notify(
+            notificationTypes.UPVOTED,
+            notificationCategories.VOTES,
+            {
+              PostId: post.id,
+              ColumnSlug: postColumn.slug,
+              actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
+            },
+            user,
+            [postAuthor.id]
+          )
+        }
       }
     } else {
       await post.addUserVote(user, { through: { type } })
-      await updateVoteValue(type, post)
+      voteValue = await updateVoteValue(type, post)
       await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
+      if (voteValue > 0 && postAuthor.id !== user.id) {
+        await notify(
+          notificationTypes.UPVOTED,
+          notificationCategories.VOTES,
+          {
+            PostId: post.id,
+            ColumnSlug: postColumn.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
+          },
+          user,
+          [postAuthor.id]
+        )
+      }
     }
   } catch (e) {
     logger.warn(`votePost: ${e}`)
@@ -250,7 +286,8 @@ const bookmarkPost = async (
   Post = db.Post,
   PostBookmark = db.PostBookmark,
   UserExpertise = db.UserExpertise,
-  Reputation = db.Reputation
+  Reputation = db.Reputation,
+  Notification = db.Notification
 ) => {
   let post
   try {
@@ -272,9 +309,23 @@ const bookmarkPost = async (
           authorId: user.id
         }
       })
+      await Notification.destroy({ where: { authorId: user.id, PostId: post.id } })
     } else {
       await post.addUserBookmark(user)
-      await calculatePoints(postAuthor, columnExpertise, reputationSources.BOOKMARKED, post, postColumn, user)
+      if (postAuthor.id !== user.id) {
+        await calculatePoints(postAuthor, columnExpertise, reputationSources.BOOKMARKED, post, postColumn, user)
+        await notify(
+          notificationTypes.BOOKMARKED_POST,
+          notificationCategories.BOOKMARKS,
+          {
+            PostId: post.id,
+            ColumnSlug: postColumn.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
+          },
+          user,
+          [postAuthor.id]
+        )
+      }
     }
   } catch (e) {
     logger.warn(`votePost: ${e.message}`)

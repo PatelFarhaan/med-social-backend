@@ -1,7 +1,7 @@
 const db = require('../../db/models')
 // const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
 
-const notifyInApp = async (type, category, data, author, receipients) => {
+const notifyInApp = async (type, category, data = {}, author = {}, receipients = []) => {
   if (!type) throw new Error(JSON.stringify({ status: 400, message: 'Notification Type is required' }))
   if (!receipients) throw new Error(JSON.stringify({ status: 400, message: 'Notification receipients are required' }))
 
@@ -18,7 +18,7 @@ const notifyInApp = async (type, category, data, author, receipients) => {
 
 // TODO: Add mailer here instead of separate service
 
-const notify = async (type, category, data, author, receipients) => {
+const notify = async (type, category, data = {}, author = {}, receipients = []) => {
   const notification = await notifyInApp(type, category, data, author, receipients)
   return notification
 }

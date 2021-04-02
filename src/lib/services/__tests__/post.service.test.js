@@ -87,16 +87,22 @@ describe('Post Service', () => {
       await db.Post.destroy({ where: {} })
       await db.Vote.destroy({ where: {} })
       await db.Reputation.destroy({ where: {} })
+      await db.Notification.destroy({ where: {} })
     })
 
     test('It should create a vote for a post when valid parameters are passed', async () => {
-      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP' } }, user)
+      console.warn('ALL VOTES', await db.Vote.findAll(), defaultPost.id, user2.id)
+      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP' } }, user2)
       const postVotes = await post.getUserVotes()
       expect(postVotes.length).toBe(1)
       expect(post.votes).toBe(1)
       expect(postVotes[0].Vote.type).toBe('UP')
       const reputationCount = await db.Reputation.count({ PostId: post.id, source: reputationSources.VOTED })
       expect(reputationCount).toBe(1)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(1)
+      const notificationReceipients = await notifications[0].getReceipients()
+      expect(notificationReceipients.length).toBe(1)
     })
 
     test('It should delete the vote for a post if it already exists', async () => {
@@ -107,6 +113,8 @@ describe('Post Service', () => {
       expect(post.votes).toBe(0)
       const reputationCount = await db.Reputation.count({ PostId: post.id, source: reputationSources.VOTED })
       expect(reputationCount).toBe(0)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(0)
     })
 
     test('It should update the original vote for the post if it has a different vote type and create a new one', async () => {
@@ -118,6 +126,8 @@ describe('Post Service', () => {
       expect(post.votes).toBe(-1)
       const reputationCount = await db.Reputation.count({ PostId: post.id, source: reputationSources.VOTED })
       expect(reputationCount).toBe(1)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(0)
     })
   })
 
@@ -131,14 +141,19 @@ describe('Post Service', () => {
       await db.Post.destroy({ where: {} })
       await db.PostBookmark.destroy({ where: {} })
       await db.Reputation.destroy({ where: {} })
+      await db.Notification.destroy({ where: {} })
     })
 
     test('It should create a bookmark for a post when valid parameters are passed', async () => {
-      const post = await postService.bookmarkPost({ body: { id: defaultPost.id } }, user)
+      const post = await postService.bookmarkPost({ body: { id: defaultPost.id } }, user2)
       const postBookmarks = await post.getUserBookmarks()
       expect(postBookmarks.length).toBe(1)
-      const reputationCount = await db.Reputation.count({ PostId: post.id, authorId: user.id, source: reputationSources.BOOKMARKED })
+      const reputationCount = await db.Reputation.count({ PostId: post.id, authorId: user2.id, source: reputationSources.BOOKMARKED })
       expect(reputationCount).toBe(1)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(1)
+      const notificationReceipients = await notifications[0].getReceipients()
+      expect(notificationReceipients.length).toBe(1)
     })
 
     test('It should delete the bookmark for a post if it already exists', async () => {
@@ -148,6 +163,8 @@ describe('Post Service', () => {
       expect(postBookmarks.length).toBe(0)
       const reputationCount = await db.Reputation.count({ PostId: post.id, authorId: user.id, source: reputationSources.BOOKMARKED })
       expect(reputationCount).toBe(0)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(0)
     })
   })
 
