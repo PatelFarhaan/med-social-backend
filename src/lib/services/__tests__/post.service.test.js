@@ -1,6 +1,6 @@
 const db = require('../../../db/models/')
 const { destroyDefaults } = require('../../../lib/testHelpers/testUtils')
-const { createDefaultUser } = require('../../fixtures/user.fixture')
+const { createDefaultUser, createDefaultUser2 } = require('../../fixtures/user.fixture')
 const { createDefaultInterest } = require('../../fixtures/interest.fixture')
 const { createDefaultExpertise } = require('../../fixtures/expertise.fixture')
 const { createDefaultColumn } = require('../../fixtures/column.fixture')
@@ -9,7 +9,7 @@ const { reputationSources } = require('../../constants/reputation.constant')
 const { postService } = require('../index')
 
 const defaultPostValue = {
-  content: 'Test 2',
+  content: 'Test 2 @sam',
   isQuoted: false,
   isStacked: false,
   columnSlug: 'test-column',
@@ -18,6 +18,7 @@ const defaultPostValue = {
 
 describe('Post Service', () => {
   let user
+  let user2
   let expertise
   let interest
   let column
@@ -27,6 +28,7 @@ describe('Post Service', () => {
 
   beforeAll(async () => {
     ;[user] = await createDefaultUser()
+    ;[user2] = await createDefaultUser2()
     ;[expertise] = await createDefaultExpertise()
     ;[interest] = await createDefaultInterest()
     await interest.addExpertise(expertise)
@@ -39,6 +41,7 @@ describe('Post Service', () => {
   describe('Post', () => {
     afterEach(async () => {
       await db.Post.destroy({ where: {} })
+      await db.Notification.destroy({ where: {} })
     })
     test('It should create a post when valid parameters are passed', async () => {
       const post = await postService.createPost({ body: defaultPostValue }, user)
@@ -46,6 +49,10 @@ describe('Post Service', () => {
       expect(author.id).toBe(user.id)
       const stackedChilrenCount = await post.countStackedChildren()
       expect(stackedChilrenCount).toBe(0)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(1)
+      const notificationReceipients = await notifications[0].getReceipients()
+      expect(notificationReceipients.length).toBe(1)
     })
 
     test('It should create a stacked post when valid parameters are passed', async () => {
@@ -54,7 +61,7 @@ describe('Post Service', () => {
           body: {
             ...defaultPostValue,
             isStacked: true,
-            stackedPosts: [{ content: 'test 11' }, { content: 'test 12' }, { content: 'test 13' }]
+            stackedPosts: [{ content: `test 11 @${user2.username}` }, { content: 'test 12' }, { content: 'test 13' }]
           }
         },
         user
@@ -63,6 +70,10 @@ describe('Post Service', () => {
       expect(author.id).toBe(user.id)
       const stackedChilrenCount = await post.countStackedChildren()
       expect(stackedChilrenCount).toBe(3)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(1)
+      const notificationReceipients = await notifications[0].getReceipients()
+      expect(notificationReceipients.length).toBe(2)
     })
   })
 
@@ -73,7 +84,7 @@ describe('Post Service', () => {
     })
 
     afterEach(async () => {
-      await db.Post.destroy({ where: { content: 'Test 2' } })
+      await db.Post.destroy({ where: {} })
       await db.Vote.destroy({ where: {} })
       await db.Reputation.destroy({ where: {} })
     })
@@ -117,7 +128,7 @@ describe('Post Service', () => {
     })
 
     afterEach(async () => {
-      await db.Post.destroy({ where: { content: 'Test 2' } })
+      await db.Post.destroy({ where: {} })
       await db.PostBookmark.destroy({ where: {} })
       await db.Reputation.destroy({ where: {} })
     })
@@ -147,7 +158,7 @@ describe('Post Service', () => {
     })
 
     afterEach(async () => {
-      await db.Post.destroy({ where: { content: 'Test 2' } })
+      await db.Post.destroy({ where: {} })
       await db.PostBookmark.destroy({ where: {} })
     })
 
@@ -167,7 +178,7 @@ describe('Post Service', () => {
     })
 
     afterEach(async () => {
-      await db.Post.destroy({ where: { content: 'Test 2' } })
+      await db.Post.destroy({ where: {} })
       await db.PostBookmark.destroy({ where: {} })
     })
 

@@ -5,6 +5,8 @@ const { isStringJSON } = require('../utils/isStringJSON')
 const { reportedContentStatuses } = require('../constants/reportedContent.constant')
 const { calculatePoints } = require('./reputation.service')
 const { reputationSources } = require('../constants/reputation.constant')
+const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
+const { notify } = require('./notification.service')
 
 const LIMIT = 50
 
@@ -134,17 +136,15 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
         )
       )
     }
-    const columnExpertise = await existingColumn.getExpertise()
-    await calculatePoints(user, columnExpertise, reputationSources.POSTED, post, existingColumn, user)
-
     if (files.length > 0) {
       const uploadedFiles = (await Promise.all(files)).map(uploadService.processUploadS3)
-      const savedFiles = (await Promise.all(uploadedFiles)).map(async file => post.createFile(file))
-      // eslint-disable-next-line no-unused-vars
-      const saveAssociations = (await Promise.all(savedFiles)).map(async file => {
-        await file.setUser(user)
-        await file.setColumn(column)
-      })
+      ;(await Promise.all(uploadedFiles)).map(async file => post.createFile({ ...file, UserId: user.id, ColumnSlug: column.slug }))
+    }
+    const columnExpertise = await existingColumn.getExpertise()
+    await calculatePoints(user, columnExpertise, reputationSources.POSTED, post, existingColumn, user)
+    const mentionedUsers = await getMentionedUsers(post, stackedPosts)
+    if (mentionedUsers.length > 0) {
+      await notifyMentionedUser(post, mentionedUsers)
     }
   } catch (e) {
     logger.warn(`createPost: ${e}`)
@@ -282,6 +282,31 @@ const bookmarkPost = async (
     throw new Error(JSON.stringify({ status: parsedError.status ? parsedError.status : 400, message: parsedError.message }))
   }
   return post
+}
+
+const getMentionedUsernames = content => content.match(/@([\w]+)\b/gm)
+
+const getMentionedUsers = async (post, stackedPosts = []) => {
+  const contentArray = [post, ...stackedPosts]
+  const mentionedUsers = []
+  contentArray.forEach(item => mentionedUsers.push(getMentionedUsernames(item.content) || []))
+  const usernames = [...new Set(mentionedUsers.flat().map(item => item.split('@')[1]))]
+  if (usernames.length > 0) {
+    return db.User.findAll({ where: { username: usernames } })
+  }
+  return []
+}
+
+const notifyMentionedUser = async (post, mentionedUsers) => {
+  const postAuthor = await post.getAuthor()
+  const postColumn = await post.getColumn()
+  return notify(
+    notificationTypes.MENTIONED,
+    notificationCategories.REPLIES,
+    { postId: post.id, columnSlug: postColumn.slug },
+    postAuthor,
+    mentionedUsers
+  )
 }
 
 module.exports = {
