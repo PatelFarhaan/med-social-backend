@@ -1,10 +1,8 @@
 const { v4: uuid } = require('uuid')
 const s3 = require('../utils/s3')
-const {
-  aws: { s3Bucket }
-} = require('../../../config/config')
+const { uploadTypeBucket } = require('../constants/upload.constant')
 
-const processUploadS3 = async file => {
+const processUploadS3 = async (file, type = 'POST') => {
   const { createReadStream, mimetype: mimeType, encoding, filename } = await file
   const stream = createReadStream()
   const { Location } = await s3
@@ -12,7 +10,7 @@ const processUploadS3 = async file => {
       Body: stream,
       Key: `${uuid()}${filename}`,
       ContentType: mimeType,
-      Bucket: s3Bucket
+      Bucket: uploadTypeBucket[type]
     })
     .promise()
   return new Promise((resolve, reject) => {

@@ -1,6 +1,6 @@
 // Resolvers: A map of functions which return data for the schema.
 const { authenticate, authenticateToken, getUsers, exportSafeUser, signup } = require('../../../lib/users')
-const { tokenService, emailService, socialService, stripeService } = require('../../../lib/services')
+const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
@@ -141,7 +141,14 @@ module.exports = {
       } catch (error) {
         throw new Error(JSON.stringify({ status: 401, message: 'Please authenticate' }))
       }
-    }
+    },
+    uploadProfilePicture: can('standard').createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const uploadedFile = await uploadService.processUploadS3(args.file, 'USER')
+      user.profilePicture = uploadedFile.location
+      const savedUser = await user.save()
+      return exportSafeModel(savedUser)
+    })
   },
   User: {
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
