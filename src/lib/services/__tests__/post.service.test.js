@@ -55,6 +55,24 @@ describe('Post Service', () => {
       expect(notificationReceipients.length).toBe(1)
     })
 
+    test('It should create a quoted post when valid parameters are passed', async () => {
+      const defaultPost = await db.Post.create({ ...defaultPostValue, author_id: user.id })
+      const post = await postService.createPost({ body: { ...defaultPostValue, isQuoted: true, quoted_post: defaultPost.id } }, user2)
+      const quotedPost = await post.getQuotedPost()
+      expect(quotedPost.content).toBe(defaultPost.content)
+      expect(quotedPost.id).toBe(defaultPost.id)
+      const author = await post.getAuthor()
+      expect(author.id).toBe(user2.id)
+      const stackedChilrenCount = await post.countStackedChildren()
+      expect(stackedChilrenCount).toBe(0)
+      const notifications = await db.Notification.findAll({})
+      expect(notifications.length).toBe(2)
+      const [notificationQuotedPost] = notifications.filter(x => x.type === 'QUOTED_POST')
+      expect(notificationQuotedPost).not.toBe(null)
+      const [notificationMentionedPost] = notifications.filter(x => x.type === 'MENTIONED')
+      expect(notificationMentionedPost).not.toBe(null)
+    })
+
     test('It should create a stacked post when valid parameters are passed', async () => {
       const post = await postService.createPost(
         {
@@ -91,7 +109,6 @@ describe('Post Service', () => {
     })
 
     test('It should create a vote for a post when valid parameters are passed', async () => {
-      console.warn('ALL VOTES', await db.Vote.findAll(), defaultPost.id, user2.id)
       const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP' } }, user2)
       const postVotes = await post.getUserVotes()
       expect(postVotes.length).toBe(1)

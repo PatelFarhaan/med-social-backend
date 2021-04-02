@@ -148,10 +148,28 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
     if (mentionedUsers.length > 0) {
       await notifyMentionedUser(post, mentionedUsers)
     }
+    if (post.isQuoted && post.quoted_post) {
+      const quotedPost = await post.getQuotedPost()
+      if (quotedPost.author_id !== user.id) {
+        const quotedPostAuthor = await quotedPost.getAuthor({ attributes: ['firstName'] })
+        await notify(
+          notificationTypes.QUOTED_POST,
+          notificationCategories.REPLIES,
+          {
+            toFirstName: quotedPostAuthor.firstName,
+            fromName: user.firstName,
+            PostId: post.id,
+            ColumnSlug: existingColumn.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(existingColumn.slug, post.id)}`
+          },
+          user,
+          [quotedPost.author_id]
+        )
+      }
+    }
   } catch (e) {
     logger.warn(`createPost: ${e}`)
-    const parsedError = isStringJSON(e.message) ? JSON.parse(e.message) : e
-    throw new Error(JSON.stringify({ status: parsedError.status ? parsedError.status : 400, message: parsedError.message }))
+    throw e
   }
   return post
 }
@@ -180,6 +198,22 @@ const createComment = async ({ body: { id, content = '' } }, user, Post = db.Pos
     if (!DBpost) throw new Error({ status: 404, message: 'Post not found' })
     const column = await DBpost.getColumn()
     comment = await DBpost.createChild({ content, isComment: true, author_id: user.id, columnSlug: column.slug })
+    if (DBpost.author_id !== user.id) {
+      const DBpostAuthor = await DBpost.getAuthor()
+      await notify(
+        notificationTypes.REPLIED_TO_POST,
+        notificationCategories.REPLIES,
+        {
+          toFirstName: DBpostAuthor.firstName,
+          fromName: user.firstName,
+          PostId: DBpost.id,
+          ColumnSlug: column.slug,
+          actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(column.slug, DBpost.id)}`
+        },
+        user,
+        [DBpostAuthor.id]
+      )
+    }
   } catch (e) {
     logger.warn(`createComment: ${e.message}`)
     const parsedError = isStringJSON(e.message) ? JSON.parse(e.message) : e

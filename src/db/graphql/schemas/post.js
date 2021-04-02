@@ -11,8 +11,8 @@ const postSchema = gql`
     createPost(
       column: String
       content: String!
-      isStacked: Boolean
       isQuoted: Boolean
+      quoted_post: Int
       stackedPosts: [StackedPostInput]
       files: [Upload]
     ): Post

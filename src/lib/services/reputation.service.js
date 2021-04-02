@@ -109,6 +109,7 @@ const calculatePoints = async (
   UserExpertise = db.UserExpertise,
   Reputation = db.Reputation
 ) => {
+  console.warn('user', user, expertise)
   const [userExpertise] = await UserExpertise.findOrCreate({
     where: { UserId: user.id, ExpertiseId: expertise.id }
   })
