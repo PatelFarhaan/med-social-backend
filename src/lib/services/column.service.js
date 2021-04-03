@@ -3,10 +3,13 @@ const logger = require('../utils/logger')
 const { isStringJSON } = require('../utils/isStringJSON')
 const { columnStatuses, columnTypes, columnVisibilities } = require('../../lib/constants/column.constant')
 const { subscriptionTypes, paymentGateways } = require('../../lib/constants/subscription.constant')
-
-const { stripeService } = require('./index')
+const stripeService = require('./stripe.service')
+const notificationService = require('./notification.service')
+const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
 
 const LIMIT = 50
+
+const COLUMN_SINGLE_PAGE = slug => `/columns/${slug}`
 
 const getColumn = async ({ slug }, loaderOpts) => db.Column.findByPk(slug, loaderOpts)
 
@@ -42,7 +45,12 @@ const listColumns = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, inc
   })
 }
 
-const createColumn = async ({ body: { interests, expertise, ...columnFields } }, user, Column = db.Column) => {
+const createColumn = async (
+  { body: { interests, expertise, ...columnFields } },
+  user,
+  Column = db.Column,
+  Subscription = db.Subscription
+) => {
   let column
   try {
     column = await Column.create(columnFields)
@@ -52,13 +60,22 @@ const createColumn = async ({ body: { interests, expertise, ...columnFields } },
       await column.save()
     }
     await column.setAuthor(user)
+    const subscription = await Subscription.create({
+      type: subscriptionTypes.COLUMN,
+      email: user.email,
+      userId: user.id,
+      ColumnSlug: column.slug
+    })
+    await subscription.addUser(user)
+    await column.addSubscription(subscription)
     const dbInterests = await db.Interest.findAll({ where: { id: interests } })
     await column.addInterest(dbInterests)
     const dbExpertise = await db.Expertise.findOne({ where: { id: expertise } })
     await column.setExpertise(dbExpertise)
   } catch (e) {
     logger.warn(`createColumn: ${e}`)
-    throw new Error(JSON.stringify({ status: 400, message: e }))
+    // throw new Error(JSON.stringify({ status: 400, message: e }))
+    throw e
   }
   return column
 }
@@ -89,10 +106,18 @@ const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.S
         userId: user.id,
         ColumnSlug: column.slug
       })
+      await notificationService.notify(notificationTypes.NEW_COLUMN_SUBSCRIPTION, notificationCategories.SUBSCRIPTION, {
+        from_name: user.firstName,
+        to_first_name: columnAuthor.firstName,
+        column_name: column.name,
+        column_slug: column.slug,
+        actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${COLUMN_SINGLE_PAGE(column.slug)}`
+      })
     } else {
       throw new Error(JSON.stringify({ status: 400, message: 'Stripe Subscription creation was cancelled' }))
     }
   }
+  await subscription.addUser(user)
   return subscription
 }
 

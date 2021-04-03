@@ -7,7 +7,9 @@ const {
 } = require('../../../config/config')
 const { states } = require('../constants/invitation.constant')
 const logger = require('../utils/logger')
-const { stripeService, emailService, columnService } = require('.')
+const columnService = require('./column.service')
+const stripeService = require('./stripe.service')
+const emailService = require('./email.service')
 const { columnTypes } = require('../constants/column.constant')
 const { invitationTypes, invitationStates } = require('../constants/invitation.constant')
 

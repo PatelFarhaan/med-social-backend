@@ -2,13 +2,13 @@ const { gql } = require('apollo-server-express')
 
 const expertiseSchema = gql`
   type Query {
-    getExpertise(id: Int): Expertise
+    getExpertise(id: Int!): Expertise
     getExpertises(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Expertises
     searchExpertises(query: String): [Expertise]
   }
 
   type Mutation {
-    createExpertise(name: String, interests: [Int]): Expertise
+    createExpertise(name: String!, interests: [Int!]): Expertise
   }
 
   input InterestInput {
