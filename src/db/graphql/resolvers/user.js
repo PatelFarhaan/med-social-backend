@@ -56,7 +56,7 @@ module.exports = {
       const users = rawUsers.rows.map(user => exportSafeUser(user))
       return {
         list: users,
-        count: users.length
+        count: rawUsers.count
       }
     }),
     socialLogin: async (_parent, { provider, token }, { db }) => {

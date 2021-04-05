@@ -15,7 +15,7 @@ module.exports = {
       const invitations = rawInvitations.rows.map(invitation => exportSafeModel(invitation))
       return {
         list: invitations,
-        count: invitations.length
+        count: rawInvitations.count
       }
     }
   },

@@ -9,14 +9,23 @@ module.exports = {
       const post = await await postService.getPost(args, { [EXPECTED_OPTIONS_KEY]: context })
       return exportSafeModel(post)
     },
-    listPosts: async (_parent, args, { context, EXPECTED_OPTIONS_KEY }) => {
-      const rawPosts = await postService.listPosts(args, { [EXPECTED_OPTIONS_KEY]: context })
+    listColumnPosts: async (_parent, args, { context, EXPECTED_OPTIONS_KEY }) => {
+      const rawPosts = await postService.listColumnPosts(args, { [EXPECTED_OPTIONS_KEY]: context })
       const posts = rawPosts.rows.map(post => exportSafeModel(post))
       return {
         list: posts,
-        count: posts.length
+        count: rawPosts.count
       }
     },
+    listUserPosts: can('standard').createResolver(async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+      const { user } = req
+      const rawPosts = await postService.listUserPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+      const posts = rawPosts.rows.map(post => exportSafeModel(post))
+      return {
+        list: posts,
+        count: rawPosts.count
+      }
+    }),
     searchPosts: async (_parent, { query }, { db }) => {
       const columns = await db.Post.search(query)
       return columns[0]

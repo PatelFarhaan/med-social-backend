@@ -91,7 +91,6 @@ const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
     if (invitation.state === states.PENDING) {
       invitation.state = states.APPROVED
       const token = await generateToken()
-      console.warn('token', token)
       invitation.token = token
       // TODO: Add approved by when you add the authentication
       // Model.approvedBy = approvedBy
