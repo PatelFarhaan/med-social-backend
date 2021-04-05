@@ -9,6 +9,7 @@ const userSchema = gql`
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
     searchByUsername(query: String): [User]
+    getUserColumns(page: Int, limit: Int): [String]
   }
 
   type socialGoogleOnboarding {

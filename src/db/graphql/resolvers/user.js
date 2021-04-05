@@ -5,6 +5,7 @@ const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
+const { subscriptionStatuses, subscriptionTypes } = require('../../../lib/constants/subscription.constant')
 
 const getUserSettings = async userSettings => {
   const defaultSettings = await getTenantSettings('user.defaults')
@@ -46,17 +47,28 @@ module.exports = {
         message: 'Email Sent'
       }
     },
-    getUser: can('superadmin').createResolver(async (_parent, _args, { db, req }) => {
+    getUser: can('standard').createResolver(async (_parent, _args, { db, req }) => {
       const user = await db.User.findOne({ where: { id: req.user.id } })
       user.settings = await getUserSettings(user.settings)
       return user
+    }),
+    getUserColumns: can('standard').createResolver(async (_parent, { limit = 10, page = 1 }, { req }) => {
+      const { user } = req
+      const userColumnSubscriptions = await user.getSubscriptions({
+        attributes: ['ColumnSlug'],
+        where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
+        limit,
+        page
+      })
+
+      return userColumnSubscriptions.map(item => item.ColumnSlug)
     }),
     getUsers: can('superadmin').createResolver(async (_parent, args, { req }) => {
       const rawUsers = await getUsers(args, req.user.id)
       const users = rawUsers.rows.map(user => exportSafeUser(user))
       return {
         list: users,
-        count: users.length
+        count: rawUsers.count
       }
     }),
     socialLogin: async (_parent, { provider, token }, { db }) => {

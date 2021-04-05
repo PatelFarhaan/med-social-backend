@@ -14,7 +14,7 @@ module.exports = {
       const expertises = rawExpertises.rows.map(expertise => exportSafeModel(expertise))
       return {
         list: expertises,
-        count: expertises.length
+        count: rawExpertises.count
       }
     },
     searchExpertises: async (_parent, { query }, { db }) => {

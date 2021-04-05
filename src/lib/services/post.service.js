@@ -3,6 +3,7 @@ const logger = require('../utils/logger')
 const uploadService = require('./upload.service')
 const { isStringJSON } = require('../utils/isStringJSON')
 const { reportedContentStatuses } = require('../constants/reportedContent.constant')
+const { subscriptionStatuses, subscriptionTypes } = require('../constants/subscription.constant')
 const { calculatePoints } = require('./reputation.service')
 const { reputationSources } = require('../constants/reputation.constant')
 const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
@@ -28,7 +29,7 @@ const getPost = async ({ id, hierarchy = true }, loaderOpts) =>
     ...loaderOpts
   })
 
-const listPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, column, hierarchy }, loaderOpts) => {
+const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, column, hierarchy }, loaderOpts) => {
   let order = [['createdAt', 'ASC']]
 
   const sortFilters = {
@@ -70,6 +71,53 @@ const listPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, colum
       isComment: false
     },
     include: includeChildren,
+    limit,
+    offset: limit * (page - 1),
+    order,
+    ...loaderOpts
+  })
+}
+
+const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
+  let order = [['createdAt', 'ASC']]
+
+  const sortFilters = {
+    votes: direction => [['votes', direction.toUpperCase()]],
+    createdAt: direction => [['createdAt', direction.toUpperCase()]]
+  }
+
+  if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
+    order = sortFilters[sortBy](sortDirection)
+  }
+
+  const userColumnSubscriptions = await user.getSubscriptions({
+    attributes: ['ColumnSlug'],
+    where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN }
+  })
+
+  if (userColumnSubscriptions.length === 0) {
+    return {
+      count: 0,
+      rows: []
+    }
+  }
+
+  const mappedColumnSlugs = userColumnSubscriptions.map(item => item.ColumnSlug)
+
+  const columnInclude = {
+    model: db.Column,
+    as: 'column',
+    where: {
+      slug: mappedColumnSlugs
+    }
+  }
+
+  return db.Post.findAndCountAll({
+    where: {
+      isStacked: false,
+      isComment: false
+    },
+    include: columnInclude,
     limit,
     offset: limit * (page - 1),
     order,
@@ -396,7 +444,8 @@ const notifyMentionedUser = async (post, mentionedUsers) => {
 
 module.exports = {
   getPost,
-  listPosts,
+  listColumnPosts,
+  listUserPosts,
   createPost,
   votePost,
   bookmarkPost,
