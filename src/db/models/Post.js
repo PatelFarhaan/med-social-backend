@@ -48,9 +48,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'quoted_post'
     })
 
-    Post.belongsTo(models.Column, {
-      as: 'column'
-    })
+    Post.belongsTo(models.Column)
 
     Post.belongsTo(models.User, {
       as: 'author',

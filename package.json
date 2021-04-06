@@ -23,7 +23,8 @@
     "test": "jest src --runInBand --coverage",
     "test:watch": "jest --watchAll",
     "semiDocker": "npm run build:docker && docker-compose stop app && sed -i '' 's/RAMBLER_HOST=db/RAMBLER_HOST=localhost/' '.env'",
-    "build:docker": "docker-compose down && sed -i '' 's/RAMBLER_HOST=localhost/RAMBLER_HOST=db/' '.env' && docker-compose up -d --build"
+    "build:docker": "docker-compose down && sed -i '' 's/RAMBLER_HOST=localhost/RAMBLER_HOST=db/' '.env' && docker-compose up -d --build",
+    "build:base": "docker build -t column/base -f Dockerfile.base ."
   },
   "lint-staged": {
     "*.js": [

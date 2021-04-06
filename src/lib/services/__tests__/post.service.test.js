@@ -12,7 +12,7 @@ const defaultPostValue = {
   content: 'Test 2 @sam',
   isQuoted: false,
   isStacked: false,
-  columnSlug: 'test-column',
+  ColumnSlug: 'test-column',
   column: 'test-column'
 }
 
