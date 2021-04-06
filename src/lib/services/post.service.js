@@ -175,12 +175,12 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
   try {
     const existingColumn = await Column.findByPk(column)
     if (!existingColumn) throw new Error({ status: 404, message: 'Column not found' })
-    post = await Post.create({ ...postFields, columnSlug: column, author_id: user.id })
+    post = await Post.create({ ...postFields, ColumnSlug: column, author_id: user.id })
     if (stackedPosts.length > 0) {
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
           post.createStackedChild(
-            { content: stackedPost.content, isStacked: true, author_id: user.id, columnSlug: column },
+            { content: stackedPost.content, isStacked: true, author_id: user.id, ColumnSlug: column },
             { through: { order: index } }
           )
         )
@@ -245,7 +245,7 @@ const createComment = async ({ body: { id, content = '' } }, user, Post = db.Pos
     const DBpost = await Post.findByPk(id)
     if (!DBpost) throw new Error({ status: 404, message: 'Post not found' })
     const column = await DBpost.getColumn()
-    comment = await DBpost.createChild({ content, isComment: true, author_id: user.id, columnSlug: column.slug })
+    comment = await DBpost.createChild({ content, isComment: true, author_id: user.id, ColumnSlug: column.slug })
     if (DBpost.author_id !== user.id) {
       const DBpostAuthor = await DBpost.getAuthor()
       await notify(
@@ -436,7 +436,7 @@ const notifyMentionedUser = async (post, mentionedUsers) => {
   return notify(
     notificationTypes.MENTIONED,
     notificationCategories.REPLIES,
-    { postId: post.id, columnSlug: postColumn.slug },
+    { postId: post.id, ColumnSlug: postColumn.slug },
     postAuthor,
     mentionedUsers
   )

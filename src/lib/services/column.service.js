@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const { isStringJSON } = require('../utils/isStringJSON')
@@ -157,11 +158,36 @@ const banUser = async ({ body: { column, bannedUser } }, user) => {
   }
 }
 
+const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Column = db.Column) => {
+  const rawUserSubscriptions = await user.getSubscriptions({ attributes: ['ColumnSlug'] })
+  const userSubscriptions = rawUserSubscriptions.map(item => item.ColumnSlug)
+  return Column.findAndCountAll({
+    limit,
+    offset: limit * (page - 1),
+    ...loaderOpts,
+    where: {
+      slug: {
+        [Op.notIn]: userSubscriptions
+      },
+      state: columnStatuses.APPROVED
+    },
+    attributes: [
+      'slug',
+      'description',
+      'name',
+      'createdAt',
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
+    ],
+    order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
+  })
+}
+
 module.exports = {
   createColumn,
   getColumn,
   listColumns,
   subscribeToColumn,
   unsubscribeToColumn,
-  banUser
+  banUser,
+  getPopularColumns
 }

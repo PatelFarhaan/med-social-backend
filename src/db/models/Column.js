@@ -55,10 +55,7 @@ module.exports = (sequelize, DataTypes) => {
       as: 'subscriptions'
     })
 
-    Column.belongsToMany(models.Post, {
-      through: 'ColumnPosts',
-      as: 'posts'
-    })
+    Column.hasMany(models.Post)
 
     Column.hasMany(models.ReportedContent)
   }

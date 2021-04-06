@@ -59,4 +59,84 @@ describe('Column Service', () => {
       expect(dbSubscriptionsCount).toBe(0)
     })
   })
+
+  describe('Get Popular Columns', () => {
+    let columns
+    beforeAll(async () => {
+      await db.Subscription.destroy({ where: {} })
+      await db.Column.destroy({ where: {} })
+    })
+    beforeEach(async () => {
+      columns = await Promise.all(
+        ['calculus', 'physics', 'trigonometry'].map(async item => {
+          const column = await db.Column.create({
+            name: item,
+            description: item,
+            state: columnStatuses.APPROVED,
+            type: columnTypes.FREE,
+            ExpertiseId: expertise.id
+          })
+          await column.addInterest(interest)
+          return column
+        })
+      )
+    })
+    afterEach(async () => {
+      await db.Post.destroy({ where: {} })
+      await db.Subscription.destroy({ where: {} })
+      await db.Column.destroy({
+        where: {
+          slug: ['calculus', 'physics', 'trigonometry']
+        }
+      })
+    })
+
+    test('it should return in descending order with regards to the number of posts within the columns', async () => {
+      await Promise.all([
+        await db.Post.create({
+          content: 'this is about calculus',
+          isQuoted: false,
+          isStacked: false,
+          ColumnSlug: 'calculus'
+        }),
+        await db.Post.create({
+          content: 'this is about calculus 2',
+          isQuoted: false,
+          isStacked: false,
+          ColumnSlug: 'calculus'
+        }),
+        await db.Post.create({
+          content: 'this is about physics',
+          isQuoted: false,
+          isStacked: false,
+          ColumnSlug: 'physics'
+        })
+      ])
+
+      const popularColumns = await columnService.getPopularColumns({}, user)
+      expect(popularColumns.count).toBe(3)
+      expect(popularColumns.rows[0].slug).toBe('calculus')
+      expect(popularColumns.rows[1].slug).toBe('physics')
+    })
+
+    test('it should not return a column that the user is already subscribed to', async () => {
+      await columnService.subscribeToColumn({ body: { column: columns[0] } }, user)
+      const popularColumns = await columnService.getPopularColumns({}, user)
+      expect(popularColumns.count).toBe(2)
+      expect(popularColumns.rows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            slug: 'trigonometry'
+          })
+        ])
+      )
+      expect(popularColumns.rows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            slug: 'physics'
+          })
+        ])
+      )
+    })
+  })
 })
