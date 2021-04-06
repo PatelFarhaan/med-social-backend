@@ -158,7 +158,7 @@ const banUser = async ({ body: { column, bannedUser } }, user) => {
   }
 }
 
-const getPopularColumns = async ({ page = 1, limit = 10, loaderOpts }, user, Column = db.Column) => {
+const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Column = db.Column) => {
   const rawUserSubscriptions = await user.getSubscriptions({ attributes: ['ColumnSlug'] })
   const userSubscriptions = rawUserSubscriptions.map(item => item.ColumnSlug)
   return Column.findAndCountAll({
