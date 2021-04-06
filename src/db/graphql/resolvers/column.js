@@ -15,7 +15,7 @@ module.exports = {
       const columns = rawColumns.rows.map(column => exportSafeModel(column))
       return {
         list: columns,
-        count: columns.length
+        count: rawColumns.count
       }
     },
     searchColumns: async (_parent, { query }, { db }) => {

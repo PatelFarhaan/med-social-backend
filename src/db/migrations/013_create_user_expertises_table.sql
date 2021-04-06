@@ -1,8 +1,9 @@
 -- rambler up
 
-CREATE TABLE "UserExpertises" (
-    "ExpertiseId" integer NOT NULL REFERENCES "Expertise"("id"),
-    "UserId" uuid NOT NULL REFERENCES "User"("id"),
+CREATE TABLE "UserExpertise" (
+    id serial NOT NULL PRIMARY KEY,
+    "ExpertiseId" integer NOT NULL REFERENCES "Expertise"("id") ON DELETE CASCADE,
+    "UserId" uuid NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
     "totalPoints" integer DEFAULT 0,
     "isPrimary" boolean,
     "isSecondary" boolean,
@@ -11,4 +12,4 @@ CREATE TABLE "UserExpertises" (
 );
 
 -- rambler down
-DROP TABLE "UserExpertises";
+DROP TABLE "UserExpertise";

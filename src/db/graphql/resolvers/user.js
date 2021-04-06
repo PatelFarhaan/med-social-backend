@@ -1,10 +1,11 @@
 // Resolvers: A map of functions which return data for the schema.
 const { authenticate, authenticateToken, getUsers, exportSafeUser, signup } = require('../../../lib/users')
-const { tokenService, emailService, socialService, stripeService } = require('../../../lib/services')
+const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
+const { subscriptionStatuses, subscriptionTypes } = require('../../../lib/constants/subscription.constant')
 
 const getUserSettings = async userSettings => {
   const defaultSettings = await getTenantSettings('user.defaults')
@@ -46,17 +47,28 @@ module.exports = {
         message: 'Email Sent'
       }
     },
-    getUser: can('superadmin').createResolver(async (_parent, _args, { db, req }) => {
+    getUser: can('standard').createResolver(async (_parent, _args, { db, req }) => {
       const user = await db.User.findOne({ where: { id: req.user.id } })
       user.settings = await getUserSettings(user.settings)
       return user
+    }),
+    getUserColumns: can('standard').createResolver(async (_parent, { limit = 10, page = 1 }, { req }) => {
+      const { user } = req
+      const userColumnSubscriptions = await user.getSubscriptions({
+        attributes: ['ColumnSlug'],
+        where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
+        limit,
+        page
+      })
+
+      return userColumnSubscriptions.map(item => item.ColumnSlug)
     }),
     getUsers: can('superadmin').createResolver(async (_parent, args, { req }) => {
       const rawUsers = await getUsers(args, req.user.id)
       const users = rawUsers.rows.map(user => exportSafeUser(user))
       return {
         list: users,
-        count: users.length
+        count: rawUsers.count
       }
     }),
     socialLogin: async (_parent, { provider, token }, { db }) => {
@@ -141,6 +153,29 @@ module.exports = {
       } catch (error) {
         throw new Error(JSON.stringify({ status: 401, message: 'Please authenticate' }))
       }
+    },
+    uploadProfilePicture: can('standard').createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const uploadedFile = await uploadService.processUploadS3(args.file, 'USER')
+      user.profilePicture = uploadedFile.location
+      const savedUser = await user.save()
+      return exportSafeModel(savedUser)
+    })
+  },
+  User: {
+    userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+    }
+  },
+  UserExpertise: {
+    user: (userExpertise, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUserExpertise = db.UserExpertise.build(userExpertise)
+      return dbUserExpertise.getUser({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    expertise: (userExpertise, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUserExpertise = db.UserExpertise.build(userExpertise)
+      return dbUserExpertise.getExpertise({ [EXPECTED_OPTIONS_KEY]: context })
     }
   }
 }

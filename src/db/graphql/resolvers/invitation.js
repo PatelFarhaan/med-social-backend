@@ -2,7 +2,7 @@
 const { invitationService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 // const logger = require('../../lib/utils/logger')
-// const { can } = require('./../auth')
+const { can } = require('./../auth')
 
 module.exports = {
   Query: {
@@ -15,7 +15,7 @@ module.exports = {
       const invitations = rawInvitations.rows.map(invitation => exportSafeModel(invitation))
       return {
         list: invitations,
-        count: invitations.length
+        count: rawInvitations.count
       }
     }
   },
@@ -32,7 +32,10 @@ module.exports = {
       const invitation = await invitationService.payForApproval(body)
       return invitation
     },
-    applyForFellowship: async (_parent, body) => invitationService.updateSamplePosts(body)
+    applyForFellowship: async (_parent, body) => invitationService.updateSamplePosts(body),
+    inviteUserToColumn: can('standard').createResolver(async (_parent, body, { req }) =>
+      invitationService.inviteUserToColumn(body, req.user)
+    )
   },
   Invitation: {
     expertises: (invitation, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {

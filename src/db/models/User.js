@@ -62,8 +62,13 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     User.belongsToMany(models.Expertise, {
-      through: models.UserExpertises,
+      through: models.UserExpertise,
       as: 'expertises'
+    })
+
+    User.hasMany(models.UserExpertise, {
+      as: 'userExpertises',
+      foreignKey: 'UserId'
     })
 
     User.belongsToMany(models.Subscription, {
@@ -84,6 +89,13 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     User.hasMany(models.ReportedContent)
+
+    User.belongsToMany(models.Notification, {
+      through: 'NotificationReceipient',
+      as: 'notifications'
+    })
+
+    User.hasMany(models.Notification, { as: 'notificationAuthor' })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {

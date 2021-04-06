@@ -9,6 +9,7 @@ const userSchema = gql`
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
     searchByUsername(query: String): [User]
+    getUserColumns(page: Int, limit: Int): [String]
   }
 
   type socialGoogleOnboarding {
@@ -65,6 +66,7 @@ const userSchema = gql`
     connectSocial(token: String!, provider: socialProviders!): User
     disconnectSocial(token: String!, provider: socialProviders!): User
     connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
+    uploadProfilePicture(file: Upload): User
   }
 
   type Users {
@@ -87,6 +89,15 @@ const userSchema = gql`
     expires: DateTime
   }
 
+  type UserExpertise {
+    id: Int
+    totalPoints: Int
+    isPrimary: Boolean
+    isSecondary: Boolean
+    user: User
+    expertise: Expertise
+  }
+
   type User {
     id: Int
     email: String!
@@ -103,6 +114,7 @@ const userSchema = gql`
     expertises: [Expertise]
     interests: [Interest]
     invitedBy: [User]
+    userExpertises: [UserExpertise]
   }
 `
 
