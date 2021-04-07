@@ -6,9 +6,20 @@ const invitationSchema = gql`
     getInvitations(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Invitations
   }
 
-  input SamplePostsInput {
-    title: String
-    content: String
+  input socialLinksInput {
+    twitter: String
+    linkedin: String
+    website: String
+    additionalLink: String
+  }
+
+  input fellowApplicationInput {
+    title: String!
+    organization: String!
+    bio: String!
+    socialLinks: socialLinksInput
+    applyForColumn: Boolean!
+    samplePosts: [String]!
   }
 
   enum invitationTypes {
@@ -26,12 +37,12 @@ const invitationSchema = gql`
       note: String
       verificationLink: String
       special: Boolean
-      samplePosts: [SamplePostsInput]
+      fellow: fellowApplicationInput
       type: invitationTypes
     ): Invitation
     approveInvitation(email: String!): Invitation
     payForApproval(paymentMethod: StripePaymentMethod!, email: String!): Approval
-    applyForFellowship(email: String!, samplePosts: [SamplePostsInput]): DefaultPayload
+    applyForFellowship(email: String!, fellow: fellowApplicationInput!, additionalExpertise: String): DefaultPayload
     inviteUserToColumn(firstName: String!, lastName: String!, email: String!, expertise: String!, columnSlug: String!): DefaultPayload
   }
 

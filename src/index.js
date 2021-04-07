@@ -17,6 +17,7 @@ const { graphqlUploadExpress } = require('graphql-upload')
 const AdminBro = require('admin-bro')
 const AdminBroSequelize = require('@admin-bro/sequelize')
 const { createContext, EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize')
+const bcrypt = require('bcrypt')
 
 AdminBro.registerAdapter(AdminBroSequelize)
 const AdminBroExpress = require('@admin-bro/express')
@@ -60,6 +61,46 @@ app.use(compression())
 // TODO: Update origin to production domain
 const origin = ['*']
 if (process.env.NODE_ENV !== 'production') origin.push(process.env.MOCK_WEBCLIENT_HOST || 'http://localhost:8080')
+
+const adminBro = new AdminBro({
+  databases: [db],
+  resources: [
+    {
+      resource: db.sequelize.models.Invitation,
+      options: invitationAdmin
+    }
+  ],
+  rootPath: '/admin'
+})
+
+const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
+  authenticate: async (email, password) => {
+    const user = await db.User.findOne({
+      where: {
+        email: email.toLowerCase(),
+        deactivatedAt: null
+      },
+      include: [
+        {
+          model: db.Role,
+          as: 'role',
+          attributes: ['id', 'type', 'createdAt', 'updatedAt']
+        }
+      ]
+    })
+    if (user) {
+      const comparison = await bcrypt.compare(password, user.hash)
+      if (comparison === true && ['admin', 'superadmin'].includes(user.role.type)) {
+        return { ...user.toJSON(), roles: [user.role.type] }
+      }
+      return null
+    }
+    return null
+  },
+  cookiePassword: process.env.JWT_SECRET
+})
+
+app.use(adminBro.options.rootPath, router)
 
 // 3rd party middleware
 app.use(cors({ origin, credentials: true }))
@@ -117,19 +158,6 @@ apolloServer.applyMiddleware({ app, cors: { origin } })
 
 const initApp = async () => {
   try {
-    const adminBro = new AdminBro({
-      databases: [db],
-      resources: [
-        {
-          resource: db.sequelize.models.Invitation,
-          options: invitationAdmin
-        }
-      ],
-      rootPath: '/admin'
-    })
-
-    const router = await AdminBroExpress.buildRouter(adminBro)
-    app.use(adminBro.options.rootPath, router)
     app.use('/static', express.static(path.join(__dirname, '/static')))
     app.use('/', api({ db, io }))
     app.use(jsonErrorHandler)
