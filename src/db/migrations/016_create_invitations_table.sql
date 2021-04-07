@@ -13,6 +13,7 @@ CREATE TABLE "Invitation" (
     "special" BOOLEAN DEFAULT FALSE,
     "reason" character varying(50),
     "note" character varying(134),
+    "verification_link" character varying(254),
     "first_name" character varying(50),
     "last_name" character varying(50),
     "state" states,

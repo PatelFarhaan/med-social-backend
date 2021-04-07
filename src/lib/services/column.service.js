@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const { isStringJSON } = require('../utils/isStringJSON')
@@ -56,7 +57,9 @@ const createColumn = async (
     column = await Column.create(columnFields)
     if (column.type === columnTypes.PAID) {
       const stripePriceId = await stripeService.createPrice(column)
+      const stripeTaxPriceId = await stripeService.createTaxPrice(column)
       column.stripePriceId = stripePriceId.id
+      column.stripeTaxPriceId = stripeTaxPriceId.id
       await column.save()
     }
     await column.setAuthor(user)
@@ -94,7 +97,7 @@ const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.S
       ColumnSlug: column.slug
     })
   } else {
-    const stripeSubscription = await stripeService.createSubscription(user.stripeCustomerId, column.stripePriceId)
+    const stripeSubscription = await stripeService.createSubscription(user.stripeCustomerId, column.stripePriceId, column.stripeTaxPriceId)
     if (stripeSubscription.latest_invoice.payment_intent.status !== 'cancelled') {
       subscription = await Subscription.create({
         paymentMethod: user.paymentMethod,
@@ -157,11 +160,36 @@ const banUser = async ({ body: { column, bannedUser } }, user) => {
   }
 }
 
+const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Column = db.Column) => {
+  const rawUserSubscriptions = await user.getSubscriptions({ attributes: ['ColumnSlug'] })
+  const userSubscriptions = rawUserSubscriptions.map(item => item.ColumnSlug)
+  return Column.findAndCountAll({
+    limit,
+    offset: limit * (page - 1),
+    ...loaderOpts,
+    where: {
+      slug: {
+        [Op.notIn]: userSubscriptions
+      },
+      state: columnStatuses.APPROVED
+    },
+    attributes: [
+      'slug',
+      'description',
+      'name',
+      'createdAt',
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
+    ],
+    order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
+  })
+}
+
 module.exports = {
   createColumn,
   getColumn,
   listColumns,
   subscribeToColumn,
   unsubscribeToColumn,
-  banUser
+  banUser,
+  getPopularColumns
 }

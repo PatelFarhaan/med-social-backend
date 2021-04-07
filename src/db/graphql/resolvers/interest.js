@@ -14,7 +14,7 @@ module.exports = {
       const interests = rawInterests.rows.map(interest => exportSafeModel(interest))
       return {
         list: interests,
-        count: interests.length
+        count: rawInterests.count
       }
     },
     searchInterests: async (_parent, { query }, { db }) => {

@@ -7,7 +7,7 @@ CREATE TABLE "Post" (
     "is_comment" BOOLEAN DEFAULT FALSE,
     "votes" integer NOT NULL DEFAULT 0,
     "author_id" uuid REFERENCES "User"("id"),
-    "columnSlug" character varying(255)REFERENCES "Column"("slug"),
+    "ColumnSlug" character varying(255)REFERENCES "Column"("slug") ON DELETE CASCADE,
     "quoted_post" integer REFERENCES "Post"("id"),
     "parentId" integer REFERENCES "Post"("id"),
     "hierarchyLevel" integer,

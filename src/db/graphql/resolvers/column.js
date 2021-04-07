@@ -15,9 +15,18 @@ module.exports = {
       const columns = rawColumns.rows.map(column => exportSafeModel(column))
       return {
         list: columns,
-        count: columns.length
+        count: rawColumns.count
       }
     },
+    listPopularColumns: can('standard').createResolver(async (_parent, args, { context, EXPECTED_OPTIONS_KEY, req }) => {
+      const { user } = req
+      const rawColumns = await columnService.getPopularColumns(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+      const columns = rawColumns.rows.map(column => exportSafeModel(column))
+      return {
+        list: columns,
+        count: rawColumns.count
+      }
+    }),
     searchColumns: async (_parent, { query }, { db }) => {
       const columns = await db.Column.search(query)
       return columns[0]
