@@ -24,6 +24,7 @@ const invitationSchema = gql`
       email: String!
       expertise: String!
       note: String
+      verificationLink: String
       special: Boolean
       samplePosts: [SamplePostsInput]
       type: invitationTypes

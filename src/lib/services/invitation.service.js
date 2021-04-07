@@ -38,7 +38,7 @@ const getInvitations = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }
 }
 
 const createInvitation = async (
-  { firstName, lastName, email, expertise, samplePosts, note, special, type },
+  { firstName, lastName, email, expertise, samplePosts, note, special, type, verificationLink },
   Invitation = db.Invitation,
   User = db.User,
   Expertise = db.Expertise
@@ -67,7 +67,8 @@ const createInvitation = async (
       samplePosts,
       note,
       special,
-      type
+      type,
+      verificationLink
     })
 
     await invitation.addExpertise(invitationExpertise)
