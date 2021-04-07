@@ -37,7 +37,7 @@ const invitationSchema = gql`
       note: String
       verificationLink: String
       special: Boolean
-      samplePosts: [SamplePostsInput]
+      fellow: fellowApplicationInput
       type: invitationTypes
     ): Invitation
     approveInvitation(email: String!): Invitation

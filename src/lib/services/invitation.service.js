@@ -81,7 +81,7 @@ const createInvitation = async (
   return invitation
 }
 
-const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
+const approveInvitation = async (email, user, Invitation = db.Invitation) => {
   const invitation = await Invitation.findOne({ where: { email } })
   if (!invitation) {
     throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
@@ -93,8 +93,7 @@ const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
       invitation.state = states.APPROVED
       const token = await generateToken()
       invitation.token = token
-      // TODO: Add approved by when you add the authentication
-      // Model.approvedBy = approvedBy
+      await invitation.setApprovedBy(user.id)
       savedInvitation = await invitation.save()
       if (invitation.special) {
         await emailService.sendEmail(

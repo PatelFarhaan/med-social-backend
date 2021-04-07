@@ -47,7 +47,7 @@ const options = {
           resource,
           currentAdmin
         } = context
-        await invitationService.approveInvitation(params.email)
+        await invitationService.approveInvitation(params.email, context.currentAdmin)
         return {
           record: context.record.toJSON(currentAdmin),
           redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
@@ -66,7 +66,7 @@ const options = {
         const { currentAdmin } = context
         context.records.forEach(async record => {
           const { params } = record
-          await invitationService.approveInvitation(params.email)
+          await invitationService.approveInvitation(params.email, currentAdmin)
         })
         return {
           records: context.records.map(x => x.toJSON(currentAdmin)),
