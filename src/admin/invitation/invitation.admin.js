@@ -3,8 +3,37 @@ const { invitationService } = require('../../lib/services')
 
 const options = {
   properties: {
-    samplePosts: {
-      // type: 'mixed',
+    fellow: {
+      type: 'mixed'
+    },
+    'fellow.title': {
+      type: 'string'
+    },
+    'fellow.organization': {
+      type: 'string'
+    },
+    'fellow.bio': {
+      type: 'string'
+    },
+    'fellow.applyForColumn': {
+      type: 'boolean'
+    },
+    'fellow.socialLinks': {
+      type: 'mixed'
+    },
+    'fellow.socialLinks.twitter': {
+      type: 'string'
+    },
+    'fellow.socialLinks.linkedin': {
+      type: 'string'
+    },
+    'fellow.socialLinks.website': {
+      type: 'string'
+    },
+    'fellow.socialLinks.additionalLink': {
+      type: 'string'
+    },
+    'fellow.samplePosts': {
       isArray: true
     }
   },

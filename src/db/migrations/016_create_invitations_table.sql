@@ -24,7 +24,7 @@ CREATE TABLE "Invitation" (
     "ColumnSlug" character varying(255) REFERENCES "Column"("slug"),
     "subscriptionId" integer REFERENCES "Subscription"("id"),
     "expires_at" timestamptz,
-    "sample_posts" jsonb NOT NULL DEFAULT '[]',
+    "fellow" jsonb,
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
     "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz
 );
