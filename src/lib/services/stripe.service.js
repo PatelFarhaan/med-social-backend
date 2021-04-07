@@ -29,6 +29,29 @@ const createPrice = async (column, interval = 'month') => {
   }
 }
 
+const createTaxPrice = async (column, interval = 'month') => {
+  try {
+    return stripe.prices.create({
+      unit_amount: Number(column.price * 10),
+      currency,
+      recurring: { interval },
+      product_data: {
+        name: 'Tax',
+        metadata: {
+          slug: `${column.slug}-tax`
+        }
+      },
+      metadata: {
+        column_name: column.name,
+        column_slug: column.slug
+      }
+    })
+  } catch (e) {
+    logger.warn(`createPrice ${e}`)
+    throw e
+  }
+}
+
 const retrivePrice = async stripePriceId => {
   try {
     return stripe.prices.retrieve(stripePriceId)
@@ -142,7 +165,7 @@ const listPaymentMethods = async customerId => {
   }
 }
 
-const createSubscription = async (stripeCustomerId, priceId) => {
+const createSubscription = async (stripeCustomerId, priceId, taxPriceId) => {
   try {
     return stripe.subscriptions.create({
       customer: stripeCustomerId,
@@ -150,6 +173,9 @@ const createSubscription = async (stripeCustomerId, priceId) => {
       items: [
         {
           price: priceId
+        },
+        {
+          price: taxPriceId
         }
       ]
     })
@@ -205,5 +231,6 @@ module.exports = {
   attachPaymentMethod,
   createSubscription,
   listPaymentMethods,
-  createEvent
+  createEvent,
+  createTaxPrice
 }

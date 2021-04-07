@@ -57,7 +57,9 @@ const createColumn = async (
     column = await Column.create(columnFields)
     if (column.type === columnTypes.PAID) {
       const stripePriceId = await stripeService.createPrice(column)
+      const stripeTaxPriceId = await stripeService.createTaxPrice(column)
       column.stripePriceId = stripePriceId.id
+      column.stripeTaxPriceId = stripeTaxPriceId.id
       await column.save()
     }
     await column.setAuthor(user)
@@ -95,7 +97,7 @@ const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.S
       ColumnSlug: column.slug
     })
   } else {
-    const stripeSubscription = await stripeService.createSubscription(user.stripeCustomerId, column.stripePriceId)
+    const stripeSubscription = await stripeService.createSubscription(user.stripeCustomerId, column.stripePriceId, column.stripeTaxPriceId)
     if (stripeSubscription.latest_invoice.payment_intent.status !== 'cancelled') {
       subscription = await Subscription.create({
         paymentMethod: user.paymentMethod,
