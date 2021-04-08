@@ -148,6 +148,8 @@ const invitationSchema = gql`
     email: String
     token: String
     state: String
+    special: Boolean
+    type: String
     expertises: [Expertise]
   }
 `
