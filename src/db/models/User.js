@@ -121,7 +121,7 @@ module.exports = (sequelize, DataTypes) => {
     query = query.toLowerCase()
 
     // eslint-disable-next-line consistent-return
-    return sequelize.query(`SELECT username, firstName, lastName FROM User WHERE "username" LIKE '%${query}%'`, User)
+    return sequelize.query(`SELECT "username", "first_name", "last_name" FROM "User" WHERE LOWER("username") LIKE '%${query}%'`, User)
   }
 
   tokenize(User, 'lookupId')
