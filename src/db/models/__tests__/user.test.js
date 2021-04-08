@@ -1,7 +1,7 @@
 const { teardownDb } = require('../../../lib/testHelpers/testUtils')
 const db = require('../')
 
-const defaultUser = { email: 'info@me.com' }
+const defaultUser = { email: 'info@me.com', username: 'info' }
 
 beforeAll(async () => {
   const defaultUserRole = await db.Role.findOne({ where: { type: 'standard' } })
@@ -43,5 +43,12 @@ describe('User', () => {
     const user = await db.User.create(defaultUser)
     await user.destroy()
     expect(await db.User.count({ where: { email: 'info@me.com' } })).toBe(0)
+  })
+
+  test('It should be able to search users by username', async () => {
+    const user = await db.User.create({ email: 'new@me.com', username: 'new', roleId: 3 })
+    const queryByUsername = await db.User.search('new')
+    expect(queryByUsername[0][0].username).toBe(user.username)
+    await user.destroy()
   })
 })

@@ -95,11 +95,11 @@ module.exports = {
     },
     searchByUsername: can('standard').createResolver(async (_parent, { query }, { db }) => {
       const rawUsers = await db.User.search(query)
-      return rawUsers.rows.map(user => exportSafeModel(user))
+      return rawUsers[1].rows
     }),
     isUsernameTaken: async (_parent, { query }, { db }) => {
-      const rawUsers = await db.User.search(query)
-      return rawUsers.rows.length > 0
+      const rawUser = await db.User.findOne({ where: { username: query } })
+      return !!rawUser
     }
   },
   Mutation: {
