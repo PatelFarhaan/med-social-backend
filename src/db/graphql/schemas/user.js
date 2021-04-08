@@ -8,7 +8,8 @@ const userSchema = gql`
     getMagicLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
-    searchByUsername(query: String): [User]
+    searchByUsername(query: String!): [User]
+    isUsernameTaken(query: String!): Boolean
     getUserColumns(page: Int, limit: Int): [String]
   }
 

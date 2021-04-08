@@ -38,7 +38,7 @@ const getInvitations = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }
 }
 
 const createInvitation = async (
-  { firstName, lastName, email, expertise, samplePosts, note, special, type, verificationLink },
+  { firstName, lastName, email, expertise, fellow, note, special, type, verificationLink },
   Invitation = db.Invitation,
   User = db.User,
   Expertise = db.Expertise
@@ -64,7 +64,7 @@ const createInvitation = async (
       firstName,
       lastName,
       email,
-      samplePosts,
+      fellow,
       note,
       special,
       type,
@@ -81,7 +81,7 @@ const createInvitation = async (
   return invitation
 }
 
-const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
+const approveInvitation = async (email, user, Invitation = db.Invitation) => {
   const invitation = await Invitation.findOne({ where: { email } })
   if (!invitation) {
     throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
@@ -93,8 +93,7 @@ const approveInvitation = async (email, _user, Invitation = db.Invitation) => {
       invitation.state = states.APPROVED
       const token = await generateToken()
       invitation.token = token
-      // TODO: Add approved by when you add the authentication
-      // Model.approvedBy = approvedBy
+      await invitation.setApprovedBy(user.id)
       savedInvitation = await invitation.save()
       if (invitation.special) {
         await emailService.sendEmail(
@@ -263,22 +262,28 @@ const resendInvitationEmail = async ({ email }, loaderOpts) => {
   }
 }
 
-const updateSamplePosts = async ({ email, samplePosts }, loaderOpts) => {
+const updateFellowApplication = async ({ email, fellow, additionalExpertise }, loaderOpts, Expertise = db.Expertise) => {
   const invitation = await db.Invitation.findOne({ where: { email, state: states.PENDING } }, loaderOpts)
   if (!invitation) throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
-  if (invitation.samplePosts.length > 0) throw new Error(JSON.stringify({ status: 400, message: 'Invitation sample posts already exists' }))
+  if (Object.keys(invitation.fellow).length > 0)
+    throw new Error(JSON.stringify({ status: 400, message: 'Invitation fellow data already exists' }))
 
   try {
-    invitation.samplePosts = samplePosts
+    if (additionalExpertise) {
+      const existingExpertise = await Expertise.findOne({ where: { name: additionalExpertise } })
+      const invitationAdditionalExpertise = existingExpertise || (await Expertise.create({ name: additionalExpertise }))
+      await invitation.addExpertise(invitationAdditionalExpertise)
+    }
+    invitation.fellow = fellow
     await invitation.save()
   } catch (e) {
-    logger.info(`updateSamplePosts ${e}`)
+    logger.info(`updateFellowApplication ${e}`)
     throw e
   }
 
   return {
     status: 204,
-    message: 'Successfully updated sample posts'
+    message: 'Successfully updated fellow application'
   }
 }
 
@@ -292,6 +297,6 @@ module.exports = {
   payForApproval,
   resendInvitationEmail,
   rejectInvitation,
-  updateSamplePosts,
+  updateFellowApplication,
   inviteUserToColumn
 }
