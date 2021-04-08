@@ -2,7 +2,7 @@ const db = require('../../../db/models/')
 const { destroyDefaults } = require('../../testHelpers/testUtils')
 const { invitationService } = require('../index')
 
-const InvitationData = {
+let InvitationData = {
   firstName: 'Moughees',
   lastName: 'Ahmed',
   email: 'test@test.com',
@@ -18,9 +18,17 @@ describe('Invitation Service', () => {
     await db.Invitation.destroy({ where: { email: InvitationData.email } })
     await destroyDefaults()
   })
-  // beforeEach(async () => {
-  //     await db.Invitation.destroy({where: {email: InvitationData.email}})
-  // })
+  beforeEach(async () => {
+    await db.Invitation.destroy({ where: { email: 'test@test.com' } })
+    await db.Invitation.destroy({ where: { email: 'test2@test.com' } })
+    InvitationData = {
+      firstName: 'Moughees',
+      lastName: 'Ahmed',
+      email: 'test@test.com',
+      expertise: 'LOL',
+      type: 'FELLOW'
+    }
+  })
 
   test('Create an invitation', async () => {
     let invite
@@ -36,8 +44,6 @@ describe('Invitation Service', () => {
     invite = await invitationService.createInvitation(InvitationData).catch(e => {
       expect(e.message).toMatch('Invitation already exists')
     })
-    await db.Invitation.destroy({ where: { email: InvitationData.email } })
-    // expect(invite).toBeNull()
   })
 
   test('Invitation without email', async () => {
@@ -45,6 +51,12 @@ describe('Invitation Service', () => {
     delete InvitationData.email
     invite = await invitationService.createInvitation(InvitationData).catch(e => {
       expect(e.Error).not.toBeNull()
+    })
+  })
+  test('No Expertise', async () => {
+    delete InvitationData.expertise
+    let invite = await invitationService.createInvitation(InvitationData).catch(e => {
+      expect(e).toBeNull()
     })
   })
 })
