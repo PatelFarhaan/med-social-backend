@@ -13,6 +13,7 @@ CREATE TABLE "Column" (
     "state" columnStatuses DEFAULT 'PENDING',
     "type" columnTypes DEFAULT 'FREE',
     "stripe_price_id" character varying(150),
+    "stripe_tax_price_id" character varying(150),
     "authorId" uuid REFERENCES "User"("id"),
     "ExpertiseId" integer REFERENCES "Expertise"("id"),
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,

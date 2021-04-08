@@ -13,6 +13,7 @@ CREATE TABLE "Invitation" (
     "special" BOOLEAN DEFAULT FALSE,
     "reason" character varying(50),
     "note" character varying(134),
+    "verification_link" character varying(254),
     "first_name" character varying(50),
     "last_name" character varying(50),
     "state" states,
@@ -23,7 +24,7 @@ CREATE TABLE "Invitation" (
     "subscriptionId" integer REFERENCES "Subscription"("id") ON DELETE CASCADE,
     "ColumnSlug" character varying(255) REFERENCES "Column"("slug"),
     "expires_at" timestamptz,
-    "sample_posts" jsonb NOT NULL DEFAULT '[]',
+    "fellow" jsonb,
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
     "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz
 );

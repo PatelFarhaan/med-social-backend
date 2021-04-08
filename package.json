@@ -23,7 +23,8 @@
     "test": "jest src --runInBand --coverage",
     "test:watch": "jest --watchAll",
     "semiDocker": "npm run build:docker && docker-compose stop app && sed -i '' 's/RAMBLER_HOST=db/RAMBLER_HOST=localhost/' '.env'",
-    "build:docker": "docker-compose down && sed -i '' 's/RAMBLER_HOST=localhost/RAMBLER_HOST=db/' '.env' && docker-compose up -d --build"
+    "build:docker": "docker-compose down && sed -i '' 's/RAMBLER_HOST=localhost/RAMBLER_HOST=db/' '.env' && docker-compose up -d --build",
+    "build:base": "docker build -t column/base -f Dockerfile.base ."
   },
   "lint-staged": {
     "*.js": [
@@ -48,6 +49,7 @@
     "chance": "^1.0.18",
     "compression": "^1.7.2",
     "connect-session-sequelize": "^5.2.1",
+    "cookie-parser": "^1.4.5",
     "cors": "^2.7.1",
     "dataloader-sequelize": "^2.3.1",
     "dotenv": "^5.0.0",
@@ -55,7 +57,7 @@
     "email-templates": "^8.0.3",
     "express": "^4.13.3",
     "express-formidable": "^1.2.0",
-    "express-session": "^1.15.6",
+    "express-session": "^1.17.1",
     "express-validator": "^5.1.2",
     "google-auth-library": "^7.0.2",
     "graphql": "^14.2.0",

@@ -19,7 +19,7 @@ CREATE TABLE "Subscription" (
     "amountPerCycle" decimal(10, 2) DEFAULT 0,
     "cycle" cycles DEFAULT 'MONTH',
     "cycleLength" integer DEFAULT 1,
-    "ColumnSlug" character varying(255) REFERENCES "Column"("slug")
+    "ColumnSlug" character varying(255) REFERENCES "Column"("slug") ON DELETE CASCADE
 );
 
 -- rambler down

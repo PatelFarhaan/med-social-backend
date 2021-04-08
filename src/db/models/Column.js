@@ -15,7 +15,8 @@ module.exports = (sequelize, DataTypes) => {
       visibility: { type: DataTypes.ENUM(Object.keys(columnVisibilities)), defaultValue: columnVisibilities.PUBLIC },
       state: { type: DataTypes.ENUM(Object.keys(columnStatuses)), defaultValue: columnStatuses.PENDING },
       type: { type: DataTypes.ENUM(Object.keys(columnTypes)), defaultValue: columnTypes.FREE },
-      stripePriceId: { type: DataTypes.STRING(150), field: 'stripe_price_id' }
+      stripePriceId: { type: DataTypes.STRING(150), field: 'stripe_price_id' },
+      stripeTaxPriceId: { type: DataTypes.STRING(150), field: 'stripe_tax_price_id' }
     },
     {
       freezeTableName: true
@@ -55,10 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       as: 'subscriptions'
     })
 
-    Column.belongsToMany(models.Post, {
-      through: 'ColumnPosts',
-      as: 'posts'
-    })
+    Column.hasMany(models.Post)
 
     Column.hasMany(models.ReportedContent)
   }

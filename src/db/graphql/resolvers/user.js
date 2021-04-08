@@ -95,8 +95,12 @@ module.exports = {
     },
     searchByUsername: can('standard').createResolver(async (_parent, { query }, { db }) => {
       const rawUsers = await db.User.search(query)
-      return rawUsers.rows.map(expertise => exportSafeModel(expertise))
-    })
+      return rawUsers.rows.map(user => exportSafeModel(user))
+    }),
+    isUsernameTaken: async (_parent, { query }, { db }) => {
+      const rawUsers = await db.User.search(query)
+      return rawUsers.rows.length > 0
+    }
   },
   Mutation: {
     connectPaymentMethod: can('standard').createResolver(async (_parent, { paymentMethod }, { req }) => {

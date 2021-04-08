@@ -32,7 +32,7 @@ module.exports = {
       const invitation = await invitationService.payForApproval(body)
       return invitation
     },
-    applyForFellowship: async (_parent, body) => invitationService.updateSamplePosts(body),
+    applyForFellowship: async (_parent, body) => invitationService.updateFellowApplication(body),
     inviteUserToColumn: can('standard').createResolver(async (_parent, body, { req }) =>
       invitationService.inviteUserToColumn(body, req.user)
     )
