@@ -57,6 +57,7 @@ describe('Invitation Service', () => {
     delete InvitationData.expertise
     let invite = await invitationService.createInvitation(InvitationData).catch(e => {
       expect(e).toBeNull()
+      //needs to change
     })
   })
 })
