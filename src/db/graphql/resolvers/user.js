@@ -167,6 +167,7 @@ module.exports = {
     }),
     setPassword: can('standard').createResolver(async (_parent, { password }, { req }) => {
       const { user } = req
+      if (user.hash) throw new Error(JSON.stringify({ status: 400, message: 'Password has already been set' }))
       const savedUser = await setPassword(user, password)
       return exportSafeModel(savedUser)
     })
