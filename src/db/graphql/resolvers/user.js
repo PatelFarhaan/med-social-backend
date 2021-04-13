@@ -148,7 +148,7 @@ module.exports = {
     refreshAuth: async (_parent, { refreshToken }, { db }) => {
       try {
         const refreshTokenDoc = await tokenService.verifyToken(refreshToken, tokenTypes.REFRESH)
-        const user = await db.User.findOne({ where: { id: refreshTokenDoc.user.id } })
+        const user = await db.User.findOne({ where: { id: refreshTokenDoc.userId } })
         if (!user) {
           throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
         }
