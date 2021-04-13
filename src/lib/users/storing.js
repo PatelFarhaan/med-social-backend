@@ -126,6 +126,7 @@ const authenticateToken = async (email, token) => {
   })
 
   if (email !== user.email) throw new Error(JSON.stringify({ status: 400, message: 'Incorrect email or token' }))
+  await session.destroy()
   return {
     ...user.toJSON(),
     roles: [user.role.type]
