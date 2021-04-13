@@ -69,7 +69,7 @@ const generateResetPasswordToken = async email => {
 const generateMagicLinkToken = async email => {
   const user = await getUserWithoutRole({ email })
   if (!user) throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
-  const existingMagicLink = await db.Session.findOne({ where: { email, type: tokenTypes.MAGIC_LINK } })
+  const existingMagicLink = await db.Session.findOne({ where: { userId: user.id, type: tokenTypes.MAGIC_LINK } })
   if (existingMagicLink) return { token: existingMagicLink.token, user }
   const expires = moment().add(config.jwt.magicLinkExpirationMinutes, 'minutes')
   const magicLinkToken = generateToken(user.id, expires, tokenTypes.MAGIC_LINK)
