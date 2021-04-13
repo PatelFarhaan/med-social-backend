@@ -1,5 +1,5 @@
 // Resolvers: A map of functions which return data for the schema.
-const { authenticate, authenticateToken, getUsers, exportSafeUser, signup } = require('../../../lib/users')
+const { authenticate, authenticateToken, getUsers, exportSafeUser, signup, setPassword } = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
@@ -163,6 +163,12 @@ module.exports = {
       const uploadedFile = await uploadService.processUploadS3(args.file, 'USER')
       user.profilePicture = uploadedFile.location
       const savedUser = await user.save()
+      return exportSafeModel(savedUser)
+    }),
+    setPassword: can('standard').createResolver(async (_parent, { password }, { req }) => {
+      const { user } = req
+      if (user.hash) throw new Error(JSON.stringify({ status: 400, message: 'Password has already been set' }))
+      const savedUser = await setPassword(user, password)
       return exportSafeModel(savedUser)
     })
   },
