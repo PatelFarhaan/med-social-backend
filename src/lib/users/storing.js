@@ -114,7 +114,15 @@ const authenticateToken = async (email, token) => {
 
   if (!session) throw new Error(JSON.stringify({ status: 404, message: 'Token not found' }))
 
-  const { user } = session
+  const user = await session.getUser({
+    include: [
+      {
+        model: db.Role,
+        as: 'role',
+        attributes: ['id', 'type', 'createdAt', 'updatedAt']
+      }
+    ]
+  })
 
   if (email !== user.email) throw new Error(JSON.stringify({ status: 400, message: 'Incorrect email or token' }))
   return {
