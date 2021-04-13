@@ -108,10 +108,11 @@ const authenticateToken = async (email, token) => {
   if (!token) throw new Error(JSON.stringify({ status: 400, message: 'Token cannot be blank' }))
 
   const session = await db.Session.findOne({
-    token,
-    type: tokenTypes.MAGIC_LINK
+    where: {
+      token,
+      type: tokenTypes.MAGIC_LINK
+    }
   })
-
   if (!session) throw new Error(JSON.stringify({ status: 404, message: 'Token not found' }))
 
   const user = await session.getUser({
