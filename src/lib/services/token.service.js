@@ -28,7 +28,7 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
 
 const verifyToken = async (token, type) => {
   const payload = jwt.verify(token, config.jwt.secret)
-  const tokenDoc = await db.Session.findOne({ token, type, user: payload.sub, blacklisted: false })
+  const tokenDoc = await db.Session.findOne({ where: { token, type, user: payload.sub, blacklisted: false } })
   if (!tokenDoc) {
     throw new Error('Token not found')
   }
@@ -69,7 +69,7 @@ const generateResetPasswordToken = async email => {
 const generateMagicLinkToken = async email => {
   const user = await getUserWithoutRole({ email })
   if (!user) throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
-  const existingMagicLink = await db.Session.findOne({ email, type: tokenTypes.MAGIC_LINK })
+  const existingMagicLink = await db.Session.findOne({ where: { email, type: tokenTypes.MAGIC_LINK } })
   if (existingMagicLink) return { token: existingMagicLink.token, user }
   const expires = moment().add(config.jwt.magicLinkExpirationMinutes, 'minutes')
   const magicLinkToken = generateToken(user.id, expires, tokenTypes.MAGIC_LINK)

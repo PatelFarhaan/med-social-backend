@@ -46,8 +46,10 @@ const calculateVotedPoints = async (userExpertise, post, author, voteValue, Repu
 
   const expertise = await userExpertise.getExpertise()
   const authorUserExpertise = await db.UserExpertise.findOne({
-    authorId: author.id,
-    expertiseId: expertise.id
+    where: {
+      authorId: author.id,
+      expertiseId: expertise.id
+    }
   })
   const authorExpertiseLevel = getLevelFromPoints(authorUserExpertise ? authorUserExpertise.totalPoints : 1)
   const additionalExpertisePoints = getAdditionalExpertisePoints(voteValue, authorExpertiseLevel)

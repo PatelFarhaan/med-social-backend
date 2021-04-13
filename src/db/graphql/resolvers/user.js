@@ -152,10 +152,10 @@ module.exports = {
         if (!user) {
           throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
         }
-        await refreshTokenDoc.remove()
+        await refreshTokenDoc.destroy()
         return tokenService.generateAuthTokens(user)
       } catch (error) {
-        throw new Error(JSON.stringify({ status: 401, message: 'Please authenticate' }))
+        throw new Error(JSON.stringify({ status: 401, message: error }))
       }
     },
     uploadProfilePicture: can('standard').createResolver(async (_parent, args, { req }) => {
