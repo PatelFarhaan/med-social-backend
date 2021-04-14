@@ -41,8 +41,7 @@ const listColumns = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, inc
     limit,
     offset: limit * (page - 1),
     order,
-    ...loaderOpts,
-    attributes: ['slug', 'name', 'createdAt']
+    ...loaderOpts
   })
 }
 

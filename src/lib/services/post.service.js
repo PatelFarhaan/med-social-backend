@@ -43,7 +43,6 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
 
   const columnInclude = {
     model: db.Column,
-    as: 'column',
     where: {
       slug: column
     }
@@ -106,7 +105,6 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
 
   const columnInclude = {
     model: db.Column,
-    as: 'column',
     where: {
       slug: mappedColumnSlugs
     }
