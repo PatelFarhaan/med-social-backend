@@ -54,6 +54,7 @@ const postSchema = gql`
     children: String
     hierarchyLevel: Int
     files: [File]
+    column: Column
   }
 
   type File {

@@ -20,6 +20,7 @@ module.exports = {
     listUserPosts: can('standard').createResolver(async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
       const { user } = req
       const rawPosts = await postService.listUserPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+      console.warn('raw', rawPosts)
       const posts = rawPosts.rows.map(post => exportSafeModel(post))
       return {
         list: posts,
@@ -57,6 +58,10 @@ module.exports = {
     reviewPost: can('admin').createResolver(async (_parent, body, { req }) => postService.reviewReportedPost({ body }, req.user))
   },
   Post: {
+    column: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbPost = db.Post.build(exportSafeModel(post))
+      return dbPost.getColumn({ [EXPECTED_OPTIONS_KEY]: context })
+    },
     author: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getAuthor({ [EXPECTED_OPTIONS_KEY]: context })
