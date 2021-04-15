@@ -52,16 +52,17 @@ module.exports = {
       user.settings = await getUserSettings(user.settings)
       return user
     }),
-    getUserColumns: can('standard').createResolver(async (_parent, { limit = 10, page = 1 }, { req }) => {
+    getUserColumns: can('standard').createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
       const { user } = req
       const userColumnSubscriptions = await user.getSubscriptions({
-        attributes: ['ColumnSlug'],
+        attributes: ['ColumnSlug', 'id'],
         where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
         limit,
         page
       })
 
-      return userColumnSubscriptions.map(item => item.ColumnSlug)
+      const rawColumns = await db.Column.findAll({ where: { slug: userColumnSubscriptions.map(item => item.ColumnSlug) } })
+      return rawColumns.map(column => exportSafeModel(column))
     }),
     getUsers: can('superadmin').createResolver(async (_parent, args, { req }) => {
       const rawUsers = await getUsers(args, req.user.id)
@@ -95,7 +96,12 @@ module.exports = {
     },
     searchByUsername: can('standard').createResolver(async (_parent, { query }, { db }) => {
       const rawUsers = await db.User.search(query)
-      return rawUsers[1].rows
+      return rawUsers[1].rows.map(item => ({
+        username: item.username,
+        firstName: item.first_name,
+        lastName: item.last_name,
+        profileDescription: item.profile_description
+      }))
     }),
     isUsernameTaken: async (_parent, { query }, { db }) => {
       const rawUser = await db.User.findOne({ where: { username: query } })
