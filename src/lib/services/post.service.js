@@ -237,13 +237,17 @@ const editPost = async ({ body: { id, content = '' } }, user, Post = db.Post) =>
   return post
 }
 
-const createComment = async ({ body: { id, content = '' } }, user, Post = db.Post) => {
+const createComment = async ({ body: { id, content = '', files = [] } }, user, Post = db.Post) => {
   let comment
   try {
     const DBpost = await Post.findByPk(id)
     if (!DBpost) throw new Error({ status: 404, message: 'Post not found' })
     const column = await DBpost.getColumn()
     comment = await DBpost.createChild({ content, isComment: true, author_id: user.id, ColumnSlug: column.slug })
+    if (files.length > 0) {
+      const uploadedFiles = (await Promise.all(files)).map(uploadService.processUploadS3)
+      ;(await Promise.all(uploadedFiles)).map(async file => comment.createFile({ ...file, UserId: user.id, ColumnSlug: column.slug }))
+    }
     if (DBpost.author_id !== user.id) {
       const DBpostAuthor = await DBpost.getAuthor()
       await notify(

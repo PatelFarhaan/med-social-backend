@@ -52,16 +52,17 @@ module.exports = {
       user.settings = await getUserSettings(user.settings)
       return user
     }),
-    getUserColumns: can('standard').createResolver(async (_parent, { limit = 10, page = 1 }, { req }) => {
+    getUserColumns: can('standard').createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
       const { user } = req
       const userColumnSubscriptions = await user.getSubscriptions({
-        attributes: ['ColumnSlug'],
+        attributes: ['ColumnSlug', 'id'],
         where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
         limit,
         page
       })
 
-      return userColumnSubscriptions.map(item => item.ColumnSlug)
+      const rawColumns = await db.Column.findAll({ where: { slug: userColumnSubscriptions.map(item => item.ColumnSlug) } })
+      return rawColumns.map(column => exportSafeModel(column))
     }),
     getUsers: can('superadmin').createResolver(async (_parent, args, { req }) => {
       const rawUsers = await getUsers(args, req.user.id)
