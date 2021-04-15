@@ -96,7 +96,12 @@ module.exports = {
     },
     searchByUsername: can('standard').createResolver(async (_parent, { query }, { db }) => {
       const rawUsers = await db.User.search(query)
-      return rawUsers[1].rows
+      return rawUsers[1].rows.map(item => ({
+        username: item.username,
+        firstName: item.first_name,
+        lastName: item.last_name,
+        profileDescription: item.profile_description
+      }))
     }),
     isUsernameTaken: async (_parent, { query }, { db }) => {
       const rawUser = await db.User.findOne({ where: { username: query } })
