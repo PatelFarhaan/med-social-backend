@@ -179,6 +179,10 @@ module.exports = {
     })
   },
   User: {
+    expertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+    },
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })
