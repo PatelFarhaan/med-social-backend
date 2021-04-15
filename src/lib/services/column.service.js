@@ -46,6 +46,7 @@ const listColumns = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, inc
       'description',
       'name',
       'createdAt',
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
     ],
     ...loaderOpts
@@ -184,6 +185,7 @@ const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Col
       'description',
       'name',
       'createdAt',
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
     ],
     order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
