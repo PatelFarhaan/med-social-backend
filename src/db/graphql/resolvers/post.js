@@ -20,7 +20,6 @@ module.exports = {
     listUserPosts: can('standard').createResolver(async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
       const { user } = req
       const rawPosts = await postService.listUserPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
-      console.warn('raw', rawPosts)
       const posts = rawPosts.rows.map(post => exportSafeModel(post))
       return {
         list: posts,

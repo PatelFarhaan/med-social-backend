@@ -159,9 +159,9 @@ module.exports = {
           throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
         }
         await refreshTokenDoc.destroy()
-        return tokenService.generateAuthTokens(user)
+        return { tokens: await tokenService.generateAuthTokens(user) }
       } catch (error) {
-        throw new Error(JSON.stringify({ status: 401, message: error }))
+        throw error
       }
     },
     uploadProfilePicture: can('standard').createResolver(async (_parent, args, { req }) => {
@@ -179,6 +179,10 @@ module.exports = {
     })
   },
   User: {
+    expertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+    },
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })

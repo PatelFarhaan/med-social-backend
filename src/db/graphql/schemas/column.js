@@ -32,6 +32,8 @@ const columnSchema = gql`
     subscriptions(page: Int, limit: Int): [Subscription]
     type: String
     bannedMembers(page: Int, limit: Int): [User]
+    PostCount: Int
+    MemberCount: Int
   }
 
   enum columnVisibility {
