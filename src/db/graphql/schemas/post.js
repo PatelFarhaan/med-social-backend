@@ -17,7 +17,7 @@ const postSchema = gql`
       stackedPosts: [StackedPostInput]
       files: [Upload]
     ): Post
-    createComment(content: String!, id: Int!): Post
+    createComment(content: String!, id: Int!, files: [Upload]): Post
     createPostBookmark(id: String!): Post
     deletePost(id: Int!): DefaultPayload
     createPostVote(id: Int!, type: voteTypes): Post

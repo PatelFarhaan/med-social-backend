@@ -10,7 +10,7 @@ const userSchema = gql`
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
     searchByUsername(query: String!): [User]
     isUsernameTaken(query: String!): Boolean
-    getUserColumns(page: Int, limit: Int): [String]
+    getUserColumns(page: Int, limit: Int): [Column]
   }
 
   type socialGoogleOnboarding {
