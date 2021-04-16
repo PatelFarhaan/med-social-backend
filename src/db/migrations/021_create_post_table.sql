@@ -6,6 +6,7 @@ CREATE TABLE "Post" (
     "is_quoted" BOOLEAN DEFAULT FALSE,
     "is_comment" BOOLEAN DEFAULT FALSE,
     "votes" integer NOT NULL DEFAULT 0,
+    "comments" integer NOT NULL DEFAULT 0,
     "author_id" uuid REFERENCES "User"("id"),
     "ColumnSlug" character varying(255)REFERENCES "Column"("slug") ON DELETE CASCADE,
     "quoted_post" integer REFERENCES "Post"("id"),

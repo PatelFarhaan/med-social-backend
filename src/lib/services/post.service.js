@@ -264,6 +264,8 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
         [DBpostAuthor.id]
       )
     }
+    DBpost.comments += 1
+    await DBpost.save()
   } catch (e) {
     logger.warn(`createComment: ${e.message}`)
     const parsedError = isStringJSON(e.message) ? JSON.parse(e.message) : e

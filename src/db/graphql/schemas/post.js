@@ -49,6 +49,7 @@ const postSchema = gql`
     updatedAt: DateTime
     createdAt: DateTime
     votes: Int
+    comments: Int
     order: Int
     stackedPosts(limit: Int, page: Int, hierarchy: Boolean): [Post]
     children: String
