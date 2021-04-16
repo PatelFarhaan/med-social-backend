@@ -297,7 +297,7 @@ const votePost = async (
     let voteValue = 0
     post = await Post.findByPk(id)
     if (!post) throw new Error({ status: 404, message: 'Post not found' })
-    const existingVote = await Vote.findOne({ where: { postId: post.id, userId: user.id } })
+    const existingVote = await Vote.findOne({ where: { PostId: post.id, UserId: user.id } })
     const postAuthor = await post.getAuthor()
     const postColumn = await post.getColumn()
     const columnExpertise = await postColumn.getExpertise()

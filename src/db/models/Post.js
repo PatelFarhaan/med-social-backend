@@ -59,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     Post.belongsToMany(models.User, {
       through: models.Vote,
       as: 'userVotes',
-      foreignKey: 'postId',
+      foreignKey: 'PostId',
       onDelete: 'RESTRICT',
       hooks: true
     })
