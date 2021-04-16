@@ -185,7 +185,7 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
       )
     }
     if (files.length > 0) {
-      const uploadedFiles = (await Promise.all(files)).map(uploadService.processUploadS3)
+      const uploadedFiles = (await Promise.all(files)).map(item => uploadService.processUploadS3(item, 'POST'))
       ;(await Promise.all(uploadedFiles)).map(async file => post.createFile({ ...file, UserId: user.id, ColumnSlug: column.slug }))
     }
     const columnExpertise = await existingColumn.getExpertise()
@@ -245,7 +245,7 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
     const column = await DBpost.getColumn()
     comment = await DBpost.createChild({ content, isComment: true, author_id: user.id, ColumnSlug: column.slug })
     if (files.length > 0) {
-      const uploadedFiles = (await Promise.all(files)).map(uploadService.processUploadS3)
+      const uploadedFiles = (await Promise.all(files)).map(item => uploadService.processUploadS3(item, 'POST'))
       ;(await Promise.all(uploadedFiles)).map(async file => comment.createFile({ ...file, UserId: user.id, ColumnSlug: column.slug }))
     }
     if (DBpost.author_id !== user.id) {
