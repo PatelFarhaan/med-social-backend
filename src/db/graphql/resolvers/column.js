@@ -58,6 +58,10 @@ module.exports = {
     })
   },
   Column: {
+    author: (column, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const col = db.Column.build(exportSafeModel(column))
+      return col.getAuthor({ [EXPECTED_OPTIONS_KEY]: context })
+    },
     interests: (column, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const col = db.Column.build(exportSafeModel(column))
       return col.getInterests({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
