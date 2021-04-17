@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       isQuoted: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_quoted', defaultValue: false },
       isComment: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_comment', defaultValue: false },
       votes: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+      comments: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt')
     },
@@ -58,7 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     Post.belongsToMany(models.User, {
       through: models.Vote,
       as: 'userVotes',
-      foreignKey: 'postId',
+      foreignKey: 'PostId',
       onDelete: 'RESTRICT',
       hooks: true
     })

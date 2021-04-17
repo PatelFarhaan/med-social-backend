@@ -34,6 +34,7 @@ const columnSchema = gql`
     bannedMembers(page: Int, limit: Int): [User]
     PostCount: Int
     MemberCount: Int
+    author: User
   }
 
   enum columnVisibility {
