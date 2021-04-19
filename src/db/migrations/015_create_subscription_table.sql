@@ -15,11 +15,12 @@ CREATE TABLE "Subscription" (
     "type" types,
     "customer_id" character varying(255),
     "subscription_id" character varying(255),
-    email character varying(255) NOT NULL,
+    email character varying(255),
     "amountPerCycle" decimal(10, 2) DEFAULT 0,
     "cycle" cycles DEFAULT 'MONTH',
     "cycleLength" integer DEFAULT 1,
-    "ColumnSlug" character varying(255) REFERENCES "Column"("slug") ON DELETE CASCADE
+    "ColumnSlug" character varying(255) REFERENCES "Column"("slug") ON DELETE CASCADE,
+    "UserId" uuid REFERENCES "User"("id") ON DELETE CASCADE
 );
 
 -- rambler down

@@ -7,7 +7,17 @@ const { can } = require('./../auth')
 module.exports = {
   Query: {
     getColumn: async (_parent, { slug }, { db, context, EXPECTED_OPTIONS_KEY }) => {
-      const column = await db.Column.findByPk(slug, { [EXPECTED_OPTIONS_KEY]: context })
+      const column = await db.Column.findByPk(slug, {
+        attributes: [
+          'slug',
+          'description',
+          'name',
+          'createdAt',
+          [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
+          [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
+        ],
+        [EXPECTED_OPTIONS_KEY]: context
+      })
       return exportSafeModel(column)
     },
     listColumns: async (_parent, args, { context, EXPECTED_OPTIONS_KEY }) => {
@@ -30,7 +40,11 @@ module.exports = {
     searchColumns: async (_parent, { query }, { db }) => {
       const columns = await db.Column.search(query)
       return columns[0]
-    }
+    },
+    isUserSubscribedToColumn: can('standard').createResolver(async (_parent, args, { context, EXPECTED_OPTIONS_KEY, req }) => {
+      const { user } = req
+      return columnService.isUserSubscribedToColumn(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+    })
   },
   Mutation: {
     createColumn: can('standard').createResolver(async (_parent, body, { req }) => {
@@ -68,7 +82,7 @@ module.exports = {
     },
     subscriptions: (column, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const col = db.Column.build(exportSafeModel(column))
-      return col.getSubscriptions({ include: ['users'], limit, page, [EXPECTED_OPTIONS_KEY]: context })
+      return col.getSubscriptions({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
     },
     expertise: (column, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const col = db.Column.build(exportSafeModel(column))
@@ -77,6 +91,12 @@ module.exports = {
     bannedMembers: (column, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const col = db.Column.build(exportSafeModel(column))
       return col.getBannedMembers({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
+    }
+  },
+  Subscription: {
+    user: (subscription, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const sub = db.Subscription.build(exportSafeModel(subscription))
+      return sub.getUser({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
     }
   }
 }
