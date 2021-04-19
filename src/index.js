@@ -60,7 +60,7 @@ app.use(compression())
 
 // TODO: Update origin to production domain
 const origin = ['*']
-if (process.env.NODE_ENV !== 'production') origin.push(process.env.MOCK_WEBCLIENT_HOST || 'http://localhost:8080')
+// if (process.env.NODE_ENV !== 'production') origin.push(process.env.MOCK_WEBCLIENT_HOST || 'http://localhost:8080')
 
 const adminBro = new AdminBro({
   databases: [db],
