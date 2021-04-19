@@ -73,7 +73,7 @@ const createInvitation = async (
 
     await invitation.addExpertise(invitationExpertise)
 
-    await emailService.sendEmail(this.email, { firstName: this.firstName }, 'invitationRequested')
+    await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationRequested')
   } catch (e) {
     logger.warn(`createInvitation ${e}`)
   }
@@ -192,8 +192,8 @@ const rejectInvitation = async (email, _user, Invitation = db.Invitation) => {
       invitation.state = states.APPROVED
       savedInvitation = await invitation.save()
       await emailService.sendEmail(
-        this.email,
-        { firstName: this.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+        invitation.email,
+        { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
         'nomDePlumeRejected'
       )
     } else {
