@@ -274,6 +274,24 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
   return comment
 }
 
+const uploadFileToPost = async ({ body: { id, files = [] } }, Post = db.Post) => {
+  let DBpost
+  try {
+    DBpost = await Post.findByPk(id)
+    if (!DBpost) throw new Error({ status: 404, message: 'Post not found' })
+    const column = await DBpost.getColumn()
+    const author = await DBpost.getAuthor()
+    if (files.length === 0) throw new Error({ status: 400, message: 'Files are required' })
+    const uploadedFiles = (await Promise.all(files)).map(item => uploadService.processUploadS3(item, 'POST'))
+    ;(await Promise.all(uploadedFiles)).map(async file => DBpost.createFile({ ...file, UserId: author.id, ColumnSlug: column.slug }))
+  } catch (e) {
+    logger.warn(`uploadFileToPost: ${e.message}`)
+    const parsedError = isStringJSON(e.message) ? JSON.parse(e.message) : e
+    throw new Error(JSON.stringify({ status: parsedError.status ? parsedError.status : 400, message: parsedError.message }))
+  }
+  return DBpost
+}
+
 const updateVoteValue = async (voteType, post) => {
   if (voteType === 'UP') {
     await post.increment('votes', { by: 1 })
@@ -457,5 +475,6 @@ module.exports = {
   deletePost,
   editPost,
   reportPost,
-  reviewReportedPost
+  reviewReportedPost,
+  uploadFileToPost
 }

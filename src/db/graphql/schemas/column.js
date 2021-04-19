@@ -5,7 +5,8 @@ const columnSchema = gql`
     getColumn(slug: String!): Column
     listColumns(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Columns
     listPopularColumns(page: Int, limit: Int, sortBy: String, sortDirection: String): Columns
-    searchColumns(query: String): [Column]
+    searchColumns(query: String!): [Column]
+    isUserSubscribedToColumn(column: String!): Boolean!
   }
 
   type Mutation {
@@ -63,7 +64,7 @@ const columnSchema = gql`
     amountPerCycle: Int
     cycle: String
     cycleLength: Int
-    users: [User]
+    user: User
   }
 `
 

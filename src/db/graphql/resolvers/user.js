@@ -61,7 +61,17 @@ module.exports = {
         page
       })
 
-      const rawColumns = await db.Column.findAll({ where: { slug: userColumnSubscriptions.map(item => item.ColumnSlug) } })
+      const rawColumns = await db.Column.findAll({
+        where: { slug: userColumnSubscriptions.map(item => item.ColumnSlug) },
+        attributes: [
+          'slug',
+          'description',
+          'name',
+          'createdAt',
+          [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
+          [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
+        ]
+      })
       return rawColumns.map(column => exportSafeModel(column))
     }),
     getUsers: can('superadmin').createResolver(async (_parent, args, { req }) => {
