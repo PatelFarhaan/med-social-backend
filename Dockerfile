@@ -1,18 +1,18 @@
 # Gives us Node, Yarn, Linux
 FROM column/base
 
+ENV NODE_ENV production
+
 # Install app dependencies
 COPY package.json /api/package.json
 COPY yarn.lock /api/yarn.lock
-RUN cd /api
-RUN yarn add bcrypt
-RUN yarn install
-
-# Copy app source
 COPY . /api
-
 # Set work directory to /api
 WORKDIR /api
+
+RUN cd /api
+RUN yarn add bcrypt
+RUN yarn install --build-from-resource
 
 RUN cd /api; npm rebuild bcrypt --build-from-source
 
