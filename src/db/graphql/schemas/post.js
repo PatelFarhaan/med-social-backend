@@ -24,6 +24,7 @@ const postSchema = gql`
     editPost(id: Int!, content: String!): Post
     reportPost(id: Int!, reason: String!): DefaultPayload
     reviewPost(id: Int!, state: reportedContentStatuses!): DefaultPayload
+    uploadFileToPost(id: Int!, files: [Upload]): Post
   }
 
   enum reportedContentStatuses {
@@ -56,6 +57,8 @@ const postSchema = gql`
     hierarchyLevel: Int
     files: [File]
     column: Column
+    quotedPost: Post
+    parent: Post
   }
 
   type File {

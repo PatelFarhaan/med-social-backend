@@ -71,10 +71,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'UserId'
     })
 
-    User.belongsToMany(models.Subscription, {
-      through: 'UserSubscriptions',
-      as: 'subscriptions'
-    })
+    User.hasMany(models.Subscription)
 
     User.belongsToMany(models.Post, {
       through: models.PostBookmark,

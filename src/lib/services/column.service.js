@@ -61,7 +61,12 @@ const createColumn = async (
 ) => {
   let column
   try {
-    column = await Column.create(columnFields)
+    const dbExpertise = await db.Expertise.findOne({ where: { id: expertise } })
+    if (dbExpertise) throw new Error(JSON.stringify({ status: 404, message: 'Expertise not found' }))
+    const dbInterests = await db.Interest.findAll({ where: { id: interests } })
+    if (dbInterests.length > 0) throw new Error(JSON.stringify({ status: 404, message: 'Interests not found' }))
+
+    column = await Column.create({ ...columnFields, ExpertiseId: expertise, authorId: user.id })
     if (column.type === columnTypes.PAID) {
       const stripePriceId = await stripeService.createPrice(column)
       const stripeTaxPriceId = await stripeService.createTaxPrice(column)
@@ -69,19 +74,15 @@ const createColumn = async (
       column.stripeTaxPriceId = stripeTaxPriceId.id
       await column.save()
     }
-    await column.setAuthor(user)
-    const subscription = await Subscription.create({
+
+    await Subscription.create({
       type: subscriptionTypes.COLUMN,
       email: user.email,
-      userId: user.id,
+      UserId: user.id,
       ColumnSlug: column.slug
     })
-    await subscription.addUser(user)
-    await column.addSubscription(subscription)
-    const dbInterests = await db.Interest.findAll({ where: { id: interests } })
+
     await column.addInterest(dbInterests)
-    const dbExpertise = await db.Expertise.findOne({ where: { id: expertise } })
-    await column.setExpertise(dbExpertise)
   } catch (e) {
     logger.warn(`createColumn: ${e}`)
     // throw new Error(JSON.stringify({ status: 400, message: e }))
@@ -100,7 +101,7 @@ const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.S
     subscription = await Subscription.create({
       type: subscriptionTypes.COLUMN,
       email: user.email,
-      userId: user.id,
+      UserId: user.id,
       ColumnSlug: column.slug
     })
   } else {
@@ -113,7 +114,7 @@ const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.S
         customerId: user.stripeCustomerId,
         subscriptionId: stripeSubscription.id,
         email: user.email,
-        userId: user.id,
+        UserId: user.id,
         ColumnSlug: column.slug
       })
       await notificationService.notify(notificationTypes.NEW_COLUMN_SUBSCRIPTION, notificationCategories.SUBSCRIPTION, {
@@ -127,7 +128,6 @@ const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.S
       throw new Error(JSON.stringify({ status: 400, message: 'Stripe Subscription creation was cancelled' }))
     }
   }
-  await subscription.addUser(user)
   return subscription
 }
 
@@ -135,8 +135,8 @@ const unsubscribeToColumn = async ({ body: { column } }, user, Subscription = db
   const subscription = await Subscription.findOne({
     where: {
       type: subscriptionTypes.COLUMN,
-      email: user.email,
-      ColumnSlug: column.slug
+      ColumnSlug: column.slug,
+      UserId: user.id
     }
   })
   if (!subscription) throw new Error(JSON.stringify({ status: 404, message: 'Subscription not found' }))
@@ -192,6 +192,12 @@ const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Col
   })
 }
 
+const isUserSubscribedToColumn = async ({ column }, user, Subscription = db.Subscription) => {
+  const subscription = await Subscription.findOne({ where: { UserId: user.id, ColumnSlug: column } })
+  if (subscription) return true
+  return false
+}
+
 module.exports = {
   createColumn,
   getColumn,
@@ -199,5 +205,6 @@ module.exports = {
   subscribeToColumn,
   unsubscribeToColumn,
   banUser,
-  getPopularColumns
+  getPopularColumns,
+  isUserSubscribedToColumn
 }

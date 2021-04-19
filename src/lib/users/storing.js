@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const { Op } = require('sequelize')
 const { env } = require('../../../config/config')
 const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
@@ -83,7 +84,7 @@ const authenticate = async (email, password) => {
 
   const user = await db.User.findOne({
     where: {
-      email: email.toLowerCase(),
+      [Op.or]: [{ email: email.toLowerCase() }, { username: email.toLowerCase() }],
       deactivatedAt: null
     },
     include: [

@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       type: { type: DataTypes.ENUM(Object.keys(subscriptionTypes)), defaultValue: subscriptionTypes.COLUMN },
       customerId: { type: DataTypes.STRING, field: 'customer_id' },
       subscriptionId: { type: DataTypes.STRING, field: 'subscription_id' },
-      email: { type: DataTypes.STRING, allowNull: false, validate: { min: 3 } },
+      email: { type: DataTypes.STRING, validate: { min: 3 } },
       state: { type: DataTypes.ENUM(Object.keys(subscriptionStatuses)), defaultValue: subscriptionStatuses.ACTIVE },
       amountPerCycle: { type: DataTypes.DECIMAL(10, 2), defaultValue: 0 },
       cycle: { type: DataTypes.ENUM(Object.keys(subscriptionCycles)), defaultValue: subscriptionCycles.MONTH },
@@ -30,10 +30,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   Subscription.associate = models => {
-    Subscription.belongsToMany(models.User, {
-      through: 'UserSubscriptions',
-      as: 'users'
-    })
+    Subscription.belongsTo(models.User)
 
     Subscription.belongsTo(models.Column)
   }
