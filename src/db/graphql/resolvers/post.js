@@ -54,7 +54,8 @@ module.exports = {
     }),
     deletePost: can('standard').createResolver(async (_parent, body, { req }) => postService.deletePost({ body }, req.user)),
     reportPost: can('standard').createResolver(async (_parent, body, { req }) => postService.reportPost({ body }, req.user)),
-    reviewPost: can('admin').createResolver(async (_parent, body, { req }) => postService.reviewReportedPost({ body }, req.user))
+    reviewPost: can('admin').createResolver(async (_parent, body, { req }) => postService.reviewReportedPost({ body }, req.user)),
+    uploadFileToPost: can('admin').createResolver(async (_parent, body, { req }) => postService.uploadFileToPost({ body }, req.user))
   },
   Post: {
     column: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
@@ -78,7 +79,12 @@ module.exports = {
               include: {
                 model: db.User,
                 as: 'author',
-                attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture']
+                attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
+                include: {
+                  model: db.Expertise,
+                  as: 'expertises',
+                  through: { attributes: [] }
+                }
               }
             }
           ]
@@ -95,6 +101,14 @@ module.exports = {
     files: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getFiles({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    quotedPost: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbPost = db.Post.build(exportSafeModel(post))
+      return dbPost.getQuotedPost({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    parent: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbPost = db.Post.build(exportSafeModel(post))
+      return dbPost.getParent({ [EXPECTED_OPTIONS_KEY]: context })
     }
   },
   File: {
