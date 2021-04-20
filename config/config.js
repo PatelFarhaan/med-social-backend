@@ -41,5 +41,6 @@ module.exports = {
     clientSecret: process.env.TWITTER_CLIENT_SECRET,
     callbackUrl: process.env.TWITTER_CALLBACK_URL,
     frontendCallbackUrl: process.env.TWITTER_FRONTEND_CALLBACK_URL
-  }
+  },
+  rebuildHierarchy: process.env.REBUILD_HIERARCHY
 }
