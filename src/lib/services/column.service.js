@@ -14,7 +14,7 @@ const COLUMN_SINGLE_PAGE = slug => `/columns/${slug}`
 
 const getColumn = async ({ slug }, loaderOpts) => db.Column.findByPk(slug, loaderOpts)
 
-const listColumns = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, includeNonApproved }, loaderOpts) => {
+const listColumns = async ({ interests = [], page = 1, limit = LIMIT, sortBy, sortDirection, includeNonApproved }, loaderOpts) => {
   let order = [['name', 'ASC']]
 
   const sortFilters = {
@@ -36,11 +36,26 @@ const listColumns = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, inc
     query = {}
   }
 
+  let includeInterestsFilter = []
+
+  if (interests.length !== 0) {
+    includeInterestsFilter = {
+      model: db.Interest,
+      as: 'interests',
+      where: {
+        id: {
+          [Op.in]: interests
+        }
+      }
+    }
+  }
+
   return db.Column.findAndCountAll({
     query,
     limit,
     offset: limit * (page - 1),
     order,
+    include: includeInterestsFilter,
     attributes: [
       'slug',
       'description',

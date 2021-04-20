@@ -3,7 +3,7 @@ const { gql } = require('apollo-server-express')
 const columnSchema = gql`
   type Query {
     getColumn(slug: String!): Column
-    listColumns(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Columns
+    listColumns(interests: [Int], page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Columns
     listPopularColumns(page: Int, limit: Int, sortBy: String, sortDirection: String): Columns
     searchColumns(query: String!): [Column]
     isUserSubscribedToColumn(column: String!): Boolean!
