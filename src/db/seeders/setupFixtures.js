@@ -2,7 +2,7 @@
 // seed multiple Tenants and Users.
 // NOTE: everything needs to be wrapped in a transaction in order to access the Postgres tenant triggers.
 const { signup } = require('./../../lib/users')
-const { interestService, expertiseService } = require('../../lib/services')
+// const { interestService, expertiseService } = require('../../lib/services')
 const db = require('./../models/')
 
 const roleTypes = ['superadmin', 'admin', 'standard']
@@ -73,20 +73,22 @@ const createUsers = async () => {
   return true
 }
 
-const createInterestsAndExpertises = async () => {
-  const testInterest = await interestService.createInterest({ body: { name: 'Math' } })
-  await Promise.all(
-    ['Algebra', 'Geometry', 'Trigonometry'].map(async expertise =>
-      expertiseService.createExpertise({ body: { name: expertise, interests: [testInterest.id] } })
-    )
-  )
-  return true
-}
+// const createInterestsAndExpertises = async () => {
+//   const testInterest = await db.Interest.create({ name: 'Math', id: 999 })
+//   await Promise.all(
+//     ['Algebra', 'Geometry', 'Trigonometry'].map(async expertise => {
+//       const dbExpertise = await db.Expertise.create({ name: expertise })
+//       await dbExpertise.addInterests([testInterest])
+//       return dbExpertise
+//     })
+//   )
+//   return true
+// }
 
 module.exports = async () => {
   try {
     await createUsers()
-    await createInterestsAndExpertises()
+    // await createInterestsAndExpertises()
     console.log('seeding complete')
   } catch (e) {
     console.log('Something wrong during seeding process: ', e)

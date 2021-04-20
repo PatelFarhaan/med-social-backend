@@ -5,6 +5,7 @@ CREATE TABLE "Post" (
     "is_stacked" BOOLEAN DEFAULT FALSE,
     "is_quoted" BOOLEAN DEFAULT FALSE,
     "is_comment" BOOLEAN DEFAULT FALSE,
+    "is_parent" BOOLEAN DEFAULT TRUE,
     "votes" integer NOT NULL DEFAULT 0,
     "comments" integer NOT NULL DEFAULT 0,
     "author_id" uuid REFERENCES "User"("id"),

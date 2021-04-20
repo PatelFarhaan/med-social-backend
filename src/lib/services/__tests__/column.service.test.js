@@ -20,16 +20,20 @@ describe('Column Service', () => {
   let user
   let expertise
   let interest
+  let interestTwo
   // let column
   afterAll(async () => {
     await destroyDefaults()
+    await db.Interest.destroy({ where: { name: 'InterestTwo ' } })
   })
 
   beforeAll(async () => {
     ;[user] = await createDefaultUser()
     ;[expertise] = await createDefaultExpertise()
     ;[interest] = await createDefaultInterest()
+    ;[interestTwo] = await db.Interest.findOrCreate({ where: { name: 'InterestTwo' } })
     await interest.addExpertise(expertise)
+    await interestTwo.addExpertise(expertise)
   })
 
   describe('Column Unsubscribe', () => {
@@ -57,6 +61,54 @@ describe('Column Service', () => {
       expect(response.message).toBe('Subscription successfully deleted')
       const dbSubscriptionsCount = await db.Subscription.count()
       expect(dbSubscriptionsCount).toBe(0)
+    })
+  })
+
+  describe('List Columns', () => {
+    beforeAll(async () => {
+      await db.Subscription.destroy({ where: {} })
+      await db.Column.destroy({ where: {} })
+    })
+    beforeEach(async () => {
+      await Promise.all(
+        ['calculus', 'physics', 'trigonometry'].map(async (item, index) => {
+          const column = await db.Column.create({
+            name: item,
+            description: item,
+            state: columnStatuses.APPROVED,
+            type: columnTypes.FREE,
+            ExpertiseId: expertise.id
+          })
+          await column.addInterest(index === 0 ? interest : interestTwo)
+          return column
+        })
+      )
+    })
+    afterEach(async () => {
+      await db.Post.destroy({ where: {} })
+      await db.Subscription.destroy({ where: {} })
+      await db.Column.destroy({
+        where: {
+          slug: ['calculus', 'physics', 'trigonometry']
+        }
+      })
+    })
+
+    test('it should only return filtered columns interestTwo if interests is empty', async () => {
+      const filteredColumns = await columnService.listColumns({ interests: [interestTwo.id] }, user)
+      expect(filteredColumns.count).toBe(2)
+      const filteredColumnSlugs = filteredColumns.rows.map(item => item.slug)
+      expect(filteredColumnSlugs.includes('physics')).toBe(true)
+      expect(filteredColumnSlugs.includes('trigonometry')).toBe(true)
+    })
+
+    test('it should return all columns within page = 1 and limit = 10 if no parameters were passed', async () => {
+      const filteredColumns = await columnService.listColumns({}, user)
+      expect(filteredColumns.count).toBe(3)
+      const filteredColumnSlugs = filteredColumns.rows.map(item => item.slug)
+      expect(filteredColumnSlugs.includes('calculus')).toBe(true)
+      expect(filteredColumnSlugs.includes('physics')).toBe(true)
+      expect(filteredColumnSlugs.includes('trigonometry')).toBe(true)
     })
   })
 

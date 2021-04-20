@@ -12,6 +12,7 @@ const postSchema = gql`
     createPost(
       column: String
       content: String!
+      isStacked: Boolean
       isQuoted: Boolean
       quoted_post: Int
       stackedPosts: [StackedPostInput]
@@ -45,6 +46,7 @@ const postSchema = gql`
     id: String!
     content: String!
     isStacked: Boolean
+    isParent: Boolean
     isQuoted: Boolean
     author: User
     updatedAt: DateTime
