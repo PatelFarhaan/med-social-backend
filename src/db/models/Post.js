@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       isStacked: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_stacked', defaultValue: false },
       isQuoted: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_quoted', defaultValue: false },
       isComment: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_comment', defaultValue: false },
+      isParent: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_parent', defaultValue: true },
       votes: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       comments: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       createdAt: types.get('createdAt'),
