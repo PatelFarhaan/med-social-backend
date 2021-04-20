@@ -66,7 +66,7 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
 
   return db.Post.findAndCountAll({
     where: {
-      isStacked: false,
+      isParent: false,
       isComment: false
     },
     include: includeChildren,
@@ -112,7 +112,7 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
 
   return db.Post.findAndCountAll({
     where: {
-      isStacked: false,
+      isParent: true,
       isComment: false
     },
     include: columnInclude,
@@ -178,7 +178,7 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
           post.createStackedChild(
-            { content: stackedPost.content, isStacked: true, author_id: user.id, ColumnSlug: column },
+            { content: stackedPost.content, isStacked: true, isParent: false, author_id: user.id, ColumnSlug: column },
             { through: { order: index } }
           )
         )
