@@ -62,9 +62,9 @@ const createColumn = async (
   let column
   try {
     const dbExpertise = await db.Expertise.findOne({ where: { id: expertise } })
-    if (dbExpertise) throw new Error(JSON.stringify({ status: 404, message: 'Expertise not found' }))
+    if (!dbExpertise) throw new Error(JSON.stringify({ status: 404, message: 'Expertise not found' }))
     const dbInterests = await db.Interest.findAll({ where: { id: interests } })
-    if (dbInterests.length > 0) throw new Error(JSON.stringify({ status: 404, message: 'Interests not found' }))
+    if (dbInterests.length === 0) throw new Error(JSON.stringify({ status: 404, message: 'Interests not found' }))
 
     column = await Column.create({ ...columnFields, ExpertiseId: expertise, authorId: user.id })
     if (column.type === columnTypes.PAID) {
