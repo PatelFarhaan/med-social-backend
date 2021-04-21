@@ -76,7 +76,7 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
 
   return db.Post.findAndCountAll({
     where: {
-      isParent: false,
+      isParent: true,
       isComment: false
     },
     include: includeChildren,
