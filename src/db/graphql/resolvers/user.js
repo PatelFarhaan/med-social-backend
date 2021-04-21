@@ -47,12 +47,12 @@ module.exports = {
         message: 'Email Sent'
       }
     },
-    getUser: can('standard').createResolver(async (_parent, _args, { db, req }) => {
+    getUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, _args, { db, req }) => {
       const user = await db.User.findOne({ where: { id: req.user.id } })
       user.settings = await getUserSettings(user.settings)
       return user
     }),
-    getUserColumns: can('standard').createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
+    getUserColumns: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
       const { user } = req
       const userColumnSubscriptions = await user.getSubscriptions({
         attributes: ['ColumnSlug', 'id'],
@@ -74,7 +74,7 @@ module.exports = {
       })
       return rawColumns.map(column => exportSafeModel(column))
     }),
-    getUsers: can('superadmin').createResolver(async (_parent, args, { req }) => {
+    getUsers: can(['admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
       const rawUsers = await getUsers(args, req.user.id)
       const users = rawUsers.rows.map(user => exportSafeUser(user))
       return {
@@ -104,7 +104,7 @@ module.exports = {
         attributes
       }
     },
-    searchByUsername: can('standard').createResolver(async (_parent, { query }, { db }) => {
+    searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query }, { db }) => {
       const rawUsers = await db.User.search(query)
       return rawUsers[1].rows.map(item => ({
         username: item.username,
@@ -119,7 +119,7 @@ module.exports = {
     }
   },
   Mutation: {
-    connectPaymentMethod: can('standard').createResolver(async (_parent, { paymentMethod }, { req }) => {
+    connectPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { paymentMethod }, { req }) => {
       const { user } = req
       const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
       await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
@@ -128,7 +128,7 @@ module.exports = {
       const savedUser = await user.save()
       return savedUser
     }),
-    connectSocial: can('standard').createResolver(async (_parent, { provider, token }, { req }) => {
+    connectSocial: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { provider, token }, { req }) => {
       // TODO: Add other socials
       if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
       const ticket = await socialService.googleTokenVerify(token)
@@ -138,14 +138,14 @@ module.exports = {
       const savedUser = await user.save()
       return savedUser
     }),
-    disconnectSocial: can('standard').createResolver(async (_parent, { provider }, { req }) => {
+    disconnectSocial: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { provider }, { req }) => {
       if (!['google', 'twitter'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
       const { user } = req
       user[userProviderAttributes[provider]] = null
       const savedUser = await user.save()
       return savedUser
     }),
-    updateUser: can('superadmin').createResolver(async (_parent, args, { req }) => {
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
       if (args.settings) {
         args.settings = Object.assign(req.User.settings, args.settings)
       }
@@ -174,14 +174,14 @@ module.exports = {
         throw error
       }
     },
-    uploadProfilePicture: can('standard').createResolver(async (_parent, args, { req }) => {
+    uploadProfilePicture: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
       const { user } = req
       const uploadedFile = await uploadService.processUploadS3(args.file, 'USER')
       user.profilePicture = uploadedFile.location
       const savedUser = await user.save()
       return exportSafeModel(savedUser)
     }),
-    setPassword: can('standard').createResolver(async (_parent, { password }, { req }) => {
+    setPassword: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { password }, { req }) => {
       const { user } = req
       if (user.hash) throw new Error(JSON.stringify({ status: 400, message: 'Password has already been set' }))
       const savedUser = await setPassword(user, password)
