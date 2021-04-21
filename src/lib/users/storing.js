@@ -10,6 +10,7 @@ const { tokenTypes } = require('../constants/token.constant')
 const logger = require('../utils/logger')
 const { calculatePoints } = require('../services/reputation.service')
 const { reputationSources } = require('../constants/reputation.constant')
+const previousAPIService = require('../services/previousAPI.service')
 
 const BCRYPT_SALT_ROUNDS = 10
 
@@ -95,6 +96,14 @@ const authenticate = async (email, password) => {
       }
     ]
   })
+
+  // TODO: Remove this once all the previous users have migrated to the new system (Started April 21)
+  if (user.isMigrated && !user.hash) {
+    const migratedUser = await previousAPIService.authenticate(email, password)
+    if (!migratedUser) throw new Error(JSON.stringify({ status: 404, message: 'Incorrect email or password' }))
+    await setPassword(user, password)
+  }
+
   if (user) {
     const comparison = await bcrypt.compare(password, user.hash)
     if (comparison === true) {
