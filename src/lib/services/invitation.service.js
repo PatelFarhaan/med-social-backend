@@ -209,7 +209,7 @@ const rejectInvitation = async (email, _user, Invitation = db.Invitation) => {
   return savedInvitation
 }
 
-const payForApproval = async (paymentMethod, email, Invitation = db.Invitation, Subscription = db.Subscription) => {
+const payForApproval = async ({ paymentMethod, email }, Invitation = db.Invitation, Subscription = db.Subscription) => {
   try {
     const invitation = await Invitation.findOne({ where: { email, state: states.PENDING } })
     if (!invitation) {
@@ -223,7 +223,23 @@ const payForApproval = async (paymentMethod, email, Invitation = db.Invitation, 
     const stripeSubscription = await stripeService.createSubscription(stripeCustomer.id, paidSubscriptionPriceId)
 
     if (stripeSubscription.latest_invoice.payment_intent.status !== 'cancelled') {
-      const approvedInvitation = await invitation.approve()
+      invitation.state = states.APPROVED
+      const token = await generateToken()
+      invitation.token = token
+      const approvedInvitation = await invitation.save()
+      if (invitation.special) {
+        await emailService.sendEmail(
+          invitation.email,
+          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          'nomDePlumeConfirmed'
+        )
+      } else {
+        await emailService.sendEmail(
+          invitation.email,
+          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          'invitationConfirmed'
+        )
+      }
 
       const subscription = await Subscription.create({
         paymentMethod,

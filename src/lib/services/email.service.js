@@ -44,7 +44,8 @@ const sendEmail = async (to, locals, template) => {
     },
     send: env === 'production',
     transport: transporter,
-    preview: env === 'production' ? null : { open: { app: 'firefox' } }
+    // preview: env === 'production' ? null : { open: { app: 'firefox' } }
+    preview: true
   })
 
   const { MOCK_SERVER_HOST, MOCK_SERVER_PORT, MOCK_SERVER_PROTOCOL } = process.env
