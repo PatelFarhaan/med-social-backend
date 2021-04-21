@@ -1,7 +1,7 @@
 // Resolvers: A map of functions which return data for the schema.
 const { interestService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
-// const { can } = require('./../auth')
+const { can } = require('./../auth')
 
 module.exports = {
   Query: {
@@ -23,10 +23,10 @@ module.exports = {
     }
   },
   Mutation: {
-    createInterest: async (_parent, body) => {
+    createInterest: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body) => {
       const interest = await interestService.createInterest({ body })
       return exportSafeModel(interest)
-    }
+    })
   },
   Interest: {
     expertises: (interest, { limit = 10, page = 1 }, { db, context, EXPECTED_OPTIONS_KEY }) => {
