@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       username: { type: DataTypes.STRING(150), unique: true },
       profilePicture: { type: DataTypes.TEXT, field: 'profile_picture' },
       isAnonymousUser: { type: DataTypes.BOOLEAN, field: 'is_anonymous_user', defaultValue: false },
+      isMigrated: { type: DataTypes.BOOLEAN, field: 'is_migrated', defaultValue: false },
       invitationLimit: { type: DataTypes.INTEGER, field: 'invitation_limit', defaultValue: 5 },
       profileDescription: { type: DataTypes.STRING(150), field: 'profile_description' },
       notificationsSeenAt: { type: DataTypes.DATE, field: 'notifications_seen_at' },

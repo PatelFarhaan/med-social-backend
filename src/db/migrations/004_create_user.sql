@@ -15,6 +15,7 @@ CREATE TABLE "User" (
     "username" character varying(150),
     "profile_picture" text,
     "is_anonymous_user" boolean,
+    "is_migrated" boolean DEFAULT false,
     "invitation_limit" integer,
     "stripe_user_id" character varying(150),
     "stripe_customer_id" character varying(150),
