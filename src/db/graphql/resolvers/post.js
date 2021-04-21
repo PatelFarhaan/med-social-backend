@@ -17,45 +17,55 @@ module.exports = {
         count: rawPosts.count
       }
     },
-    listUserPosts: can('standard').createResolver(async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
-      const { user } = req
-      const rawPosts = await postService.listUserPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
-      const posts = rawPosts.rows.map(post => exportSafeModel(post))
-      return {
-        list: posts,
-        count: rawPosts.count
+    listUserPosts: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+        const { user } = req
+        const rawPosts = await postService.listUserPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+        const posts = rawPosts.rows.map(post => exportSafeModel(post))
+        return {
+          list: posts,
+          count: rawPosts.count
+        }
       }
-    }),
+    ),
     searchPosts: async (_parent, { query }, { db }) => {
       const columns = await db.Post.search(query)
       return columns[0]
     }
   },
   Mutation: {
-    createPost: can('standard').createResolver(async (_parent, body, { req }) => {
+    createPost: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) => {
       const post = await postService.createPost({ body }, req.user)
       return exportSafeModel(post)
     }),
-    editPost: can('standard').createResolver(async (_parent, body, { req }) => {
+    editPost: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) => {
       const post = await postService.editPost({ body }, req.user)
       return exportSafeModel(post)
     }),
-    createComment: can('standard').createResolver(async (_parent, body, { req }) => {
+    createComment: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) => {
       const comment = await postService.createComment({ body }, req.user)
       return exportSafeModel(comment)
     }),
-    createPostBookmark: can('standard').createResolver(async (_parent, body, { req }) => {
+    createPostBookmark: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) => {
       const post = await postService.bookmarkPost({ body }, req.user)
       return exportSafeModel(post)
     }),
-    createPostVote: can('standard').createResolver(async (_parent, body, { req }) => {
+    createPostVote: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) => {
       const post = await postService.votePost({ body }, req.user)
       return exportSafeModel(post)
     }),
-    deletePost: can('standard').createResolver(async (_parent, body, { req }) => postService.deletePost({ body }, req.user)),
-    reportPost: can('standard').createResolver(async (_parent, body, { req }) => postService.reportPost({ body }, req.user)),
-    reviewPost: can('admin').createResolver(async (_parent, body, { req }) => postService.reviewReportedPost({ body }, req.user)),
-    uploadFileToPost: can('admin').createResolver(async (_parent, body, { req }) => postService.uploadFileToPost({ body }, req.user))
+    deletePost: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) =>
+      postService.deletePost({ body }, req.user)
+    ),
+    reportPost: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) =>
+      postService.reportPost({ body }, req.user)
+    ),
+    reviewPost: can(['admin', 'superadmin']).createResolver(async (_parent, body, { req }) =>
+      postService.reviewReportedPost({ body }, req.user)
+    ),
+    uploadFileToPost: can(['admin', 'superadmin']).createResolver(async (_parent, body, { req }) =>
+      postService.uploadFileToPost({ body }, req.user)
+    )
   },
   Post: {
     column: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {

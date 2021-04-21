@@ -24,16 +24,16 @@ module.exports = {
       const invitation = await invitationService.createInvitation(body)
       return exportSafeModel(invitation)
     },
-    approveInvitation: async (_parent, { email }, { _req }) => {
+    approveInvitation: can(['admin', 'superadmin']).createResolver(async (_parent, { email }, { _req }) => {
       const invitation = await invitationService.approveInvitation(email)
       return exportSafeModel(invitation)
-    },
+    }),
     payForApproval: async (_parent, body) => {
       const invitation = await invitationService.payForApproval(body)
       return invitation
     },
     applyForFellowship: async (_parent, body) => invitationService.updateFellowApplication(body),
-    inviteUserToColumn: can('standard').createResolver(async (_parent, body, { req }) =>
+    inviteUserToColumn: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) =>
       invitationService.inviteUserToColumn(body, req.user)
     )
   },
