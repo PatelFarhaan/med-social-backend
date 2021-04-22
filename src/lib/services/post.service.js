@@ -27,7 +27,8 @@ const getPost = async ({ id, hierarchy = true }, loaderOpts) =>
         include: {
           model: db.Expertise,
           as: 'expertises',
-          attributes: ['id', 'name']
+          attributes: ['id', 'name'],
+          limit: 1
         }
       }
     },
@@ -67,7 +68,8 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
             include: {
               model: db.Expertise,
               as: 'expertises',
-              attributes: ['id', 'name']
+              attributes: ['id', 'name'],
+              limit: 1
             }
           }
         }
