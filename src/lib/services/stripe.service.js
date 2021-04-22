@@ -64,12 +64,12 @@ const retrivePrice = async stripePriceId => {
 const createCustomer = async (user, paymentData) => {
   try {
     return stripe.customers.create({
-      payment_method: paymentData.payment_method_id,
+      payment_method: paymentData.id,
       name: paymentData.payment_name,
       // metadata: { user_id: user.id },
       email: user.email,
       invoice_settings: {
-        default_payment_method: paymentData.payment_method_id
+        default_payment_method: paymentData.id
       }
     })
   } catch (e) {
@@ -116,7 +116,7 @@ const deletePaymentMethod = async user => {
 
 const updatePaymentMethod = async (user, paymentData) => {
   try {
-    await stripe.paymentMethods.attach(paymentData.payment_method_id, {
+    await stripe.paymentMethods.attach(paymentData.id, {
       customer: user.stripeCustomerId
     })
 
@@ -124,7 +124,7 @@ const updatePaymentMethod = async (user, paymentData) => {
 
     await stripe.customers.update(user.stripeCustomerId, {
       invoice_settings: {
-        default_payment_method: paymentData.payment_method_id
+        default_payment_method: paymentData.id
       }
     })
 
@@ -143,7 +143,7 @@ const attachPaymentMethodToUser = async (user, paymentData) =>
 
 const attachPaymentMethod = async (customerId, paymentData) => {
   try {
-    await stripe.paymentMethods.attach(paymentData.payment_method_id, {
+    await stripe.paymentMethods.attach(paymentData.id, {
       customer: customerId
     })
   } catch (e) {

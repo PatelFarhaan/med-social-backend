@@ -97,14 +97,14 @@ const authenticate = async (email, password) => {
     ]
   })
 
-  // TODO: Remove this once all the previous users have migrated to the new system (Started April 21)
-  if (user.isMigrated && !user.hash) {
-    const migratedUser = await previousAPIService.authenticate(email, password)
-    if (!migratedUser) throw new Error(JSON.stringify({ status: 404, message: 'Incorrect email or password' }))
-    await setPassword(user, password)
-  }
-
   if (user) {
+    // TODO: Remove this once all the previous users have migrated to the new system (Started April 21)
+    if (user.isMigrated && !user.hash) {
+      const migratedUser = await previousAPIService.authenticate(email, password)
+      if (!migratedUser) throw new Error(JSON.stringify({ status: 404, message: 'Incorrect email or password' }))
+      await setPassword(user, password)
+    }
+
     const comparison = await bcrypt.compare(password, user.hash)
     if (comparison === true) {
       return { ...user.toJSON(), roles: [user.role.type] }
