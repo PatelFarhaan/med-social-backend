@@ -101,7 +101,7 @@ const userSchema = gql`
   }
 
   type User {
-    id: Int
+    id: String
     email: String!
     lookupId: String!
     fullName: String
