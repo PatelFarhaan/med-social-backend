@@ -31,7 +31,10 @@ const columnSchema = gql`
     interests(page: Int, limit: Int): [Interest]
     expertise: Expertise
     subscriptions(page: Int, limit: Int): [Subscription]
-    type: String
+    price: Float
+    type: columnTypes
+    visibility: columnVisibility
+    state: columnStatuses
     bannedMembers(page: Int, limit: Int): [User]
     PostCount: Int
     MemberCount: Int
@@ -41,6 +44,14 @@ const columnSchema = gql`
   enum columnVisibility {
     PUBLIC
     PRIVATE
+  }
+
+  enum columnStatuses {
+    PENDING
+    APPROVED
+    REJECTED
+    REVIEWED
+    CANCELED
   }
 
   enum columnTypes {

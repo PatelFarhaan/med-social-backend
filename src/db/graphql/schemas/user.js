@@ -100,8 +100,17 @@ const userSchema = gql`
     expertise: Expertise
   }
 
+  type UserPaymentMethod {
+    id: String
+    name: String
+    brend: String
+    expire_year: Int
+    last_digits: String
+    expire_month: Int
+  }
+
   type User {
-    id: Int
+    id: String
     email: String!
     lookupId: String!
     fullName: String
@@ -117,6 +126,7 @@ const userSchema = gql`
     interests: [Interest]
     invitedBy: [User]
     userExpertises: [UserExpertise]
+    paymentMethod: UserPaymentMethod
   }
 `
 
