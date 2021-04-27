@@ -19,7 +19,7 @@ const postSchema = gql`
       files: [Upload]
     ): Post
     createComment(content: String!, id: Int!, files: [Upload]): Post
-    createPostBookmark(id: String!): Post
+    createPostBookmark(id: Int!): Post
     deletePost(id: Int!): DefaultPayload
     createPostVote(id: Int!, type: voteTypes): Post
     editPost(id: Int!, content: String!): Post
@@ -61,6 +61,8 @@ const postSchema = gql`
     column: Column
     quotedPost: Post
     parent: Post
+    userVote: String
+    userBookmark: Int
   }
 
   type File {

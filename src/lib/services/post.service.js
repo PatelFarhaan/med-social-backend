@@ -13,29 +13,50 @@ const LIMIT = 50
 
 const POSTS_SINGLE_PAGE = (slug, post) => `/columns/${slug}/posts/${post}`
 
-const getPost = async ({ id, hierarchy = true }, loaderOpts) =>
-  db.Post.findOne({
+const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
+  const attributes = ['id', 'content', 'isStacked', 'isQuoted', 'isParent', 'order', 'votes', 'comments', 'createdAt', 'updatedAt']
+  if (user) {
+    attributes.push(
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    )
+  }
+  return db.Post.findOne({
     where: { id },
+    attributes,
     include: {
       model: db.Post,
       as: 'descendents',
       hierarchy,
-      include: {
-        model: db.User,
-        as: 'author',
-        attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
-        include: {
-          model: db.Expertise,
-          as: 'expertises',
-          attributes: ['id', 'name'],
-          limit: 1
+      include: [
+        {
+          model: db.User,
+          as: 'author',
+          attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
+          include: {
+            model: db.Expertise,
+            as: 'expertises',
+            attributes: ['id', 'name'],
+            limit: 1
+          }
         }
-      }
+      ]
     },
     ...loaderOpts
   })
+}
 
-const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, column, hierarchy }, loaderOpts) => {
+const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, column, hierarchy }, user, loaderOpts) => {
   let order = [['createdAt', 'ASC']]
 
   const sortFilters = {
@@ -76,11 +97,30 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
       ]
     : [columnInclude]
 
+  const attributes = ['id', 'content', 'isStacked', 'isQuoted', 'isParent', 'order', 'votes', 'comments', 'createdAt', 'updatedAt']
+  if (user) {
+    attributes.push(
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    )
+  }
+
   return db.Post.findAndCountAll({
     where: {
       isParent: true,
       isComment: false
     },
+    attributes,
     include: includeChildren,
     limit,
     offset: limit * (page - 1),
@@ -127,7 +167,31 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
       isParent: true,
       isComment: false
     },
-    include: columnInclude,
+    attributes: [
+      'id',
+      'content',
+      'isStacked',
+      'isQuoted',
+      'isParent',
+      'order',
+      'votes',
+      'comments',
+      'createdAt',
+      'updatedAt',
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    ],
+    include: [columnInclude],
     limit,
     offset: limit * (page - 1),
     order,
@@ -190,8 +254,8 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
           post.createStackedChild(
-            { content: stackedPost.content, isStacked: true, isParent: false, author_id: user.id, ColumnSlug: column },
-            { through: { order: index } }
+            { content: stackedPost.content, isStacked: true, isParent: false, author_id: user.id, ColumnSlug: column, order: index + 1 },
+            { through: { order: index + 1 } }
           )
         )
       )
