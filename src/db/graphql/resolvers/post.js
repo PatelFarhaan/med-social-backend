@@ -28,6 +28,28 @@ module.exports = {
         }
       }
     ),
+    listUserAuthoredPosts: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+        const { user } = req
+        const rawPosts = await postService.listUserAuthoredPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+        const posts = rawPosts.rows.map(post => exportSafeModel(post))
+        return {
+          list: posts,
+          count: rawPosts.count
+        }
+      }
+    ),
+    listUserBookmarks: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+        const { user } = req
+        const rawPosts = await postService.listUserBookmarks(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+        const posts = rawPosts.rows.map(post => exportSafeModel(post))
+        return {
+          list: posts,
+          count: rawPosts.count
+        }
+      }
+    ),
     searchPosts: async (_parent, { query }, { db }) => {
       const columns = await db.Post.search(query)
       return columns[0]
