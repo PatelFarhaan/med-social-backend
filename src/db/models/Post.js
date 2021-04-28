@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     Post.belongsTo(models.Post, {
+      as: 'stackParent'
+    })
+
+    Post.belongsTo(models.Post, {
       as: 'quotedPost',
       foreignKey: 'quoted_post'
     })

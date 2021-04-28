@@ -94,6 +94,10 @@ module.exports = {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getColumn({ [EXPECTED_OPTIONS_KEY]: context })
     },
+    stackParent: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbPost = db.Post.build(exportSafeModel(post))
+      return dbPost.getStackParent({ [EXPECTED_OPTIONS_KEY]: context })
+    },
     author: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getAuthor({ [EXPECTED_OPTIONS_KEY]: context })

@@ -65,6 +65,7 @@ const postSchema = gql`
     parent: Post
     userVote: String
     userBookmark: Int
+    stackParent: Post
   }
 
   type File {

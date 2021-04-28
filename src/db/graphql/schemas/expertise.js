@@ -4,20 +4,12 @@ const expertiseSchema = gql`
   type Query {
     getExpertise(id: Int!): Expertise
     getExpertises(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Expertises
-    searchExpertises(query: String): [Expertise],
-    getExpertiseRankingTable: RankingTable
+    searchExpertises(query: String): [Expertise]
+    getExpertiseRankingTable: [Int]
   }
 
   type Mutation {
     createExpertise(name: String!, interests: [Int!]): Expertise
-  }
-
-  type RankingTable {
-    1: Int
-    2: Int
-    3: Int
-    4: Int
-    5: Int
   }
 
   input InterestInput {
