@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const uploadService = require('./upload.service')
@@ -195,6 +196,106 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
     limit,
     offset: limit * (page - 1),
     order,
+    ...loaderOpts
+  })
+}
+
+const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
+  let order = [['createdAt', 'ASC']]
+
+  const sortFilters = {
+    votes: direction => [['votes', direction.toUpperCase()]],
+    comments: direction => [['comments', direction.toUpperCase()]],
+    createdAt: direction => [['createdAt', direction.toUpperCase()]]
+  }
+
+  if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
+    order = sortFilters[sortBy](sortDirection)
+  }
+
+  return db.Post.findAndCountAll({
+    where: {
+      author_id: user.id
+    },
+    attributes: [
+      'id',
+      'content',
+      'isStacked',
+      'isQuoted',
+      'isParent',
+      'order',
+      'votes',
+      'comments',
+      'createdAt',
+      'updatedAt',
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    ],
+    limit,
+    offset: limit * (page - 1),
+    order,
+    ...loaderOpts
+  })
+}
+
+const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
+  let order = [['createdAt', 'ASC']]
+
+  const sortFilters = {
+    votes: direction => [['votes', direction.toUpperCase()]],
+    comments: direction => [['comments', direction.toUpperCase()]],
+    createdAt: direction => [['createdAt', direction.toUpperCase()]]
+  }
+
+  if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
+    order = sortFilters[sortBy](sortDirection)
+  }
+
+  const userBookmarks = await db.PostBookmark.findAll({
+    where: { userId: user.id },
+    limit,
+    offset: limit * (page - 1),
+    order
+  })
+
+  return db.Post.findAndCountAll({
+    where: {
+      [Op.in]: userBookmarks.map(item => item.postId)
+    },
+    attributes: [
+      'id',
+      'content',
+      'isStacked',
+      'isQuoted',
+      'isParent',
+      'order',
+      'votes',
+      'comments',
+      'createdAt',
+      'updatedAt',
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    ],
     ...loaderOpts
   })
 }
@@ -552,5 +653,7 @@ module.exports = {
   editPost,
   reportPost,
   reviewReportedPost,
-  uploadFileToPost
+  uploadFileToPost,
+  listUserAuthoredPosts,
+  listUserBookmarks
 }

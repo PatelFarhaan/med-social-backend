@@ -28,6 +28,28 @@ module.exports = {
         }
       }
     ),
+    listUserAuthoredPosts: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+        const { user } = req
+        const rawPosts = await postService.listUserAuthoredPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+        const posts = rawPosts.rows.map(post => exportSafeModel(post))
+        return {
+          list: posts,
+          count: rawPosts.count
+        }
+      }
+    ),
+    listUserBookmarks: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+        const { user } = req
+        const rawPosts = await postService.listUserBookmarks(args, user, { [EXPECTED_OPTIONS_KEY]: context })
+        const posts = rawPosts.rows.map(post => exportSafeModel(post))
+        return {
+          list: posts,
+          count: rawPosts.count
+        }
+      }
+    ),
     searchPosts: async (_parent, { query }, { db }) => {
       const columns = await db.Post.search(query)
       return columns[0]
@@ -71,6 +93,10 @@ module.exports = {
     column: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getColumn({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    stackParent: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbPost = db.Post.build(exportSafeModel(post))
+      return dbPost.getStackParent({ [EXPECTED_OPTIONS_KEY]: context })
     },
     author: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
