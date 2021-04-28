@@ -48,7 +48,7 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(id: String, settings: JSON!): User
+    updateUser(email: String!): User
     createUser(
       email: String!
       firstName: String!
