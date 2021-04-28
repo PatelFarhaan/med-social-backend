@@ -5,6 +5,7 @@ const expertiseSchema = gql`
     getExpertise(id: Int!): Expertise
     getExpertises(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Expertises
     searchExpertises(query: String): [Expertise]
+    getExpertiseRankingTable: [Int]
   }
 
   type Mutation {

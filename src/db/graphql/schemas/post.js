@@ -4,6 +4,8 @@ const postSchema = gql`
   type Query {
     getPost(id: Int!, hierarchy: Boolean): Post
     listColumnPosts(column: String, page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
+    listUserAuthoredPosts(page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
+    listUserBookmarks(page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
     listUserPosts(page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
     searchPosts(query: String): [Post]
   }
@@ -63,6 +65,7 @@ const postSchema = gql`
     parent: Post
     userVote: String
     userBookmark: Int
+    stackParent: Post
   }
 
   type File {

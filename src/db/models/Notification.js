@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       data: { type: DataTypes.JSONB, allowNull: false },
       category: { type: DataTypes.ENUM(Object.keys(notificationCategories)), allowNull: false },
       type: { type: DataTypes.ENUM(Object.keys(notificationTypes)), allowNull: false },
+      isRead: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       createdAt: types.get('createdAt')
     },
     {

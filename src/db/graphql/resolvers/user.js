@@ -145,14 +145,9 @@ module.exports = {
       const savedUser = await user.save()
       return savedUser
     }),
-    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
-      if (args.settings) {
-        args.settings = Object.assign(req.User.settings, args.settings)
-      }
-      const user = await req.User.update(args, { returning: true })
-      user.settings = await getUserSettings(user.settings)
-      return user
-    }),
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email }, { req, db }) =>
+      db.User.update({ email }, { where: { id: req.user.id }, returning: true })
+    ),
     createUser: async (_parent, body) => {
       const user = await signup({ body })
       const tokens = await tokenService.generateAuthTokens(user)

@@ -1,4 +1,5 @@
 // Resolvers: A map of functions which return data for the schema.
+const { rankingLevelPointsUpperBorder } = require('../../../lib/constants/reputation.constant')
 const { expertiseService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 const { can } = require('./../auth')
@@ -20,7 +21,8 @@ module.exports = {
     searchExpertises: async (_parent, { query }, { db }) => {
       const expertises = await db.Expertise.search(query)
       return expertises[0]
-    }
+    },
+    getExpertiseRankingTable: (_parent, _body) => rankingLevelPointsUpperBorder
   },
   Mutation: {
     createExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body) => {
