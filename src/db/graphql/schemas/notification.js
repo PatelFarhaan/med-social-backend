@@ -2,7 +2,7 @@ const { gql } = require('apollo-server-express')
 
 const interestSchema = gql`
   type Query {
-    listUserNotifications(page: Int, limit: Int, sortBy: String, sortDirection: String): Interests
+    listUserNotifications(page: Int, limit: Int, isRead: Boolean): Interests
   }
 
   type Mutation {
