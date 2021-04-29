@@ -29,7 +29,7 @@ const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
     'author_id',
     'ColumnSlug',
     'quoted_post',
-    'parent_id',
+    'parentId',
     'hierarchyLevel',
     'order'
   ]
@@ -123,7 +123,7 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
     'author_id',
     'ColumnSlug',
     'quoted_post',
-    'parent_id',
+    'parentId',
     'hierarchyLevel',
     'order'
   ]
@@ -210,7 +210,7 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
       'author_id',
       'ColumnSlug',
       'quoted_post',
-      'parent_id',
+      'parentId',
       'hierarchyLevel',
       'order',
       [
@@ -265,7 +265,7 @@ const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDire
       'author_id',
       'ColumnSlug',
       'quoted_post',
-      'parent_id',
+      'parentId',
       'hierarchyLevel',
       'order',
       [
@@ -326,7 +326,7 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
       'author_id',
       'ColumnSlug',
       'quoted_post',
-      'parent_id',
+      'parentId',
       'hierarchyLevel',
       'order',
       [
