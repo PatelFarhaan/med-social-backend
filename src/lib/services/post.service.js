@@ -15,7 +15,19 @@ const LIMIT = 50
 const POSTS_SINGLE_PAGE = (slug, post) => `/columns/${slug}/posts/${post}`
 
 const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
-  const attributes = ['id', 'content', 'isStacked', 'isQuoted', 'isParent', 'order', 'votes', 'comments', 'createdAt', 'updatedAt']
+  const attributes = [
+    'id',
+    'content',
+    'isStacked',
+    'isQuoted',
+    'isParent',
+    'order',
+    'votes',
+    'comments',
+    'createdAt',
+    'updatedAt',
+    'author_id'
+  ]
   if (user) {
     attributes.push(
       [
@@ -39,19 +51,15 @@ const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
       model: db.Post,
       as: 'descendents',
       hierarchy,
-      include: [
-        {
-          model: db.User,
-          as: 'author',
-          attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
-          include: {
-            model: db.Expertise,
-            as: 'expertises',
-            attributes: ['id', 'name'],
-            limit: 1
-          }
+      include: {
+        model: db.User,
+        as: 'author',
+        attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
+        include: {
+          model: db.Expertise,
+          as: 'expertises'
         }
-      ]
+      }
     },
     ...loaderOpts
   })
@@ -89,9 +97,7 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
             attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
             include: {
               model: db.Expertise,
-              as: 'expertises',
-              attributes: ['id', 'name'],
-              limit: 1
+              as: 'expertises'
             }
           }
         }

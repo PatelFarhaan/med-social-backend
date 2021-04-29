@@ -32,6 +32,11 @@ module.exports = (sequelize, DataTypes) => {
       as: 'expertises'
     })
 
+    Interest.belongsToMany(models.User, {
+      through: 'UserInterests',
+      as: 'users'
+    })
+
     Interest.belongsToMany(models.Column, {
       through: 'ColumnInterests',
       as: 'columns'

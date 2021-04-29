@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       as: 'users'
     })
 
-    Expertise.hasMany(models.UserExpertise)
+    // Expertise.hasMany(models.UserExpertise)
   }
 
   return Expertise
