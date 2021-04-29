@@ -54,11 +54,12 @@ module.exports = {
     }),
     getUserColumns: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
       const { user } = req
+      console.warn('page', page, limit)
       const userColumnSubscriptions = await user.getSubscriptions({
         attributes: ['ColumnSlug', 'id'],
         where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
         limit,
-        page
+        offset: limit * (page - 1)
       })
 
       const rawColumns = await db.Column.findAll({
