@@ -26,7 +26,12 @@ const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
     'comments',
     'createdAt',
     'updatedAt',
-    'author_id'
+    'author_id',
+    'ColumnSlug',
+    'quoted_post',
+    'parentId',
+    'hierarchyLevel',
+    'order'
   ]
   if (user) {
     attributes.push(
@@ -104,7 +109,24 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
       ]
     : [columnInclude]
 
-  const attributes = ['id', 'content', 'isStacked', 'isQuoted', 'isParent', 'order', 'votes', 'comments', 'createdAt', 'updatedAt']
+  const attributes = [
+    'id',
+    'content',
+    'isStacked',
+    'isQuoted',
+    'isParent',
+    'order',
+    'votes',
+    'comments',
+    'createdAt',
+    'updatedAt',
+    'author_id',
+    'ColumnSlug',
+    'quoted_post',
+    'parentId',
+    'hierarchyLevel',
+    'order'
+  ]
   if (user) {
     attributes.push(
       [
@@ -185,6 +207,12 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
       'comments',
       'createdAt',
       'updatedAt',
+      'author_id',
+      'ColumnSlug',
+      'quoted_post',
+      'parentId',
+      'hierarchyLevel',
+      'order',
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -234,6 +262,12 @@ const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDire
       'comments',
       'createdAt',
       'updatedAt',
+      'author_id',
+      'ColumnSlug',
+      'quoted_post',
+      'parentId',
+      'hierarchyLevel',
+      'order',
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -289,6 +323,12 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
       'comments',
       'createdAt',
       'updatedAt',
+      'author_id',
+      'ColumnSlug',
+      'quoted_post',
+      'parentId',
+      'hierarchyLevel',
+      'order',
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
