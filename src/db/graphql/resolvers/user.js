@@ -54,11 +54,12 @@ module.exports = {
     }),
     getUserColumns: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
       const { user } = req
+      console.warn('page', page, limit)
       const userColumnSubscriptions = await user.getSubscriptions({
         attributes: ['ColumnSlug', 'id'],
         where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
         limit,
-        page
+        offset: limit * (page - 1)
       })
 
       const rawColumns = await db.Column.findAll({
@@ -145,9 +146,10 @@ module.exports = {
       const savedUser = await user.save()
       return savedUser
     }),
-    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email }, { req, db }) =>
-      db.User.update({ email }, { where: { id: req.user.id }, returning: true })
-    ),
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email, profileDescription }, { req, db }) => {
+      if (!email && !profileDescription) throw new Error(JSON.stringify({ status: 400, message: 'Email or profileDescription is needed' }))
+      return db.User.update({ email, profileDescription }, { where: { id: req.user.id }, returning: true })
+    }),
     createUser: async (_parent, body) => {
       const user = await signup({ body })
       const tokens = await tokenService.generateAuthTokens(user)
@@ -184,9 +186,15 @@ module.exports = {
     })
   },
   User: {
-    expertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    expertises: async (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
-      return dbUser.getExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+      const rawExp = await dbUser.getExpertises({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
+      const exp = rawExp.map(item => exportSafeModel(item))
+      return exp
+    },
+    interests: (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getInterests({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
     },
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))

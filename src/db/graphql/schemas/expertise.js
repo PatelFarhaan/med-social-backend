@@ -21,6 +21,7 @@ const expertiseSchema = gql`
     id: Int
     name: String!
     interests(page: Int, limit: Int): [Interest]
+    UserExpertises: [UserExpertise]
   }
 
   type Expertises {

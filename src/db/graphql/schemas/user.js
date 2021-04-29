@@ -48,7 +48,7 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(email: String!): User
+    updateUser(email: String, profileDescription: String): User
     createUser(
       email: String!
       firstName: String!
@@ -122,8 +122,8 @@ const userSchema = gql`
     isAnonymousUser: Boolean
     notificationsSeenAt: DateTime
     settings: JSON!
-    expertises: [Expertise]
-    interests: [Interest]
+    expertises(limit: Int, page: Int): [Expertise]
+    interests(limit: Int, page: Int): [Interest]
     invitedBy: [User]
     userExpertises: [UserExpertise]
     paymentMethod: UserPaymentMethod
