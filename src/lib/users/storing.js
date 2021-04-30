@@ -170,6 +170,9 @@ const resetPassword = async (user, resetPasswordToken, newPassword) => {
   if (!payload || payload.userId !== user.id) {
     throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   }
+  const existingToken = await db.Session.findOne({ where: { userId: user.id, type: tokenTypes.RESET_PASSWORD, token: resetPasswordToken } })
+  if (!existingToken)
+    throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   await setPassword(user, newPassword)
   return user.save()
 }

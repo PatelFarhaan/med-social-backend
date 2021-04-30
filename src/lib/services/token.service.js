@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const config = require('../../../config/config')
-const { getUser, getUserWithoutRole } = require('../users/retrieval')
+const { getUserWithoutRole } = require('../users/retrieval')
 const db = require('../../db/models')
 const { tokenTypes } = require('../constants/token.constant')
 
@@ -55,27 +55,21 @@ const generateAuthTokens = async user => {
   }
 }
 
-const generateResetPasswordToken = async email => {
-  const user = await getUser({ email })
-  if (!user) {
-    throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
-  }
-  const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes')
-  const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD)
-  await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD)
-  return resetPasswordToken
+const mappedTokenTypeExpiry = {
+  [tokenTypes.RESET_PASSWORD]: config.jwt.resetPasswordExpirationMinutes,
+  [tokenTypes.MAGIC_LINK]: config.jwt.magicLinkExpirationMinutes
 }
 
-const generateMagicLinkToken = async email => {
+const generateTypeToken = async (email, type = tokenTypes.MAGIC_LINK) => {
   const user = await getUserWithoutRole({ email })
   if (!user) throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
-  const existingMagicLink = await db.Session.findOne({ where: { userId: user.id, type: tokenTypes.MAGIC_LINK } })
-  if (existingMagicLink) return { token: existingMagicLink.token, user }
-  const expires = moment().add(config.jwt.magicLinkExpirationMinutes, 'minutes')
-  const magicLinkToken = generateToken(user.id, expires, tokenTypes.MAGIC_LINK)
-  await saveToken(magicLinkToken, user.id, expires, tokenTypes.MAGIC_LINK)
+  const existingToken = await db.Session.findOne({ where: { userId: user.id, type } })
+  if (existingToken) return { token: existingToken.token, user }
+  const expires = moment().add(mappedTokenTypeExpiry[type], 'minutes')
+  const token = generateToken(user.id, expires, type)
+  await saveToken(token, user.id, expires, type)
   return {
-    token: magicLinkToken,
+    token,
     user
   }
 }
@@ -85,6 +79,5 @@ module.exports = {
   saveToken,
   verifyToken,
   generateAuthTokens,
-  generateResetPasswordToken,
-  generateMagicLinkToken
+  generateTypeToken
 }

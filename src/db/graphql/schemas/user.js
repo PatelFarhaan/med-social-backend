@@ -6,6 +6,7 @@ const userSchema = gql`
     getUser(id: String!): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
+    resetPasswordLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
     searchByUsername(query: String!): [User]
@@ -69,6 +70,7 @@ const userSchema = gql`
     connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
     uploadProfilePicture(file: Upload!): User
     setPassword(password: String!): User
+    resetPassword(password: String!, token: String!): User
   }
 
   type Users {
