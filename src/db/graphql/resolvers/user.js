@@ -1,5 +1,5 @@
 // Resolvers: A map of functions which return data for the schema.
-const { authenticate, authenticateToken, getUsers, exportSafeUser, signup, setPassword } = require('../../../lib/users')
+const { authenticate, authenticateToken, getUsers, exportSafeUser, signup, setPassword, resetPassword } = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
@@ -36,11 +36,27 @@ module.exports = {
       }
     },
     getMagicLink: async (_parent, { email }) => {
-      const { user, token } = await tokenService.generateMagicLinkToken(email)
+      const { user, token } = await tokenService.generateTypeToken(email, tokenTypes.MAGIC_LINK)
       await emailService.sendEmail(
         user.email,
         { firstName: user.firstName, linkToLogin: `${process.env.MOCK_WEBCLIENT_HOST}/login?token=${token}&email=${user.email}` },
         'magicLink'
+      )
+      return {
+        status: 200,
+        message: 'Email Sent'
+      }
+    },
+    resetPasswordLink: async (_parent, { email }) => {
+      const { user, token } = await tokenService.generateTypeToken(email, tokenTypes.RESET_PASSWORD)
+      await emailService.sendEmail(
+        user.email,
+        {
+          firstName: user.firstName,
+          email: user.email,
+          resetPasswordUrl: `${process.env.MOCK_WEBCLIENT_HOST}/reset-password?token=${token}&email=${user.email}`
+        },
+        'userResetPassword'
       )
       return {
         status: 200,
@@ -181,6 +197,11 @@ module.exports = {
       const { user } = req
       if (user.hash) throw new Error(JSON.stringify({ status: 400, message: 'Password has already been set' }))
       const savedUser = await setPassword(user, password)
+      return exportSafeModel(savedUser)
+    }),
+    resetPassword: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { token, password }, { req }) => {
+      const { user } = req
+      const savedUser = await resetPassword(user, token, password)
       return exportSafeModel(savedUser)
     })
   },
