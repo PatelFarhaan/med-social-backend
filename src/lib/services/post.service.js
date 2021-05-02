@@ -401,7 +401,15 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
           post.createStackedChild(
-            { content: stackedPost.content, isStacked: true, isParent: false, author_id: user.id, ColumnSlug: column, order: index + 1 },
+            {
+              content: stackedPost.content,
+              isStacked: true,
+              isParent: false,
+              author_id: user.id,
+              ColumnSlug: column,
+              order: index + 1,
+              stackParentId: post.id
+            },
             { through: { order: index + 1 } }
           )
         )

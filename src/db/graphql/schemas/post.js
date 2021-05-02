@@ -62,10 +62,12 @@ const postSchema = gql`
     files: [File]
     column: Column
     quotedPost: Post
+    quoted_post: Int
     parent: Post
     userVote: String
     userBookmark: Int
     stackParent: Post
+    stackParentId: Int
   }
 
   type File {
