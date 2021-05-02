@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     query = query.toLowerCase()
 
     // eslint-disable-next-line consistent-return
-    return sequelize.query(`SELECT * FROM "${Column.tableName}" WHERE "state"="APPROVED" AND "name" LIKE '%${query}%'`, Column)
+    return sequelize.query(`SELECT * FROM "${Column.tableName}" WHERE "state" = 'APPROVED' AND "name" LIKE '%${query}%'`, Column)
   }
 
   Column.associate = models => {

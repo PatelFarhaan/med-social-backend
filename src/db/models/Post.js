@@ -100,7 +100,7 @@ module.exports = (sequelize, DataTypes) => {
     query = sequelize.getQueryInterface().escape(query)
     console.log(query)
 
-    return sequelize.query(`SELECT * FROM "POST" WHERE "PostText" @@ plainto_tsquery('english', ${query})`, Post)
+    return sequelize.query(`SELECT * FROM "POST" WHERE "PostText" @@ plainto_tsquery('english', '${query}')`, Post)
   }
 
   return Post

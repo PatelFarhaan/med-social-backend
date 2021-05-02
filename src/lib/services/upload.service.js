@@ -5,7 +5,7 @@ const { uploadTypeBucket } = require('../constants/upload.constant')
 const processUploadS3 = async (file, type = 'POST') => {
   const { createReadStream, mimetype: mimeType, encoding, filename } = await file
   const stream = createReadStream()
-  const { Location } = await s3
+  const { Location } = await s3(uploadTypeBucket[type])
     .upload({
       Body: stream,
       Key: `${uuid()}${filename}`,
