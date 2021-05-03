@@ -49,7 +49,7 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(email: String, profileDescription: String): User
+    updateUser(email: String, profile_description: String): User
     createUser(
       email: String!
       firstName: String!
@@ -114,7 +114,7 @@ const userSchema = gql`
   type User {
     id: String
     email: String!
-    lookupId: String!
+    lookupId: String
     fullName: String
     firstName: String
     lastName: String

@@ -31,7 +31,8 @@ const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
     'quoted_post',
     'parentId',
     'hierarchyLevel',
-    'order'
+    'order',
+    'stackParentId'
   ]
   if (user) {
     attributes.push(
@@ -125,7 +126,8 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
     'quoted_post',
     'parentId',
     'hierarchyLevel',
-    'order'
+    'order',
+    'stackParentId'
   ]
   if (user) {
     attributes.push(
@@ -213,6 +215,7 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
       'parentId',
       'hierarchyLevel',
       'order',
+      'stackParentId',
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -268,6 +271,7 @@ const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDire
       'parentId',
       'hierarchyLevel',
       'order',
+      'stackParentId',
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -288,7 +292,7 @@ const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDire
   })
 }
 
-const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
+const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, _loaderOpts) => {
   let order = [['createdAt', 'ASC']]
 
   const sortFilters = {
@@ -310,7 +314,9 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
 
   return db.Post.findAndCountAll({
     where: {
-      [Op.in]: userBookmarks.map(item => item.postId)
+      id: {
+        [Op.in]: userBookmarks.map(item => item.postId)
+      }
     },
     attributes: [
       'id',
@@ -329,6 +335,7 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
       'parentId',
       'hierarchyLevel',
       'order',
+      'stackParentId',
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -341,8 +348,8 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
         ),
         'userBookmark'
       ]
-    ],
-    ...loaderOpts
+    ]
+    // ...loaderOpts
   })
 }
 

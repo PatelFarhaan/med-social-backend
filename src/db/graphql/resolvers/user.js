@@ -161,9 +161,12 @@ module.exports = {
       const savedUser = await user.save()
       return savedUser
     }),
-    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email, profileDescription }, { req, db }) => {
-      if (!email && !profileDescription) throw new Error(JSON.stringify({ status: 400, message: 'Email or profileDescription is needed' }))
-      return db.User.update({ email, profileDescription }, { where: { id: req.user.id }, returning: true })
+    // eslint-disable-next-line camelcase
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email, profile_description }, { req, db }) => {
+      // eslint-disable-next-line camelcase
+      if (!email && !profile_description)
+        throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
+      return db.User.update({ email, profile_description }, { where: { id: req.user.id }, returning: true })
     }),
     createUser: async (_parent, body) => {
       const user = await signup({ body })
