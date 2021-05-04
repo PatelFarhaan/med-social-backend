@@ -156,7 +156,15 @@ module.exports = {
       const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
       await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
       user.stripeCustomerId = stripeCustomer.id
-      user.paymentMethod = paymentMethod
+      user.paymentMethod = {
+        id: paymentMethod.id,
+        name: `${user.firstName} ${user.lastName}`,
+        brend: paymentMethod.card.brand,
+        expire_year: paymentMethod.card.exp_year,
+        expire_month: paymentMethod.card.exp_month,
+        last_digits: paymentMethod.card.last4,
+        stripe: paymentMethod
+      }
       const savedUser = await user.save()
       return savedUser
     }),
