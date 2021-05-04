@@ -5,7 +5,7 @@ const columnSchema = gql`
     getColumn(slug: String!): Column
     listColumns(interests: [Int], page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Columns
     listPopularColumns(page: Int, limit: Int, sortBy: String, sortDirection: String): Columns
-    searchColumns(query: String!): [Column]
+    searchColumns(query: String!, page: Int, limit: Int): [Column]
     isUserSubscribedToColumn(column: String!): Boolean!
   }
 

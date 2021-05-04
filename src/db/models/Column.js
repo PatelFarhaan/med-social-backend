@@ -23,16 +23,20 @@ module.exports = (sequelize, DataTypes) => {
     }
   )
 
-  Column.search = query => {
+  Column.search = (query, page = 1, limit = 10) => {
     if (sequelize.options.dialect !== 'postgres') {
       console.log('Search is only implemented on POSTGRES database')
       return
     }
 
     query = query.toLowerCase()
-
+    const offset = limit * (page - 1)
     // eslint-disable-next-line consistent-return
-    return sequelize.query(`SELECT * FROM "${Column.tableName}" WHERE "state" = 'APPROVED' AND "name" LIKE '%${query}%'`, Column)
+    return sequelize.query(
+      // eslint-disable-next-line max-len
+      `SELECT * FROM "Column" WHERE "visibility" = 'PUBLIC' AND "state" = 'APPROVED' AND LOWER("name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
+      Column
+    )
   }
 
   Column.associate = models => {

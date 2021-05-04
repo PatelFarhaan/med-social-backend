@@ -17,16 +17,19 @@ module.exports = (sequelize, DataTypes) => {
 
   Expertise.getSearchVector = () => 'ExpertiseName'
 
-  Expertise.search = query => {
+  Expertise.search = (query, page = 1, limit = 10) => {
     if (sequelize.options.dialect !== 'postgres') {
       console.log('Search is only implemented on POSTGRES database')
       return
     }
 
     query = query.toLowerCase()
-
+    const offset = limit * (page - 1)
     // eslint-disable-next-line consistent-return
-    return sequelize.query(`SELECT * FROM "${Expertise.tableName}" WHERE "isApproved"=TRUE AND "name" LIKE '%${query}%'`, Expertise)
+    return sequelize.query(
+      `SELECT * FROM "${Expertise.tableName}" WHERE "isApproved"=TRUE AND LOWER("name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
+      Expertise
+    )
   }
 
   Expertise.associate = models => {
