@@ -58,10 +58,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(compression())
 
-// TODO: Update origin to production domain
 // eslint-disable-next-line prefer-const
-let origin = ['*']
-if (process.env.NODE_ENV !== 'production') origin.push(process.env.MOCK_WEBCLIENT_HOST || 'http://localhost:3000')
+let origin = ['*', 'https://columnhq.com', 'https://www.columnhq.com', 'https://joincolumn.com', 'https://www.joincolumn.com']
 
 const adminBro = new AdminBro({
   databases: [db],
