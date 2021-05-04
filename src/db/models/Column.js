@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     // eslint-disable-next-line consistent-return
     return sequelize.query(
       // eslint-disable-next-line max-len
-      `SELECT * FROM "Column" WHERE "visibility" = 'PUBLIC' AND "state" = 'APPROVED' AND LOWER("name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT * FROM "Column" WHERE "state" = 'APPROVED' AND LOWER("name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
       Column
     )
   }

@@ -2,6 +2,42 @@ const formatName = require('./../../lib/utils/createFullNameForDB')
 const types = require('../types')
 const { tokenize } = require('../tokenizeField')
 
+const publicFields = [
+  'id',
+  'email',
+  'firstName',
+  'lastName',
+  'fullName',
+  'username',
+  'profilePicture',
+  'isAnonymousUser',
+  'profileDescription',
+  'createdAt'
+]
+
+const privateFields = [
+  ...publicFields,
+  'paymentMethod',
+  'muted_notification_categories',
+  'settings',
+  'roleId',
+  'updatedAt',
+  'deactivatedAt',
+  'notificationsSeenAt'
+]
+
+const systemPrivateFields = [
+  ...privateFields,
+  'hash',
+  'invitatationLimit',
+  'invitedBy',
+  'googleUserId',
+  'linkedinUserId',
+  'twitterUserId',
+  'stripeUserId',
+  'stripeCustomerId'
+]
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
@@ -112,17 +148,34 @@ module.exports = (sequelize, DataTypes) => {
     instance.fullname = fullname
   })
 
-  User.search = query => {
+  // eslint-disable-next-line func-names
+  User.prototype.userPublicFields = function() {
+    return publicFields
+  }
+
+  // eslint-disable-next-line func-names
+  User.prototype.userPrivateFields = function() {
+    return privateFields
+  }
+
+  // eslint-disable-next-line func-names
+  User.prototype.systemPrivateFields = function() {
+    return systemPrivateFields
+  }
+
+  User.search = (query, page = 1, limit = 10) => {
     if (sequelize.options.dialect !== 'postgres') {
       console.log('Search is only implemented on POSTGRES database')
       return
     }
 
     query = query.toLowerCase()
+    const offset = limit * (page - 1)
 
     // eslint-disable-next-line consistent-return
     return sequelize.query(
-      `SELECT "username", "first_name", "last_name", "profile_description" FROM "User" WHERE LOWER("username") LIKE '%${query}%'`,
+      // eslint-disable-next-line max-len
+      `SELECT "username", "first_name", "last_name", "profile_description" FROM "User" WHERE LOWER("username") LIKE '%${query}%' OR LOWER("first_name") LIKE '%${query}%' LOWER("last_name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
       User
     )
   }

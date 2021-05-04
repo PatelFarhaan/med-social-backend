@@ -242,7 +242,15 @@ const payForApproval = async ({ paymentMethod, email }, Invitation = db.Invitati
       }
 
       const subscription = await Subscription.create({
-        paymentMethod,
+        paymentMethod: {
+          id: paymentMethod.id,
+          name: `${invitation.firstName} ${invitation.lastName}`,
+          brend: paymentMethod.card.brand,
+          expire_year: paymentMethod.card.exp_year,
+          expire_month: paymentMethod.card.exp_month,
+          last_digits: paymentMethod.card.last4,
+          stripe: paymentMethod
+        },
         paymentGateway: 'STRIPE',
         type: 'PAID_INVITATION',
         customerId: stripeCustomer.id,

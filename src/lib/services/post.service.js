@@ -14,26 +14,28 @@ const LIMIT = 50
 
 const POSTS_SINGLE_PAGE = (slug, post) => `/columns/${slug}/posts/${post}`
 
+const publicFields = [
+  'id',
+  'content',
+  'isStacked',
+  'isQuoted',
+  'isParent',
+  'order',
+  'votes',
+  'comments',
+  'createdAt',
+  'updatedAt',
+  'author_id',
+  'ColumnSlug',
+  'quoted_post',
+  'parentId',
+  'hierarchyLevel',
+  'order',
+  'stackParentId'
+]
+
 const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
-  const attributes = [
-    'id',
-    'content',
-    'isStacked',
-    'isQuoted',
-    'isParent',
-    'order',
-    'votes',
-    'comments',
-    'createdAt',
-    'updatedAt',
-    'author_id',
-    'ColumnSlug',
-    'quoted_post',
-    'parentId',
-    'hierarchyLevel',
-    'order',
-    'stackParentId'
-  ]
+  const attributes = publicFields
   if (user) {
     attributes.push(
       [
@@ -110,25 +112,7 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
       ]
     : [columnInclude]
 
-  const attributes = [
-    'id',
-    'content',
-    'isStacked',
-    'isQuoted',
-    'isParent',
-    'order',
-    'votes',
-    'comments',
-    'createdAt',
-    'updatedAt',
-    'author_id',
-    'ColumnSlug',
-    'quoted_post',
-    'parentId',
-    'hierarchyLevel',
-    'order',
-    'stackParentId'
-  ]
+  const attributes = publicFields
   if (user) {
     attributes.push(
       [
@@ -199,23 +183,7 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
       isComment: false
     },
     attributes: [
-      'id',
-      'content',
-      'isStacked',
-      'isQuoted',
-      'isParent',
-      'order',
-      'votes',
-      'comments',
-      'createdAt',
-      'updatedAt',
-      'author_id',
-      'ColumnSlug',
-      'quoted_post',
-      'parentId',
-      'hierarchyLevel',
-      'order',
-      'stackParentId',
+      ...publicFields,
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -255,23 +223,7 @@ const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDire
       author_id: user.id
     },
     attributes: [
-      'id',
-      'content',
-      'isStacked',
-      'isQuoted',
-      'isParent',
-      'order',
-      'votes',
-      'comments',
-      'createdAt',
-      'updatedAt',
-      'author_id',
-      'ColumnSlug',
-      'quoted_post',
-      'parentId',
-      'hierarchyLevel',
-      'order',
-      'stackParentId',
+      ...publicFields,
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -319,23 +271,7 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
       }
     },
     attributes: [
-      'id',
-      'content',
-      'isStacked',
-      'isQuoted',
-      'isParent',
-      'order',
-      'votes',
-      'comments',
-      'createdAt',
-      'updatedAt',
-      'author_id',
-      'ColumnSlug',
-      'quoted_post',
-      'parentId',
-      'hierarchyLevel',
-      'order',
-      'stackParentId',
+      ...publicFields,
       [
         db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
@@ -403,7 +339,7 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
   try {
     const existingColumn = await Column.findByPk(column)
     if (!existingColumn) throw new Error({ status: 404, message: 'Column not found' })
-    post = await Post.create({ ...postFields, ColumnSlug: column, author_id: user.id })
+    post = await Post.create({ ...postFields, ColumnSlug: column, author_id: user.id, isStacked: stackedPosts.length > 0 })
     if (stackedPosts.length > 0) {
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
