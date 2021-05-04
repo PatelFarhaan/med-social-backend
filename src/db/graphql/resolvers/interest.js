@@ -17,8 +17,8 @@ module.exports = {
         count: rawInterests.count
       }
     },
-    searchInterests: async (_parent, { query }, { db }) => {
-      const interests = await db.Interest.search(query)
+    searchInterests: async (_parent, { query, page, limit }, { db }) => {
+      const interests = await db.Interest.search(query, page, limit)
       return interests[0]
     }
   },

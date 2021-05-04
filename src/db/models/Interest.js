@@ -14,16 +14,20 @@ module.exports = (sequelize, DataTypes) => {
     }
   )
 
-  Interest.search = query => {
+  Interest.search = (query, page = 1, limit = 10) => {
     if (sequelize.options.dialect !== 'postgres') {
       console.log('Search is only implemented on POSTGRES database')
       return
     }
 
     query = query.toLowerCase()
+    const offset = limit * (page - 1)
 
     // eslint-disable-next-line consistent-return
-    return sequelize.query(`SELECT * FROM "${Interest.tableName}" WHERE LOWER("name") LIKE '%${query}%'`, Interest)
+    return sequelize.query(
+      `SELECT * FROM "${Interest.tableName}" WHERE LOWER("name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
+      Interest
+    )
   }
 
   Interest.associate = models => {

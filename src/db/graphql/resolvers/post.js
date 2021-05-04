@@ -50,9 +50,9 @@ module.exports = {
         }
       }
     ),
-    searchPosts: async (_parent, { query }, { db }) => {
-      const columns = await db.Post.search(query)
-      return columns[0]
+    searchPosts: async (_parent, { query, page, limit }, { db }) => {
+      const posts = await db.Post.search(query, page, limit)
+      return posts[0]
     }
   },
   Mutation: {

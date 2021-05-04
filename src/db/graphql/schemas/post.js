@@ -3,11 +3,11 @@ const { gql } = require('apollo-server-express')
 const postSchema = gql`
   type Query {
     getPost(id: Int!, hierarchy: Boolean): Post
-    listColumnPosts(column: String, page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
+    listColumnPosts(column: String!, page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
     listUserAuthoredPosts(page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
     listUserBookmarks(page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
     listUserPosts(page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
-    searchPosts(query: String): [Post]
+    searchPosts(query: String!, page: Int, limit: Int): [Post]
   }
 
   type Mutation {

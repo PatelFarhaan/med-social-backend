@@ -46,8 +46,8 @@ module.exports = {
         }
       }
     ),
-    searchColumns: async (_parent, { query }, { db }) => {
-      const columns = await db.Column.search(query)
+    searchColumns: async (_parent, { query, page, limit }, { db }) => {
+      const columns = await db.Column.search(query, page, limit)
       return columns[0]
     },
     isUserSubscribedToColumn: can(['standard', 'admin', 'superadmin']).createResolver(
