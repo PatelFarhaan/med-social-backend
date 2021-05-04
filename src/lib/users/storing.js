@@ -165,16 +165,30 @@ const inviteUser = async (email, role, firstName = '', lastName = '') => {
 
 const forgotPassword = async user => jwt.sign({ userId: user.id }, user.hash, { expiresIn: '24h' })
 
-const resetPassword = async (user, resetPasswordToken, newPassword) => {
+const resetPassword = async (resetPasswordToken, newPassword) => {
+  const existingToken = await db.Session.findOne({ where: { type: tokenTypes.RESET_PASSWORD, token: resetPasswordToken } })
+  if (!existingToken)
+    throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
+  const { userId } = existingToken
+  const user = await db.User.findByPk(userId)
   const payload = jwt.verify(resetPasswordToken, user.hash)
   if (!payload || payload.userId !== user.id) {
     throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   }
-  const existingToken = await db.Session.findOne({ where: { userId: user.id, type: tokenTypes.RESET_PASSWORD, token: resetPasswordToken } })
-  if (!existingToken)
-    throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   await setPassword(user, newPassword)
   return user.save()
+}
+
+const passwordChange = async (user, oldPassword, newPassword) => {
+  const comparison = await bcrypt.compare(oldPassword, user.hash)
+  if (comparison === true) {
+    const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS)
+    const hash = await bcrypt.hash(newPassword, salt)
+    user.set({ hash })
+    await user.save()
+    return { status: 200, message: 'Password Successfully updated' }
+  }
+  return { status: 400, message: 'Old password does not match' }
 }
 
 const setPassword = async (user, newPassword) => {
@@ -252,5 +266,6 @@ module.exports = {
   setPassword,
   updateUser,
   updatePrimaryUserRole,
-  authenticateToken
+  authenticateToken,
+  passwordChange
 }

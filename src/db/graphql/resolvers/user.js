@@ -1,5 +1,14 @@
 // Resolvers: A map of functions which return data for the schema.
-const { authenticate, authenticateToken, getUsers, exportSafeUser, signup, setPassword, resetPassword } = require('../../../lib/users')
+const {
+  authenticate,
+  authenticateToken,
+  getUsers,
+  exportSafeUser,
+  signup,
+  setPassword,
+  resetPassword,
+  passwordChange
+} = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
@@ -63,11 +72,12 @@ module.exports = {
         message: 'Email Sent'
       }
     },
-    getUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, _args, { db, req }) => {
-      const user = await db.User.findOne({ where: { id: req.user.id } })
-      user.settings = await getUserSettings(user.settings)
+    getUser: async (_parent, { id }, { db, req }) => {
+      const attributes = req.user && req.user.id === id ? db.User.privateFields() : db.User.publicFields()
+      const user = await db.User.findOne({ where: { id }, attributes })
+      if (!user) throw new Error(JSON.stringify({ status: 404, message: 'Id provided is not valid' }))
       return user
-    }),
+    },
     getUserColumns: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
       const { user } = req
       const userColumnSubscriptions = await user.getSubscriptions({
@@ -84,6 +94,12 @@ module.exports = {
           'description',
           'name',
           'createdAt',
+          'price',
+          'visibility',
+          'state',
+          'type',
+          'authorId',
+          'ExpertiseId',
           [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
           [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
         ]
@@ -120,8 +136,8 @@ module.exports = {
         attributes
       }
     },
-    searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query }, { db }) => {
-      const rawUsers = await db.User.search(query)
+    searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query, page, limit }, { db }) => {
+      const rawUsers = await db.User.search(query, page, limit)
       return rawUsers[1].rows.map(item => ({
         username: item.username,
         firstName: item.first_name,
@@ -169,7 +185,7 @@ module.exports = {
       return db.User.update({ email, profile_description }, { where: { id: req.user.id }, returning: true })
     }),
     createUser: async (_parent, body) => {
-      const user = await signup({ body })
+      const user = await signup({ body, roleId: '3' })
       const tokens = await tokenService.generateAuthTokens(user)
       return {
         user,
@@ -202,11 +218,13 @@ module.exports = {
       const savedUser = await setPassword(user, password)
       return exportSafeModel(savedUser)
     }),
-    resetPassword: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { token, password }, { req }) => {
-      const { user } = req
-      const savedUser = await resetPassword(user, token, password)
+    resetPassword: async (_parent, { token, password }) => {
+      const savedUser = await resetPassword(token, password)
       return exportSafeModel(savedUser)
-    })
+    },
+    passwordChange: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { oldPassword, newPassword }, { req }) =>
+      passwordChange(req.user, oldPassword, newPassword)
+    )
   },
   User: {
     expertises: async (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {

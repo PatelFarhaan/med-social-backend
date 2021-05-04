@@ -9,7 +9,7 @@ const userSchema = gql`
     resetPasswordLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
-    searchByUsername(query: String!): [User]
+    searchByUsername(query: String!, page: Int, limit: Int): [User]
     isUsernameTaken(query: String!): Boolean
     getUserColumns(page: Int, limit: Int): [Column]
   }
@@ -57,7 +57,6 @@ const userSchema = gql`
       username: String!
       password: String
       passwordRepeat: String
-      roleId: Int!
       expertises: [Int]
       interests: [Int]
       token: String!
@@ -71,6 +70,7 @@ const userSchema = gql`
     uploadProfilePicture(file: Upload!): User
     setPassword(password: String!): User
     resetPassword(password: String!, token: String!): User
+    passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
   }
 
   type Users {
