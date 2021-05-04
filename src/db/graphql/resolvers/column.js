@@ -7,12 +7,19 @@ const { can } = require('./../auth')
 module.exports = {
   Query: {
     getColumn: async (_parent, { slug }, { db, context, EXPECTED_OPTIONS_KEY }) => {
-      const column = await db.Column.findByPk(slug, {
+      const column = await db.Column.findOne({
+        where: { slug },
         attributes: [
           'slug',
           'description',
           'name',
           'createdAt',
+          'price',
+          'visibility',
+          'state',
+          'type',
+          'authorId',
+          'ExpertiseId',
           [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
           [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
         ],
@@ -39,8 +46,8 @@ module.exports = {
         }
       }
     ),
-    searchColumns: async (_parent, { query }, { db }) => {
-      const columns = await db.Column.search(query)
+    searchColumns: async (_parent, { query, page, limit }, { db }) => {
+      const columns = await db.Column.search(query, page, limit)
       return columns[0]
     },
     isUserSubscribedToColumn: can(['standard', 'admin', 'superadmin']).createResolver(

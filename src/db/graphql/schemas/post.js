@@ -3,9 +3,11 @@ const { gql } = require('apollo-server-express')
 const postSchema = gql`
   type Query {
     getPost(id: Int!, hierarchy: Boolean): Post
-    listColumnPosts(column: String, page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
+    listColumnPosts(column: String!, page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
+    listUserAuthoredPosts(page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
+    listUserBookmarks(page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
     listUserPosts(page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
-    searchPosts(query: String): [Post]
+    searchPosts(query: String!, page: Int, limit: Int): [Post]
   }
 
   type Mutation {
@@ -19,7 +21,7 @@ const postSchema = gql`
       files: [Upload]
     ): Post
     createComment(content: String!, id: Int!, files: [Upload]): Post
-    createPostBookmark(id: String!): Post
+    createPostBookmark(id: Int!): Post
     deletePost(id: Int!): DefaultPayload
     createPostVote(id: Int!, type: voteTypes): Post
     editPost(id: Int!, content: String!): Post
@@ -60,7 +62,12 @@ const postSchema = gql`
     files: [File]
     column: Column
     quotedPost: Post
+    quoted_post: Int
     parent: Post
+    userVote: String
+    userBookmark: Int
+    stackParent: Post
+    stackParentId: Int
   }
 
   type File {

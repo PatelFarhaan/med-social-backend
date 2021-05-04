@@ -5,7 +5,7 @@ const columnSchema = gql`
     getColumn(slug: String!): Column
     listColumns(interests: [Int], page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Columns
     listPopularColumns(page: Int, limit: Int, sortBy: String, sortDirection: String): Columns
-    searchColumns(query: String!): [Column]
+    searchColumns(query: String!, page: Int, limit: Int): [Column]
     isUserSubscribedToColumn(column: String!): Boolean!
   }
 
@@ -31,7 +31,10 @@ const columnSchema = gql`
     interests(page: Int, limit: Int): [Interest]
     expertise: Expertise
     subscriptions(page: Int, limit: Int): [Subscription]
-    type: String
+    price: Float
+    type: columnTypes
+    visibility: columnVisibility
+    state: columnStatuses
     bannedMembers(page: Int, limit: Int): [User]
     PostCount: Int
     MemberCount: Int
@@ -41,6 +44,14 @@ const columnSchema = gql`
   enum columnVisibility {
     PUBLIC
     PRIVATE
+  }
+
+  enum columnStatuses {
+    PENDING
+    APPROVED
+    REJECTED
+    REVIEWED
+    CANCELED
   }
 
   enum columnTypes {

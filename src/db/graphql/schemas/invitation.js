@@ -47,8 +47,9 @@ const invitationSchema = gql`
   }
 
   input StripeCard {
-    last4: String!
-    exp_month: String!
+    last4: String
+    exp_month: Int
+    exp_year: Int
     brand: String
   }
 

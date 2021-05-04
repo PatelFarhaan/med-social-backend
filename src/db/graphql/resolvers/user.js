@@ -1,5 +1,5 @@
 // Resolvers: A map of functions which return data for the schema.
-const { authenticate, authenticateToken, getUsers, exportSafeUser, signup, setPassword } = require('../../../lib/users')
+const { authenticate, authenticateToken, getUsers, exportSafeUser, signup, setPassword, resetPassword } = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
@@ -36,11 +36,27 @@ module.exports = {
       }
     },
     getMagicLink: async (_parent, { email }) => {
-      const { user, token } = await tokenService.generateMagicLinkToken(email)
+      const { user, token } = await tokenService.generateTypeToken(email, tokenTypes.MAGIC_LINK)
       await emailService.sendEmail(
         user.email,
         { firstName: user.firstName, linkToLogin: `${process.env.MOCK_WEBCLIENT_HOST}/login?token=${token}&email=${user.email}` },
         'magicLink'
+      )
+      return {
+        status: 200,
+        message: 'Email Sent'
+      }
+    },
+    resetPasswordLink: async (_parent, { email }) => {
+      const { user, token } = await tokenService.generateTypeToken(email, tokenTypes.RESET_PASSWORD)
+      await emailService.sendEmail(
+        user.email,
+        {
+          firstName: user.firstName,
+          email: user.email,
+          resetPasswordUrl: `${process.env.MOCK_WEBCLIENT_HOST}/reset-password?token=${token}&email=${user.email}`
+        },
+        'userResetPassword'
       )
       return {
         status: 200,
@@ -58,7 +74,7 @@ module.exports = {
         attributes: ['ColumnSlug', 'id'],
         where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
         limit,
-        page
+        offset: limit * (page - 1)
       })
 
       const rawColumns = await db.Column.findAll({
@@ -145,13 +161,12 @@ module.exports = {
       const savedUser = await user.save()
       return savedUser
     }),
-    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
-      if (args.settings) {
-        args.settings = Object.assign(req.User.settings, args.settings)
-      }
-      const user = await req.User.update(args, { returning: true })
-      user.settings = await getUserSettings(user.settings)
-      return user
+    // eslint-disable-next-line camelcase
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email, profile_description }, { req, db }) => {
+      // eslint-disable-next-line camelcase
+      if (!email && !profile_description)
+        throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
+      return db.User.update({ email, profile_description }, { where: { id: req.user.id }, returning: true })
     }),
     createUser: async (_parent, body) => {
       const user = await signup({ body })
@@ -186,12 +201,23 @@ module.exports = {
       if (user.hash) throw new Error(JSON.stringify({ status: 400, message: 'Password has already been set' }))
       const savedUser = await setPassword(user, password)
       return exportSafeModel(savedUser)
+    }),
+    resetPassword: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { token, password }, { req }) => {
+      const { user } = req
+      const savedUser = await resetPassword(user, token, password)
+      return exportSafeModel(savedUser)
     })
   },
   User: {
-    expertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    expertises: async (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
-      return dbUser.getExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+      const rawExp = await dbUser.getExpertises({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
+      const exp = rawExp.map(item => exportSafeModel(item))
+      return exp
+    },
+    interests: (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getInterests({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
     },
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))

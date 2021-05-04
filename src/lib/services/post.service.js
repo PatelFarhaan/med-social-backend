@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const uploadService = require('./upload.service')
@@ -13,9 +14,45 @@ const LIMIT = 50
 
 const POSTS_SINGLE_PAGE = (slug, post) => `/columns/${slug}/posts/${post}`
 
-const getPost = async ({ id, hierarchy = true }, loaderOpts) =>
-  db.Post.findOne({
+const getPost = async ({ id, hierarchy = true }, user, loaderOpts) => {
+  const attributes = [
+    'id',
+    'content',
+    'isStacked',
+    'isQuoted',
+    'isParent',
+    'order',
+    'votes',
+    'comments',
+    'createdAt',
+    'updatedAt',
+    'author_id',
+    'ColumnSlug',
+    'quoted_post',
+    'parentId',
+    'hierarchyLevel',
+    'order',
+    'stackParentId'
+  ]
+  if (user) {
+    attributes.push(
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    )
+  }
+  return db.Post.findOne({
     where: { id },
+    attributes,
     include: {
       model: db.Post,
       as: 'descendents',
@@ -23,19 +60,18 @@ const getPost = async ({ id, hierarchy = true }, loaderOpts) =>
       include: {
         model: db.User,
         as: 'author',
-        attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
+        attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture', 'username'],
         include: {
           model: db.Expertise,
-          as: 'expertises',
-          attributes: ['id', 'name'],
-          limit: 1
+          as: 'expertises'
         }
       }
     },
     ...loaderOpts
   })
+}
 
-const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, column, hierarchy }, loaderOpts) => {
+const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection, column, hierarchy }, user, loaderOpts) => {
   let order = [['createdAt', 'ASC']]
 
   const sortFilters = {
@@ -64,23 +100,58 @@ const listColumnPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection,
           include: {
             model: db.User,
             as: 'author',
-            attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture'],
+            attributes: ['id', 'firstName', 'lastName', 'fullName', 'profilePicture', 'username'],
             include: {
               model: db.Expertise,
-              as: 'expertises',
-              attributes: ['id', 'name'],
-              limit: 1
+              as: 'expertises'
             }
           }
         }
       ]
     : [columnInclude]
 
+  const attributes = [
+    'id',
+    'content',
+    'isStacked',
+    'isQuoted',
+    'isParent',
+    'order',
+    'votes',
+    'comments',
+    'createdAt',
+    'updatedAt',
+    'author_id',
+    'ColumnSlug',
+    'quoted_post',
+    'parentId',
+    'hierarchyLevel',
+    'order',
+    'stackParentId'
+  ]
+  if (user) {
+    attributes.push(
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    )
+  }
+
   return db.Post.findAndCountAll({
     where: {
       isParent: true,
       isComment: false
     },
+    attributes,
     include: includeChildren,
     limit,
     offset: limit * (page - 1),
@@ -127,11 +198,158 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
       isParent: true,
       isComment: false
     },
-    include: columnInclude,
+    attributes: [
+      'id',
+      'content',
+      'isStacked',
+      'isQuoted',
+      'isParent',
+      'order',
+      'votes',
+      'comments',
+      'createdAt',
+      'updatedAt',
+      'author_id',
+      'ColumnSlug',
+      'quoted_post',
+      'parentId',
+      'hierarchyLevel',
+      'order',
+      'stackParentId',
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    ],
+    include: [columnInclude],
     limit,
     offset: limit * (page - 1),
     order,
     ...loaderOpts
+  })
+}
+
+const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
+  let order = [['createdAt', 'ASC']]
+
+  const sortFilters = {
+    votes: direction => [['votes', direction.toUpperCase()]],
+    comments: direction => [['comments', direction.toUpperCase()]],
+    createdAt: direction => [['createdAt', direction.toUpperCase()]]
+  }
+
+  if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
+    order = sortFilters[sortBy](sortDirection)
+  }
+
+  return db.Post.findAndCountAll({
+    where: {
+      author_id: user.id
+    },
+    attributes: [
+      'id',
+      'content',
+      'isStacked',
+      'isQuoted',
+      'isParent',
+      'order',
+      'votes',
+      'comments',
+      'createdAt',
+      'updatedAt',
+      'author_id',
+      'ColumnSlug',
+      'quoted_post',
+      'parentId',
+      'hierarchyLevel',
+      'order',
+      'stackParentId',
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    ],
+    limit,
+    offset: limit * (page - 1),
+    order,
+    ...loaderOpts
+  })
+}
+
+const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, _loaderOpts) => {
+  let order = [['createdAt', 'ASC']]
+
+  const sortFilters = {
+    votes: direction => [['votes', direction.toUpperCase()]],
+    comments: direction => [['comments', direction.toUpperCase()]],
+    createdAt: direction => [['createdAt', direction.toUpperCase()]]
+  }
+
+  if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
+    order = sortFilters[sortBy](sortDirection)
+  }
+
+  const userBookmarks = await db.PostBookmark.findAll({
+    where: { userId: user.id },
+    limit,
+    offset: limit * (page - 1),
+    order
+  })
+
+  return db.Post.findAndCountAll({
+    where: {
+      id: {
+        [Op.in]: userBookmarks.map(item => item.postId)
+      }
+    },
+    attributes: [
+      'id',
+      'content',
+      'isStacked',
+      'isQuoted',
+      'isParent',
+      'order',
+      'votes',
+      'comments',
+      'createdAt',
+      'updatedAt',
+      'author_id',
+      'ColumnSlug',
+      'quoted_post',
+      'parentId',
+      'hierarchyLevel',
+      'order',
+      'stackParentId',
+      [
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        'userVote'
+      ],
+      [
+        db.sequelize.literal(
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
+        ),
+        'userBookmark'
+      ]
+    ]
+    // ...loaderOpts
   })
 }
 
@@ -190,8 +408,16 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
           post.createStackedChild(
-            { content: stackedPost.content, isStacked: true, isParent: false, author_id: user.id, ColumnSlug: column },
-            { through: { order: index } }
+            {
+              content: stackedPost.content,
+              isStacked: true,
+              isParent: false,
+              author_id: user.id,
+              ColumnSlug: column,
+              order: index + 1,
+              stackParentId: post.id
+            },
+            { through: { order: index + 1 } }
           )
         )
       )
@@ -488,5 +714,7 @@ module.exports = {
   editPost,
   reportPost,
   reviewReportedPost,
-  uploadFileToPost
+  uploadFileToPost,
+  listUserAuthoredPosts,
+  listUserBookmarks
 }

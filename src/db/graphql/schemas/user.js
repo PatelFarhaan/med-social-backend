@@ -6,6 +6,7 @@ const userSchema = gql`
     getUser(id: String!): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
+    resetPasswordLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
     searchByUsername(query: String!): [User]
@@ -48,7 +49,7 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(id: String, settings: JSON!): User
+    updateUser(email: String, profile_description: String): User
     createUser(
       email: String!
       firstName: String!
@@ -69,6 +70,7 @@ const userSchema = gql`
     connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
     uploadProfilePicture(file: Upload!): User
     setPassword(password: String!): User
+    resetPassword(password: String!, token: String!): User
   }
 
   type Users {
@@ -100,10 +102,19 @@ const userSchema = gql`
     expertise: Expertise
   }
 
+  type UserPaymentMethod {
+    id: String
+    name: String
+    brend: String
+    expire_year: Int
+    last_digits: String
+    expire_month: Int
+  }
+
   type User {
     id: String
     email: String!
-    lookupId: String!
+    lookupId: String
     fullName: String
     firstName: String
     lastName: String
@@ -113,10 +124,11 @@ const userSchema = gql`
     isAnonymousUser: Boolean
     notificationsSeenAt: DateTime
     settings: JSON!
-    expertises: [Expertise]
-    interests: [Interest]
+    expertises(limit: Int, page: Int): [Expertise]
+    interests(limit: Int, page: Int): [Interest]
     invitedBy: [User]
     userExpertises: [UserExpertise]
+    paymentMethod: UserPaymentMethod
   }
 `
 

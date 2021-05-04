@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       isQuoted: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_quoted', defaultValue: false },
       isComment: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_comment', defaultValue: false },
       isParent: { type: DataTypes.BOOLEAN, allowNull: false, field: 'is_parent', defaultValue: true },
+      order: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       votes: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       comments: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       createdAt: types.get('createdAt'),
@@ -43,6 +44,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'postId',
       onDelete: 'RESTRICT',
       hooks: true
+    })
+
+    Post.belongsTo(models.Post, {
+      as: 'stackParent'
     })
 
     Post.belongsTo(models.Post, {
@@ -87,15 +92,18 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   // eslint-disable-next-line func-names
-  Post.search = function(query) {
+  Post.search = function(query, page = 1, limit = 10) {
     if (sequelize.options.dialect !== 'postgres') {
       throw new Error({ status: 500, message: 'Search is only implemented on POSTGRES database' })
     }
 
     query = sequelize.getQueryInterface().escape(query)
-    console.log(query)
+    const offset = limit * (page - 1)
 
-    return sequelize.query(`SELECT * FROM "POST" WHERE "PostText" @@ plainto_tsquery('english', ${query})`, Post)
+    return sequelize.query(
+      `SELECT * FROM "Post" WHERE "PostText" @@ plainto_tsquery('english', ${query}) LIMIT ${limit} OFFSET ${offset}`,
+      Post
+    )
   }
 
   return Post
