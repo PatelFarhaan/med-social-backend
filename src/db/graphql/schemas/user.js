@@ -6,9 +6,10 @@ const userSchema = gql`
     getUser(id: String!): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
+    resetPasswordLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session
     socialOnboarding(token: String!, provider: socialProviders!): socialGoogleOnboarding
-    searchByUsername(query: String!): [User]
+    searchByUsername(query: String!, page: Int, limit: Int): [User]
     isUsernameTaken(query: String!): Boolean
     getUserColumns(page: Int, limit: Int): [Column]
   }
@@ -48,7 +49,7 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(email: String!): User
+    updateUser(email: String, profile_description: String): User
     createUser(
       email: String!
       firstName: String!
@@ -56,7 +57,6 @@ const userSchema = gql`
       username: String!
       password: String
       passwordRepeat: String
-      roleId: Int!
       expertises: [Int]
       interests: [Int]
       token: String!
@@ -69,6 +69,8 @@ const userSchema = gql`
     connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
     uploadProfilePicture(file: Upload!): User
     setPassword(password: String!): User
+    resetPassword(password: String!, token: String!): User
+    passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
   }
 
   type Users {
@@ -112,7 +114,7 @@ const userSchema = gql`
   type User {
     id: String
     email: String!
-    lookupId: String!
+    lookupId: String
     fullName: String
     firstName: String
     lastName: String
@@ -121,9 +123,9 @@ const userSchema = gql`
     profileDescription: String
     isAnonymousUser: Boolean
     notificationsSeenAt: DateTime
-    settings: JSON!
-    expertises: [Expertise]
-    interests: [Interest]
+    settings: JSON
+    expertises(limit: Int, page: Int): [Expertise]
+    interests(limit: Int, page: Int): [Interest]
     invitedBy: [User]
     userExpertises: [UserExpertise]
     paymentMethod: UserPaymentMethod

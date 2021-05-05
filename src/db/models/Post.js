@@ -92,15 +92,18 @@ module.exports = (sequelize, DataTypes) => {
   })
 
   // eslint-disable-next-line func-names
-  Post.search = function(query) {
+  Post.search = function(query, page = 1, limit = 10) {
     if (sequelize.options.dialect !== 'postgres') {
       throw new Error({ status: 500, message: 'Search is only implemented on POSTGRES database' })
     }
 
     query = sequelize.getQueryInterface().escape(query)
-    console.log(query)
+    const offset = limit * (page - 1)
 
-    return sequelize.query(`SELECT * FROM "POST" WHERE "PostText" @@ plainto_tsquery('english', ${query})`, Post)
+    return sequelize.query(
+      `SELECT * FROM "Post" WHERE "PostText" @@ plainto_tsquery('english', ${query}) LIMIT ${limit} OFFSET ${offset}`,
+      Post
+    )
   }
 
   return Post

@@ -18,8 +18,8 @@ module.exports = {
         count: rawExpertises.count
       }
     },
-    searchExpertises: async (_parent, { query }, { db }) => {
-      const expertises = await db.Expertise.search(query)
+    searchExpertises: async (_parent, { query, page, limit }, { db }) => {
+      const expertises = await db.Expertise.search(query, page, limit)
       return expertises[0]
     },
     getExpertiseRankingTable: (_parent, _body) => rankingLevelPointsUpperBorder

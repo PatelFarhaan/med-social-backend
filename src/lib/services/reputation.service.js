@@ -131,7 +131,7 @@ const calculatePoints = async (
 
   const finalPoints = await Reputation.sum('value', { where: { UserExpertiseId: userExpertise.id } })
 
-  userExpertise.totalPoints = finalPoints
+  userExpertise.totalPoints = Math.ceil(finalPoints)
   await userExpertise.save()
 
   if (getLevelFromPoints(finalPoints) !== getLevelFromPoints(currentPoints)) {

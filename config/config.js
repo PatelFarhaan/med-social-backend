@@ -42,5 +42,7 @@ module.exports = {
     callbackUrl: process.env.TWITTER_CALLBACK_URL,
     frontendCallbackUrl: process.env.TWITTER_FRONTEND_CALLBACK_URL
   },
-  rebuildHierarchy: process.env.REBUILD_HIERARCHY
+  rebuildHierarchy: process.env.REBUILD_HIERARCHY,
+  dbSync: process.env.DB_SYNC || false,
+  forceDBSync: process.env.FORCE_DB_SYNC || false
 }

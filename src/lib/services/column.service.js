@@ -61,6 +61,12 @@ const listColumns = async ({ interests = [], page = 1, limit = LIMIT, sortBy, so
       'description',
       'name',
       'createdAt',
+      'price',
+      'visibility',
+      'state',
+      'type',
+      'authorId',
+      'ExpertiseId',
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
     ],
@@ -200,6 +206,12 @@ const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Col
       'description',
       'name',
       'createdAt',
+      'price',
+      'visibility',
+      'state',
+      'type',
+      'authorId',
+      'ExpertiseId',
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
     ],
@@ -207,8 +219,8 @@ const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Col
   })
 }
 
-const isUserSubscribedToColumn = async ({ column }, user, Subscription = db.Subscription) => {
-  const subscription = await Subscription.findOne({ where: { UserId: user.id, ColumnSlug: column } })
+const isUserSubscribedToColumn = async ({ column }, user, loaderOpts, Subscription = db.Subscription) => {
+  const subscription = await Subscription.findOne({ where: { UserId: user.id, ColumnSlug: column }, ...loaderOpts })
   if (subscription) return true
   return false
 }

@@ -5,12 +5,12 @@ const { can } = require('./../auth')
 
 module.exports = {
   Query: {
-    getPost: async (_parent, args, { context, EXPECTED_OPTIONS_KEY }) => {
-      const post = await await postService.getPost(args, { [EXPECTED_OPTIONS_KEY]: context })
+    getPost: async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+      const post = await await postService.getPost(args, req.user, { [EXPECTED_OPTIONS_KEY]: context })
       return exportSafeModel(post)
     },
-    listColumnPosts: async (_parent, args, { context, EXPECTED_OPTIONS_KEY }) => {
-      const rawPosts = await postService.listColumnPosts(args, { [EXPECTED_OPTIONS_KEY]: context })
+    listColumnPosts: async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+      const rawPosts = await postService.listColumnPosts(args, req.user, { [EXPECTED_OPTIONS_KEY]: context })
       const posts = rawPosts.rows.map(post => exportSafeModel(post))
       return {
         list: posts,
@@ -50,9 +50,9 @@ module.exports = {
         }
       }
     ),
-    searchPosts: async (_parent, { query }, { db }) => {
-      const columns = await db.Post.search(query)
-      return columns[0]
+    searchPosts: async (_parent, { query, page, limit }, { db }) => {
+      const posts = await db.Post.search(query, page, limit)
+      return posts[0]
     }
   },
   Mutation: {
@@ -90,19 +90,19 @@ module.exports = {
     )
   },
   Post: {
-    column: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    column: async (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getColumn({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    stackParent: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    stackParent: async (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getStackParent({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    author: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    author: async (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getAuthor({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    children: (post, _args) => JSON.stringify(post.children),
+    children: async (post, _args) => JSON.stringify(post.children),
     stackedPosts: async (post, { limit = 10, page = 1, hierarchy = false }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       const includeChildren = hierarchy
@@ -134,15 +134,15 @@ module.exports = {
 
       return children.map(c => ({ ...exportSafeModel(c), order: c.StackedPost ? c.StackedPost.order : null }))
     },
-    files: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    files: async (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getFiles({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    quotedPost: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    quotedPost: async (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getQuotedPost({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    parent: (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    parent: async (post, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
       return dbPost.getParent({ [EXPECTED_OPTIONS_KEY]: context })
     }

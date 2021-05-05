@@ -1,13 +1,18 @@
 const S3 = require('aws-sdk/clients/s3')
 const {
-  aws: { accessKeyId, secretAccessKey, region, s3Bucket }
+  aws: { accessKeyId, secretAccessKey, region }
 } = require('../../../config/config')
 
-const s3 = new S3({
-  bucketName: s3Bucket,
-  accessKeyId,
-  secretAccessKey,
-  region
-})
+const s3 = bucketName =>
+  new S3({
+    bucketName,
+    accessKeyId,
+    secretAccessKey,
+    region,
+    params: {
+      ACL: 'public-read',
+      Bucket: bucketName
+    }
+  })
 
 module.exports = s3

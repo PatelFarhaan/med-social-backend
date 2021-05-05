@@ -4,7 +4,7 @@ const expertiseSchema = gql`
   type Query {
     getExpertise(id: Int!): Expertise
     getExpertises(page: Int, limit: Int, sortBy: String, sortDirection: String, includeNonApproved: Boolean): Expertises
-    searchExpertises(query: String): [Expertise]
+    searchExpertises(query: String!, page: Int, limit: Int): [Expertise]
     getExpertiseRankingTable: [Int]
   }
 
@@ -21,6 +21,7 @@ const expertiseSchema = gql`
     id: Int
     name: String!
     interests(page: Int, limit: Int): [Interest]
+    UserExpertises: [UserExpertise]
   }
 
   type Expertises {

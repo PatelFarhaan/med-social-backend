@@ -1,9 +1,19 @@
 // Resolvers: A map of functions which return data for the schema.
-const { authenticate, authenticateToken, getUsers, exportSafeUser, signup, setPassword } = require('../../../lib/users')
+const {
+  authenticate,
+  authenticateToken,
+  getUsers,
+  exportSafeUser,
+  signup,
+  setPassword,
+  resetPassword,
+  passwordChange
+} = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
+const { publicFields, privateFields } = require('../../../lib/constants/user.constant')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 const { subscriptionStatuses, subscriptionTypes } = require('../../../lib/constants/subscription.constant')
 
@@ -36,7 +46,7 @@ module.exports = {
       }
     },
     getMagicLink: async (_parent, { email }) => {
-      const { user, token } = await tokenService.generateMagicLinkToken(email)
+      const { user, token } = await tokenService.generateTypeToken(email, tokenTypes.MAGIC_LINK)
       await emailService.sendEmail(
         user.email,
         { firstName: user.firstName, linkToLogin: `${process.env.MOCK_WEBCLIENT_HOST}/login?token=${token}&email=${user.email}` },
@@ -47,18 +57,35 @@ module.exports = {
         message: 'Email Sent'
       }
     },
-    getUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, _args, { db, req }) => {
-      const user = await db.User.findOne({ where: { id: req.user.id } })
-      user.settings = await getUserSettings(user.settings)
+    resetPasswordLink: async (_parent, { email }) => {
+      const { user, token } = await tokenService.generateTypeToken(email, tokenTypes.RESET_PASSWORD)
+      await emailService.sendEmail(
+        user.email,
+        {
+          firstName: user.firstName,
+          email: user.email,
+          resetPasswordUrl: `${process.env.MOCK_WEBCLIENT_HOST}/reset-password?token=${token}&email=${user.email}`
+        },
+        'userResetPassword'
+      )
+      return {
+        status: 200,
+        message: 'Email Sent'
+      }
+    },
+    getUser: async (_parent, { id }, { db, req }) => {
+      const attributes = req.user && req.user.id === id ? privateFields : publicFields
+      const user = await db.User.findOne({ where: { id }, attributes })
+      if (!user) throw new Error(JSON.stringify({ status: 404, message: 'Id provided is not valid' }))
       return user
-    }),
+    },
     getUserColumns: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {
       const { user } = req
       const userColumnSubscriptions = await user.getSubscriptions({
         attributes: ['ColumnSlug', 'id'],
         where: { state: subscriptionStatuses.ACTIVE, type: subscriptionTypes.COLUMN },
         limit,
-        page
+        offset: limit * (page - 1)
       })
 
       const rawColumns = await db.Column.findAll({
@@ -68,6 +95,12 @@ module.exports = {
           'description',
           'name',
           'createdAt',
+          'price',
+          'visibility',
+          'state',
+          'type',
+          'authorId',
+          'ExpertiseId',
           [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
           [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
         ]
@@ -104,8 +137,8 @@ module.exports = {
         attributes
       }
     },
-    searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query }, { db }) => {
-      const rawUsers = await db.User.search(query)
+    searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query, page, limit }, { db }) => {
+      const rawUsers = await db.User.search(query, page, limit)
       return rawUsers[1].rows.map(item => ({
         username: item.username,
         firstName: item.first_name,
@@ -124,7 +157,15 @@ module.exports = {
       const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
       await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
       user.stripeCustomerId = stripeCustomer.id
-      user.paymentMethod = paymentMethod
+      user.paymentMethod = {
+        id: paymentMethod.id,
+        name: `${user.firstName} ${user.lastName}`,
+        brend: paymentMethod.card.brand,
+        expire_year: paymentMethod.card.exp_year,
+        expire_month: paymentMethod.card.exp_month,
+        last_digits: paymentMethod.card.last4,
+        stripe: paymentMethod
+      }
       const savedUser = await user.save()
       return savedUser
     }),
@@ -145,11 +186,15 @@ module.exports = {
       const savedUser = await user.save()
       return savedUser
     }),
-    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email }, { req, db }) =>
-      db.User.update({ email }, { where: { id: req.user.id }, returning: true })
-    ),
+    // eslint-disable-next-line camelcase
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email, profile_description }, { req, db }) => {
+      // eslint-disable-next-line camelcase
+      if (!email && !profile_description)
+        throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
+      return db.User.update({ email, profile_description }, { where: { id: req.user.id }, returning: true })
+    }),
     createUser: async (_parent, body) => {
-      const user = await signup({ body })
+      const user = await signup({ body, roleId: '3' })
       const tokens = await tokenService.generateAuthTokens(user)
       return {
         user,
@@ -181,12 +226,25 @@ module.exports = {
       if (user.hash) throw new Error(JSON.stringify({ status: 400, message: 'Password has already been set' }))
       const savedUser = await setPassword(user, password)
       return exportSafeModel(savedUser)
-    })
+    }),
+    resetPassword: async (_parent, { token, password }) => {
+      const savedUser = await resetPassword(token, password)
+      return exportSafeModel(savedUser)
+    },
+    passwordChange: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { oldPassword, newPassword }, { req }) =>
+      passwordChange(req.user, oldPassword, newPassword)
+    )
   },
   User: {
-    expertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    expertises: async (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
-      return dbUser.getExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+      const rawExp = await dbUser.getExpertises({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
+      const exp = rawExp.map(item => exportSafeModel(item))
+      return exp
+    },
+    interests: (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getInterests({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
     },
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
