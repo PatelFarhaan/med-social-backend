@@ -59,7 +59,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(compression())
 
 // eslint-disable-next-line prefer-const
-let origin = ['*', 'https://columnhq.com', 'https://www.columnhq.com', 'https://joincolumn.com', 'https://www.joincolumn.com']
+let origin = ['*', 'https://columnhq.com', 'https://www.columnhq.com', 'https://joincolumn.com', 'https://www.joincolumn.com', 'http://localhost:3000']
 
 const adminBro = new AdminBro({
   databases: [db],
