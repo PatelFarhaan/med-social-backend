@@ -205,7 +205,10 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
   })
 }
 
-const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
+const listUserAuthoredPosts = async ({ id, page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
+  if (!user && !id) throw new Error(JSON.stringify({ status: 404, message: 'No id was supplied' }))
+  const userId = id || user.id
+
   let order = [['createdAt', 'ASC']]
 
   const sortFilters = {
@@ -220,19 +223,18 @@ const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDire
 
   return db.Post.findAndCountAll({
     where: {
-      author_id: user.id
+      author_id: userId
     },
     attributes: [
       ...publicFields,
       [
-        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${userId}')`),
         'userVote'
       ],
       [
         db.sequelize.literal(
-          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
-            user.id
-          }')`
+          // eslint-disable-next-line max-len
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${userId}')`
         ),
         'userBookmark'
       ]
@@ -244,7 +246,10 @@ const listUserAuthoredPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDire
   })
 }
 
-const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirection }, user, _loaderOpts) => {
+const listUserBookmarks = async ({ id, page = 1, limit = LIMIT, sortBy, sortDirection }, user, _loaderOpts) => {
+  if (!user && !id) throw new Error(JSON.stringify({ status: 404, message: 'No id was supplied' }))
+  const userId = id || user.id
+
   let order = [['createdAt', 'ASC']]
 
   const sortFilters = {
@@ -258,7 +263,7 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
   }
 
   const userBookmarks = await db.PostBookmark.findAll({
-    where: { userId: user.id },
+    where: { userId },
     limit,
     offset: limit * (page - 1),
     order
@@ -273,14 +278,13 @@ const listUserBookmarks = async ({ page = 1, limit = LIMIT, sortBy, sortDirectio
     attributes: [
       ...publicFields,
       [
-        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${userId}')`),
         'userVote'
       ],
       [
         db.sequelize.literal(
-          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
-            user.id
-          }')`
+          // eslint-disable-next-line max-len
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${userId}')`
         ),
         'userBookmark'
       ]

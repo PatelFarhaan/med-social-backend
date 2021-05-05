@@ -12,7 +12,7 @@ const env = process.env.NODE_ENV || 'development'
 const { Op } = Sequelize
 
 const config = require('../../../config/db.config.js')[env]
-const { rebuildHierarchy, dbSync, forceDBSync } = require('../../../config/config.js')
+const { rebuildHierarchy } = require('../../../config/config.js')
 
 config.operatorsAliases = Op
 
@@ -39,8 +39,6 @@ Object.keys(db).forEach(modelName => {
 })
 
 if (rebuildHierarchy) db.Post.rebuildHierarchy()
-
-if (dbSync && forceDBSync) sequelize.sync({ force: true })
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize

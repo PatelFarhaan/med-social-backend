@@ -28,28 +28,22 @@ module.exports = {
         }
       }
     ),
-    listUserAuthoredPosts: can(['standard', 'admin', 'superadmin']).createResolver(
-      async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
-        const { user } = req
-        const rawPosts = await postService.listUserAuthoredPosts(args, user, { [EXPECTED_OPTIONS_KEY]: context })
-        const posts = rawPosts.rows.map(post => exportSafeModel(post))
-        return {
-          list: posts,
-          count: rawPosts.count
-        }
+    listUserAuthoredPosts: async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+      const rawPosts = await postService.listUserAuthoredPosts(args, req.user, { [EXPECTED_OPTIONS_KEY]: context })
+      const posts = rawPosts.rows.map(post => exportSafeModel(post))
+      return {
+        list: posts,
+        count: rawPosts.count
       }
-    ),
-    listUserBookmarks: can(['standard', 'admin', 'superadmin']).createResolver(
-      async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
-        const { user } = req
-        const rawPosts = await postService.listUserBookmarks(args, user, { [EXPECTED_OPTIONS_KEY]: context })
-        const posts = rawPosts.rows.map(post => exportSafeModel(post))
-        return {
-          list: posts,
-          count: rawPosts.count
-        }
+    },
+    listUserBookmarks: async (_parent, args, { req, context, EXPECTED_OPTIONS_KEY }) => {
+      const rawPosts = await postService.listUserBookmarks(args, req.user, { [EXPECTED_OPTIONS_KEY]: context })
+      const posts = rawPosts.rows.map(post => exportSafeModel(post))
+      return {
+        list: posts,
+        count: rawPosts.count
       }
-    ),
+    },
     searchPosts: async (_parent, { query, page, limit }, { db }) => {
       const posts = await db.Post.search(query, page, limit)
       return posts[0]
