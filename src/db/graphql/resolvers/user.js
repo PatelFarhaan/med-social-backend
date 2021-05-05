@@ -73,7 +73,7 @@ module.exports = {
       }
     },
     getUser: async (_parent, { id }, { db, req }) => {
-      const attributes = req.user && req.user.id === id ? db.User.privateFields() : db.User.publicFields()
+      const attributes = req.user && req.user.id === id ? db.User.userPrivateFields() : db.User.userPublicFields()
       const user = await db.User.findOne({ where: { id }, attributes })
       if (!user) throw new Error(JSON.stringify({ status: 404, message: 'Id provided is not valid' }))
       return user
