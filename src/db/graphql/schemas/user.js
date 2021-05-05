@@ -123,7 +123,7 @@ const userSchema = gql`
     profileDescription: String
     isAnonymousUser: Boolean
     notificationsSeenAt: DateTime
-    settings: JSON!
+    settings: JSON
     expertises(limit: Int, page: Int): [Expertise]
     interests(limit: Int, page: Int): [Interest]
     invitedBy: [User]
