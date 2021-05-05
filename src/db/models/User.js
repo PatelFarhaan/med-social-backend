@@ -2,42 +2,6 @@ const formatName = require('./../../lib/utils/createFullNameForDB')
 const types = require('../types')
 const { tokenize } = require('../tokenizeField')
 
-const publicFields = [
-  'id',
-  'email',
-  'firstName',
-  'lastName',
-  'fullName',
-  'username',
-  'profilePicture',
-  'isAnonymousUser',
-  'profileDescription',
-  'createdAt'
-]
-
-const privateFields = [
-  ...publicFields,
-  'paymentMethod',
-  'muted_notification_categories',
-  'settings',
-  'roleId',
-  'updatedAt',
-  'deactivatedAt',
-  'notificationsSeenAt'
-]
-
-const systemPrivateFields = [
-  ...privateFields,
-  'hash',
-  'invitatationLimit',
-  'invitedBy',
-  'googleUserId',
-  'linkedinUserId',
-  'twitterUserId',
-  'stripeUserId',
-  'stripeCustomerId'
-]
-
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
@@ -147,21 +111,6 @@ module.exports = (sequelize, DataTypes) => {
     if (!instance.firstName) fullname = null
     instance.fullname = fullname
   })
-
-  // eslint-disable-next-line func-names
-  User.prototype.userPublicFields = function() {
-    return publicFields
-  }
-
-  // eslint-disable-next-line func-names
-  User.prototype.userPrivateFields = function() {
-    return privateFields
-  }
-
-  // eslint-disable-next-line func-names
-  User.prototype.systemPrivateFields = function() {
-    return systemPrivateFields
-  }
 
   User.search = (query, page = 1, limit = 10) => {
     if (sequelize.options.dialect !== 'postgres') {

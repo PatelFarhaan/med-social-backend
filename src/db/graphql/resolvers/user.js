@@ -13,6 +13,7 @@ const { tokenService, emailService, socialService, stripeService, uploadService 
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
+const { publicFields, privateFields } = require('../../../lib/constants/user.constant')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 const { subscriptionStatuses, subscriptionTypes } = require('../../../lib/constants/subscription.constant')
 
@@ -73,7 +74,7 @@ module.exports = {
       }
     },
     getUser: async (_parent, { id }, { db, req }) => {
-      const attributes = req.user && req.user.id === id ? db.User.userPrivateFields() : db.User.userPublicFields()
+      const attributes = req.user && req.user.id === id ? privateFields : publicFields
       const user = await db.User.findOne({ where: { id }, attributes })
       if (!user) throw new Error(JSON.stringify({ status: 404, message: 'Id provided is not valid' }))
       return user
