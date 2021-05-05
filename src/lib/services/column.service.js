@@ -2,7 +2,7 @@ const { Op } = require('sequelize')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const { isStringJSON } = require('../utils/isStringJSON')
-const { columnStatuses, columnTypes, columnVisibilities } = require('../../lib/constants/column.constant')
+const { columnStatuses, columnTypes } = require('../../lib/constants/column.constant')
 const { subscriptionTypes, paymentGateways } = require('../../lib/constants/subscription.constant')
 const stripeService = require('./stripe.service')
 const notificationService = require('./notification.service')
@@ -115,8 +115,9 @@ const createColumn = async (
 const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.Subscription) => {
   let subscription
   const columnAuthor = await column.getAuthor()
-  if (column.visibility === columnVisibilities.PRIVATE && columnAuthor.id !== user.id)
-    throw new Error(JSON.stringify({ status: 403, message: 'Only column owners can invite to the column' }))
+  // TODO: This check is for when the column creator needs to be the only one to invite within a private column
+  // if (column.visibility === columnVisibilities.PRIVATE && columnAuthor.id !== user.id)
+  //   throw new Error(JSON.stringify({ status: 403, message: 'Only column owners can invite to the column' }))
 
   if (column.type === columnTypes.FREE) {
     subscription = await Subscription.create({
