@@ -139,12 +139,7 @@ module.exports = {
     },
     searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query, page, limit }, { db }) => {
       const rawUsers = await db.User.search(query, page, limit)
-      return rawUsers[1].rows.map(item => ({
-        username: item.username,
-        firstName: item.first_name,
-        lastName: item.last_name,
-        profileDescription: item.profile_description
-      }))
+      return rawUsers[1].rows.map(user => exportSafeUser(user))
     }),
     isUsernameTaken: async (_parent, { query }, { db }) => {
       const rawUser = await db.User.findOne({ where: { username: query } })
