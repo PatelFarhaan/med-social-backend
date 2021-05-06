@@ -124,7 +124,7 @@ module.exports = (sequelize, DataTypes) => {
     // eslint-disable-next-line consistent-return
     return sequelize.query(
       // eslint-disable-next-line max-len
-      `SELECT "username", "first_name", "last_name", "profile_description" FROM "User" WHERE LOWER("username") LIKE '%${query}%' OR LOWER("first_name") LIKE '%${query}%' LOWER("last_name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT * FROM "User" WHERE LOWER("username") LIKE '%${query}%' OR LOWER("first_name") LIKE '%${query}%' OR LOWER("last_name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
       User
     )
   }

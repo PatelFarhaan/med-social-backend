@@ -11,6 +11,7 @@ const logger = require('../utils/logger')
 const { calculatePoints } = require('../services/reputation.service')
 const { reputationSources } = require('../constants/reputation.constant')
 const previousAPIService = require('../services/previousAPI.service')
+const config = require('../../../config/config')
 
 const BCRYPT_SALT_ROUNDS = 10
 
@@ -163,15 +164,15 @@ const inviteUser = async (email, role, firstName = '', lastName = '') => {
   }
 }
 
-const forgotPassword = async user => jwt.sign({ userId: user.id }, user.hash, { expiresIn: '24h' })
+const forgotPassword = async user => jwt.sign({ userId: user.id }, config.jwt.secret, { expiresIn: '24h' })
 
-const resetPassword = async (resetPasswordToken, newPassword) => {
+const resetPassword = async (resetPasswordToken, newPassword, secret = config.jwt.secret) => {
   const existingToken = await db.Session.findOne({ where: { type: tokenTypes.RESET_PASSWORD, token: resetPasswordToken } })
   if (!existingToken)
     throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   const { userId } = existingToken
   const user = await db.User.findByPk(userId)
-  const payload = jwt.verify(resetPasswordToken, user.hash)
+  const payload = jwt.verify(resetPasswordToken, secret)
   if (!payload || payload.userId !== user.id) {
     throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   }

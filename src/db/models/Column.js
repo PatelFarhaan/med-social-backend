@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
     // eslint-disable-next-line consistent-return
     return sequelize.query(
       // eslint-disable-next-line max-len
-      `SELECT * FROM "Column" WHERE "state" = 'APPROVED' AND LOWER("name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT "Column".*, (SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = "Column"."slug") AS "MemberCount", (SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = "Column"."slug") AS "PostCount" FROM "Column" WHERE "state" = 'APPROVED' AND LOWER("name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
       Column
     )
   }
