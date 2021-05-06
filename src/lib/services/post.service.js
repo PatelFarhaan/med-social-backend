@@ -18,6 +18,7 @@ const publicFields = [
   'id',
   'content',
   'isStacked',
+  'isComment',
   'isQuoted',
   'isParent',
   'order',
@@ -387,7 +388,9 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
             actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(existingColumn.slug, post.id)}`
           },
           user,
-          [quotedPost.author_id]
+          [quotedPost.author_id],
+          post,
+          existingColumn
         )
       }
     }
@@ -439,7 +442,9 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
           actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(column.slug, DBpost.id)}`
         },
         user,
-        [DBpostAuthor.id]
+        [DBpostAuthor.id],
+        DBpost,
+        column
       )
     }
     DBpost.comments += 1
@@ -532,7 +537,9 @@ const votePost = async (
               actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
             },
             user,
-            [postAuthor.id]
+            [postAuthor.id],
+            post,
+            postColumn
           )
         }
       }
@@ -550,7 +557,9 @@ const votePost = async (
             actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
           },
           user,
-          [postAuthor.id]
+          [postAuthor.id],
+          post,
+          postColumn
         )
       }
     }
@@ -605,12 +614,14 @@ const bookmarkPost = async (
             actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
           },
           user,
-          [postAuthor.id]
+          [postAuthor.id],
+          post,
+          postColumn
         )
       }
     }
   } catch (e) {
-    logger.warn(`votePost: ${e.message}`)
+    logger.warn(`bookmarkPost: ${e.message}`)
     const parsedError = isStringJSON(e.message) ? JSON.parse(e.message) : e
     throw new Error(JSON.stringify({ status: parsedError.status ? parsedError.status : 400, message: parsedError.message }))
   }
@@ -638,7 +649,9 @@ const notifyMentionedUser = async (post, mentionedUsers) => {
     notificationCategories.REPLIES,
     { postId: post.id, ColumnSlug: postColumn.slug },
     postAuthor,
-    mentionedUsers
+    mentionedUsers,
+    post,
+    postColumn
   )
 }
 
