@@ -48,9 +48,9 @@ const listUserNotifications = async ({ page = 1, limit = LIMIT, isRead }, user, 
 const markNotificationsAsRead = async user => {
   try {
     await db.sequelize.query(
-      `UPDATE "Notification" as n SET "isRead" = true FROM "NotificationReceipient" as nr WHERE nr."UserId" = ${
+      `UPDATE "Notification" AS n SET "isRead" = true FROM "NotificationReceipient" AS nr WHERE nr."UserId" = '${
         user.id
-      } AND nr."NotificationId" = n."id" AND n."isRead" = false;`
+      }' AND nr."NotificationId" = n."id" AND n."isRead" = false;`
     )
     return {
       status: 204,
