@@ -186,7 +186,13 @@ module.exports = {
       // eslint-disable-next-line camelcase
       if (!email && !profile_description)
         throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
-      return db.User.update({ email, profile_description }, { where: { id: req.user.id }, returning: true })
+
+      const updatePayload = {}
+      if (email) updatePayload.email = email
+      // eslint-disable-next-line camelcase
+      if (profile_description) updatePayload.profileDescription = profile_description
+      const updatedUser = await db.User.update(updatePayload, { where: { id: req.user.id }, returning: true, plain: true })
+      return updatedUser[1]
     }),
     createUser: async (_parent, body) => {
       const user = await signup({ body, roleId: '3' })

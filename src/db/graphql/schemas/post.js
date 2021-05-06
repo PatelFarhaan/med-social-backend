@@ -4,8 +4,8 @@ const postSchema = gql`
   type Query {
     getPost(id: Int!, hierarchy: Boolean): Post
     listColumnPosts(column: String!, page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
-    listUserAuthoredPosts(id: Int, page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
-    listUserBookmarks(id: Int, page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
+    listUserAuthoredPosts(id: String!, page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
+    listUserBookmarks(id: String!, page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
     listUserPosts(page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
     searchPosts(query: String!, page: Int, limit: Int): [Post]
   }
