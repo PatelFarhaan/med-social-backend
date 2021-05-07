@@ -177,6 +177,7 @@ const resetPassword = async (resetPasswordToken, newPassword, secret = config.jw
     throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   }
   await setPassword(user, newPassword)
+  await existingToken.destroy()
   return user.save()
 }
 

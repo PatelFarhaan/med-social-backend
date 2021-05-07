@@ -26,9 +26,9 @@ const notify = async (type, category, data = {}, author = {}, receipients = [], 
   return notification
 }
 
-const listUserNotifications = async ({ page = 1, limit = LIMIT, isRead }, user, loaderOpts) => {
+const listUserNotifications = async ({ page = 1, limit = LIMIT, isRead = false }, user, loaderOpts) => {
   const where = {}
-  if (isRead !== null) where.isRead = isRead
+  if (isRead) where.isRead = isRead
   return db.Notification.findAndCountAll({
     where,
     include: {
