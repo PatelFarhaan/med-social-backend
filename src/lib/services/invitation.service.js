@@ -125,7 +125,7 @@ const inviteUserToColumn = async (
   Invitation = db.Invitation,
   Expertise = db.Expertise
 ) => {
-  const existingInvitation = await Invitation.findOne({ where: { email, columnSlug, state: states.PENDING } })
+  const existingInvitation = await Invitation.findOne({ where: { email, ColumnSlug: columnSlug, state: states.PENDING } })
   if (existingInvitation) {
     throw new Error(JSON.stringify({ status: 400, message: 'Invitation already exists' }))
   }

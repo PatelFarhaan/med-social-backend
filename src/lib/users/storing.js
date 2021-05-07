@@ -173,10 +173,11 @@ const resetPassword = async (resetPasswordToken, newPassword, secret = config.jw
   const { userId } = existingToken
   const user = await db.User.findByPk(userId)
   const payload = jwt.verify(resetPasswordToken, secret)
-  if (!payload || payload.userId !== user.id) {
+  if (!payload || payload.sub !== user.id) {
     throw new Error(JSON.stringify({ status: 403, message: 'Invalid reset password token given, could not reset password' }))
   }
   await setPassword(user, newPassword)
+  await existingToken.destroy()
   return user.save()
 }
 
