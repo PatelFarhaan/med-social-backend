@@ -1,4 +1,5 @@
 // Resolvers: A map of functions which return data for the schema.
+const { Op } = require('sequelize')
 const {
   authenticate,
   authenticateToken,
@@ -137,9 +138,31 @@ module.exports = {
         attributes
       }
     },
-    searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query, page, limit }, { db }) => {
-      const rawUsers = await db.User.search(query, page, limit)
-      return rawUsers[1].rows.map(user => exportSafeUser(user))
+    searchByUsername: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { query, page = 1, limit = 10 }, { db }) => {
+      const rawUsers = await db.User.findAndCountAll({
+        where: {
+          [Op.or]: [
+            {
+              username: {
+                [Op.iLike]: `%${query.toLowerCase()}%`
+              }
+            },
+            {
+              firstName: {
+                [Op.iLike]: `%${query.toLowerCase()}%`
+              }
+            },
+            {
+              lastName: {
+                [Op.iLike]: `%${query.toLowerCase()}%`
+              }
+            }
+          ]
+        },
+        limit,
+        offset: limit * (page - 1)
+      })
+      return rawUsers.rows.map(user => exportSafeUser(user))
     }),
     isUsernameTaken: async (_parent, { query }, { db }) => {
       const rawUser = await db.User.findOne({ where: { username: query } })

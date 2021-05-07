@@ -2,7 +2,7 @@ const db = require('../../db/models')
 // const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
 const LIMIT = 50
 
-const notifyInApp = async (type, category, data = {}, author = {}, receipients = []) => {
+const notifyInApp = async (type, category, data = {}, author = {}, receipients = [], post = {}, column = {}) => {
   if (!type) throw new Error(JSON.stringify({ status: 400, message: 'Notification Type is required' }))
   if (!receipients) throw new Error(JSON.stringify({ status: 400, message: 'Notification receipients are required' }))
 
@@ -10,7 +10,9 @@ const notifyInApp = async (type, category, data = {}, author = {}, receipients =
     type,
     category,
     data,
-    authorId: author.id
+    authorId: author.id,
+    PostId: post.id,
+    ColumnSlug: column.slug
   })
 
   await notification.setReceipients(receipients)
@@ -19,23 +21,22 @@ const notifyInApp = async (type, category, data = {}, author = {}, receipients =
 
 // TODO: Add mailer here instead of separate service
 
-const notify = async (type, category, data = {}, author = {}, receipients = []) => {
-  const notification = await notifyInApp(type, category, data, author, receipients)
+const notify = async (type, category, data = {}, author = {}, receipients = [], post = {}, column = {}) => {
+  const notification = await notifyInApp(type, category, data, author, receipients, post, column)
   return notification
 }
 
 const listUserNotifications = async ({ page = 1, limit = LIMIT, isRead }, user, loaderOpts) => {
   const where = {}
   if (isRead) where.isRead = isRead
+  console.warn('user', user.id)
   return db.Notification.findAndCountAll({
     where,
     include: {
       model: db.User,
       as: 'receipients',
-      through: {
-        where: {
-          UserId: user.id
-        }
+      where: {
+        id: user.id
       }
     },
     limit,

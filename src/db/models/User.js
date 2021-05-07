@@ -112,23 +112,6 @@ module.exports = (sequelize, DataTypes) => {
     instance.fullname = fullname
   })
 
-  User.search = (query, page = 1, limit = 10) => {
-    if (sequelize.options.dialect !== 'postgres') {
-      console.log('Search is only implemented on POSTGRES database')
-      return
-    }
-
-    query = query.toLowerCase()
-    const offset = limit * (page - 1)
-
-    // eslint-disable-next-line consistent-return
-    return sequelize.query(
-      // eslint-disable-next-line max-len
-      `SELECT * FROM "User" WHERE LOWER("username") LIKE '%${query}%' OR LOWER("first_name") LIKE '%${query}%' OR LOWER("last_name") LIKE '%${query}%' LIMIT ${limit} OFFSET ${offset}`,
-      User
-    )
-  }
-
   tokenize(User, 'lookupId')
 
   return User

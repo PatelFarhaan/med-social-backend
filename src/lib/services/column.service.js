@@ -139,13 +139,21 @@ const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.S
         UserId: user.id,
         ColumnSlug: column.slug
       })
-      await notificationService.notify(notificationTypes.NEW_COLUMN_SUBSCRIPTION, notificationCategories.SUBSCRIPTION, {
-        from_name: user.firstName,
-        to_first_name: columnAuthor.firstName,
-        column_name: column.name,
-        column_slug: column.slug,
-        actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${COLUMN_SINGLE_PAGE(column.slug)}`
-      })
+      await notificationService.notify(
+        notificationTypes.NEW_COLUMN_SUBSCRIPTION,
+        notificationCategories.SUBSCRIPTION,
+        {
+          from_name: user.firstName,
+          to_first_name: columnAuthor.firstName,
+          column_name: column.name,
+          column_slug: column.slug,
+          actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${COLUMN_SINGLE_PAGE(column.slug)}`
+        },
+        user,
+        [columnAuthor.id],
+        {},
+        column
+      )
     } else {
       throw new Error(JSON.stringify({ status: 400, message: 'Stripe Subscription creation was cancelled' }))
     }
