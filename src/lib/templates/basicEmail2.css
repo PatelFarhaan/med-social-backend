@@ -1,0 +1,260 @@
+:root {
+    color-scheme: only;
+    supported-color-schemes: light;
+}
+
+@font-face {
+    font-family: "Avenir-Roman";
+    src: url("http://localhost:3005/static/fonts/Avenir-Roman.woff") format("woff"),
+        url("http://localhost:3005/static/fonts/Avenir-Roman.woff2") format("woff2"),
+        url("http://localhost:3005/static/fonts/Avenir-Roman.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "SchnyderM-Demi-Web";
+    src: url("http://localhost:3005/static/fonts/SchnyderM-Demi-Web.woff") format("woff"),
+        url("http://localhost:3005/static/fonts/SchnyderM-Demi-Web.woff2") format("woff2"),
+        url("http://localhost:3005/static/fonts/SchnyderM-Demi-Web.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "SchnyderL-Bold-Web";
+    src: url("http://localhost:3005/static/fonts/SchnyderL-Bold-Web.woff") format("woff"),
+        url("http://localhost:3005/static/fonts/SchnyderL-Bold-Web.woff2") format("woff2"),
+        url("http://localhost:3005/static/fonts/SchnyderL-Bold-Web.ttf") format("truetype");
+}
+
+body {
+    margin: 0;
+    background-color: #f5f4f0;
+    background-image: url("http://localhost:3005/static/images/noise.png");
+    background-repeat: repeat;
+    font-family: "Avenir-Roman";
+}
+
+@media (min-width: 1px) {
+    .header_column_image__logo {
+        width: 52px;
+        height: 38px;
+        position: absolute;
+        left: 32px;
+        top: 32px;
+    }
+
+    .header_statue_image__logo {
+        position: absolute;
+        width: 240px;
+        height: 302px;
+        right: 5%;
+        top: 32px;
+        z-index: -1;
+    }
+
+    .footer {
+        padding: 0 32px;
+    }
+
+    .footer_column_image__logo {
+        height: 195px;
+    }
+
+    .footer_signature__div {
+        padding-top: 60px;
+    }
+
+    .footer_yours_sincerely__text {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 18px;
+        line-height: 25px;
+        color: #666666;
+        margin-bottom: 0;
+    }
+
+    .footer_signature__logo {
+        width: 149px;
+        height: 97px;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-top: 12px;
+    }
+
+    .footer_alina__text {
+        font-family: "SchnyderL-Bold-Web";
+        font-style: normal;
+        font-weight: bold;
+        font-size: 24px;
+        line-height: 32px;
+        color: #000000;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-top: 4px;
+    }
+
+    .footer_column_secretary__text {
+        font-style: normal;
+        font-weight: normal;
+        font-size: 16px;
+        line-height: 22px;
+        color: #999999;
+        margin-top: 0;
+        margin-bottom: 60px;
+        padding-top: 4px;
+    }
+
+    .footer_signature__logo {
+        width: 139px;
+        height: 139px;
+        color: #E37158;
+    }
+
+    .footer_stamp__logo {
+        width: 139px;
+        height: 139px;
+        position: absolute;
+        right: 5%;
+        bottom: -45%;
+    }
+
+    .email {
+        padding: 0 32px 60px;
+    }
+
+    .email__name {
+        padding-top: 100px;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 24px;
+        line-height: 33px;
+        color: #333333;
+    }
+
+    .email__title {
+        font-family: "SchnyderM-Demi-Web";
+        font-style: normal;
+        font-weight: 600;
+        font-size: 36px;
+        line-height: 41px;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: #000000;
+        max-width: 406px;
+    }
+
+    .email_text {
+        font-family: "Avenir-Roman";
+        font-style: normal;
+        font-weight: normal;
+        font-size: 20px;
+        line-height: 32px;
+        color: #666666;
+    }
+
+    .ps {
+        margin: 0;
+        padding: 60px 32px 0;
+    }
+
+    .ps_text {
+        font-family: "Avenir-Roman";
+        font-size: 20px;
+        line-height: 32px;
+        color: #666666;
+    }
+
+    .ps_text__link {
+        color: #3D8F44;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    .email__button {
+        position: 'relative';
+        border-radius: 2px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #3D8F44;
+        background-color: #3D8F44;
+        padding: 18px;
+        text-align: center;
+        width: 231px;
+        color: white;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .email__button::after {
+        content: "";
+        width: 215px;
+        padding: 27px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: #3D8F44;
+        border-radius: 2px;
+        position: absolute;
+        transform: translate(-203px, -14px);
+        background-color: #EDECE8;
+        z-index: -1;
+    }
+}
+
+
+@media (min-width: 750px) {
+    .header_column_image__logo {
+        left: 90px;
+        top: 60px;
+    }
+
+    .header_statue_image__logo {
+        width: 415.34px;
+        height: 581.31px;
+        left: 336.04px;
+        top: -62.26px;
+    }
+
+    .footer_column_image__logo {
+        width: 750px;
+        height: 244px;
+    }
+
+    .footer_column_secretary__text {
+        margin-bottom: 90px;
+    }
+
+    .footer_signature__div {
+        padding-top: 90px;
+    }
+
+    .ps {
+        padding: 90px 60px;
+    }
+
+    .footer {
+        padding: 90px 60px;
+    }
+
+    .email {
+        padding: 90px 60px;
+    }
+
+    .email__name {
+        font-size: 24px;
+        line-height: 36px;
+    }
+
+    .email__title {
+        font-size: 52px;
+        line-height: 59px;
+    }
+
+    .email__button {
+        font-size: 24px;
+    }
+}
+
+@media (prefers-color-scheme: dark ) {
+    .email__name, .email__footer-text, .email__footer-name, .email__subtext, .email__text {
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+    }
+}
