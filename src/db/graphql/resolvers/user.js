@@ -50,7 +50,7 @@ module.exports = {
       const { user, token } = await tokenService.generateTypeToken(email, tokenTypes.MAGIC_LINK)
       await emailService.sendEmail(
         user.email,
-        { firstName: user.firstName, linkToLogin: `${process.env.MOCK_WEBCLIENT_HOST}/login?token=${token}&email=${user.email}` },
+        { firstName: user.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/login?token=${token}&email=${user.email}` },
         'magicLink'
       )
       return {
@@ -64,8 +64,7 @@ module.exports = {
         user.email,
         {
           firstName: user.firstName,
-          email: user.email,
-          resetPasswordUrl: `${process.env.MOCK_WEBCLIENT_HOST}/reset-password?token=${token}&email=${user.email}`
+          callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/reset-password?token=${token}&email=${user.email}`
         },
         'userResetPassword'
       )
