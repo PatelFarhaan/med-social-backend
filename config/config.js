@@ -5,8 +5,8 @@ module.exports = {
     secret: process.env.JWT_SECRET,
     accessExpirationMinutes: process.env.JWT_ACCESS_EXPIRATION_MINUTES || 30,
     refreshExpirationDays: process.env.JWT_REFRESH_EXPIRATION_DAYS || 30,
-    resetPasswordExpirationMinutes: 10,
-    magicLinkExpirationMinutes: 5
+    resetPasswordExpirationMinutes: process.env.JWT_RESET_PASSWORD || 30,
+    magicLinkExpirationMinutes: process.env.JWT_MAGIC_LINK || 120
   },
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY,
