@@ -173,29 +173,42 @@ body {
         border-radius: 2px;
         border-width: 1px;
         border-style: solid;
-        border-color: #3D8F44;
-        background-color: #3D8F44;
-        padding: 18px;
+        border-color: #3d8f44;
+        background-color: #3d8f44;
         text-align: center;
-        width: 231px;
+        width: 311px;
         color: white;
-        display: inline-block;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-decoration: none;
-    }
+        transform-style: preserve-3d;
+        height: 52px;
+        margin-top: 40px;
+        margin-bottom: 40px;
+        letter-spacing: 0.2em;
+        font-size: 12px;
+      }
 
-    .email__button::after {
-        content: "";
-        width: 215px;
-        padding: 27px;
+      .email__button:hover {
+        background-color: '#509a56';
+      }
+
+      .email__button::after {
+        content: '';
+        width: 311px;
+        height: 52px;
+        left: 4px;
+        top: 4px;
         border-width: 1px;
         border-style: solid;
-        border-color: #3D8F44;
+        border-color: #3d8f44;
         border-radius: 2px;
         position: absolute;
-        transform: translate(-203px, -14px);
-        background-color: #EDECE8;
-        z-index: -1;
-    }
+        transform: translateZ(-4px);
+        background-color: #edece8;
+      }
 }
 
 
