@@ -74,9 +74,17 @@ const createInvitation = async (
     await invitation.addExpertise(invitationExpertise)
 
     if (type === invitationTypes.FELLOW) {
-      await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationFellowRequested')
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: process.env.MOCK_WEBCLIENT_HOST },
+        'invitationFellowRequested'
+      )
     } else {
-      await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationRequested')
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: process.env.MOCK_WEBCLIENT_HOST },
+        'invitationRequested'
+      )
     }
   } catch (e) {
     logger.warn(`createInvitation ${e}`)
