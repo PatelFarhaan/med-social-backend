@@ -64,7 +64,15 @@ const generateTypeToken = async (email, type = tokenTypes.MAGIC_LINK) => {
   const user = await getUserWithoutRole({ email })
   if (!user) throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
   const existingToken = await db.Session.findOne({ where: { userId: user.id, type } })
-  if (existingToken) return { token: existingToken.token, user }
+  if (existingToken) {
+    try {
+      const verifiedToken = jwt.verify(existingToken.token, config.jwt.secret)
+      return { token: verifiedToken, user }
+    } catch (e) {
+      await existingToken.destroy()
+    }
+  }
+
   const expires = moment().add(mappedTokenTypeExpiry[type], 'minutes')
   const token = generateToken(user.id, expires, type)
   await saveToken(token, user.id, expires, type)

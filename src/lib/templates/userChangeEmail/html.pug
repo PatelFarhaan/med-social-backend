@@ -1,6 +1,12 @@
-extends ../otherEmail
+extends ../basicEmail3
 
 block content
-  p(class="email__text") You asked for email change for this email account&nbsp;
-    strong #{email}
-  a(class="email__button", href=`${changeEmailUrl}`, target="_blank") Click here to change your email
+  div(class="email")
+    p(class="email__title") CHANGE EMAIL
+    p(class="email__text").
+      Hi #{firstName},#[br]#[br]
+      You requested to change your email on Column/. Click this button to change it:
+    div(class="text_center")
+      a(class="email__button", href=`${callToActionUrl}`) CHANGE EMAIL
+    br
+    p(class="email__text") If you did not request this, please ignore this email or reply to let us know. This change email is valid for the next 30 minutes.

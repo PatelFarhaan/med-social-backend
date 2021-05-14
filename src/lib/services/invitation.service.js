@@ -73,7 +73,19 @@ const createInvitation = async (
 
     await invitation.addExpertise(invitationExpertise)
 
-    await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationRequested')
+    if (type === invitationTypes.FELLOW) {
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: process.env.MOCK_WEBCLIENT_HOST },
+        'invitationFellowRequested'
+      )
+    } else {
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: process.env.MOCK_WEBCLIENT_HOST },
+        'invitationRequested'
+      )
+    }
   } catch (e) {
     logger.warn(`createInvitation ${e}`)
   }
@@ -98,13 +110,13 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
       if (invitation.special) {
         await emailService.sendEmail(
           invitation.email,
-          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
           'nomDePlumeConfirmed'
         )
       } else {
         await emailService.sendEmail(
           invitation.email,
-          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
           'invitationConfirmed'
         )
       }
@@ -165,7 +177,7 @@ const inviteUserToColumn = async (
 
   await emailService.sendEmail(
     invitation.email,
-    { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+    { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
     'invitationConfirmed'
   )
 
@@ -193,13 +205,17 @@ const rejectInvitation = async (email, _user, Invitation = db.Invitation) => {
       savedInvitation = await invitation.save()
       await emailService.sendEmail(
         invitation.email,
-        { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+        { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
         'nomDePlumeRejected'
       )
     } else {
       invitation.state = states.REJECTED
       await invitation.save()
-      await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationRejected')
+      if (invitation.type === invitationTypes.FELLOW) {
+        await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationFellowRejected')
+      } else {
+        await emailService.sendEmail(invitation.email, { firstName: invitation.firstName }, 'invitationRejected')
+      }
     }
   } catch (e) {
     logger.warn(`savedInvitation ${e}`)
@@ -216,6 +232,9 @@ const payForApproval = async ({ paymentMethod, email }, Invitation = db.Invitati
       throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
     }
 
+    if (invitation.special)
+      throw new Error(JSON.stringify({ status: 400, message: 'Nom de plume invitations are not allowed to pay for approval.' }))
+
     const stripeCustomer = await stripeService.createCustomer({ email }, paymentMethod)
 
     await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
@@ -227,19 +246,11 @@ const payForApproval = async ({ paymentMethod, email }, Invitation = db.Invitati
       const token = await generateToken()
       invitation.token = token
       const approvedInvitation = await invitation.save()
-      if (invitation.special) {
-        await emailService.sendEmail(
-          invitation.email,
-          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-          'nomDePlumeConfirmed'
-        )
-      } else {
-        await emailService.sendEmail(
-          invitation.email,
-          { firstName: invitation.firstName, linkToOnboarding: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-          'invitationConfirmed'
-        )
-      }
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+        'invitationConfirmed'
+      )
 
       const subscription = await Subscription.create({
         paymentMethod: {

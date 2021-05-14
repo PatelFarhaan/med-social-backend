@@ -1,0 +1,14 @@
+extends ../basicEmail2
+
+block content
+  div(class="email")
+    p(class="email__name") Dear #{firstName},
+    p(class="email__title") We’ve reviewed your Fellowship request and think you'd be a great addition to Column/.
+    p(class="email__text") We’d like to offer you a free one-year Fellowship subscription to Column/.
+    a(class="email__button", href=`${callToActionUrl}`) READ NEWSPAPER
+block ps
+  div(class="ps")
+    p(class="ps__text").
+      Column/ is a new social network dedicated to signal over noise. #[br]
+      If Twitter is a library crossed with a civil war, we’re a library crossed with a dinner party. #[br]#[br]
+      Can't wait to see you there!
