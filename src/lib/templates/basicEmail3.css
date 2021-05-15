@@ -1,29 +1,34 @@
-:root {
+  @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@300;400;500&display=swap');
+
+  :root {
     color-scheme: only;
-    supported-color-schemes: light;
+    supported-color-schemes: light dark;
   }
 
   @font-face {
-    font-family: 'Avenir-Roman';
+    font-family: "Avenir-Roman";
     src: url('https://api.columnhq.com/static/fonts/Avenir-Roman.woff') format('woff'),
       url('https://api.columnhq.com/static/fonts/Avenir-Roman.woff2') format('woff2'),
       url('https://api.columnhq.com/static/fonts/Avenir-Roman.ttf') format('truetype');
   }
 
   @font-face {
-    font-family: 'SchnyderM-Demi-Web';
+    font-family: "SchnyderM-Demi-Web";
     src: url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.woff') format('woff'),
       url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.woff2') format('woff2'),
       url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.ttf') format('truetype');
   }
 
   @font-face {
-    font-family: SchnyderXL;
-    src: url('../../static/fonts/SchnyderXL-Bold-Web.woff') format('woff');
+    font-family: "SchnyderXL";
+    src: url('https://api.columnhq.com/static/fonts/SchnyderXL-Bold-Web.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/SchnyderXL-Bold-Web.ttf') format('ttf'),
+      url('https://api.columnhq.com/static/fonts/SchnyderXL-Bold-Web.woff') format('woff2');
   }
 
   @font-face {
-    font-family: 'SchnyderL-Bold-Web';
+    font-family: "SchnyderL-Bold-Web";
     src: url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.woff') format('woff'),
       url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.woff2') format('woff2'),
       url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.ttf') format('truetype');
@@ -39,13 +44,14 @@
     justify-content: center;
     align-items: center;
   }
+
   @media (min-width: 1px) {
     body {
       margin: 0;
       background-color: #fdfbf7;
       background-image: url('https://api.columnhq.com/static/images/noise.png');
       background-repeat: repeat;
-      font-family: 'Avenir-Roman';
+      font-family: "Avenir-Roman";
       border: 3px solid #3d8f44;
       border-radius: 2px;
       margin: 60px 24px 24px 24px;
@@ -86,7 +92,7 @@
     }
 
     .footer_alina__text {
-      font-family: SchnyderL-Bold-Web;
+      font-family: "SchnyderL-Bold-Web";
       font-style: normal;
       font-weight: bold;
       font-size: 24px;
@@ -98,7 +104,7 @@
     }
 
     .footer_column_secretary__text {
-      font-family: Avenir-Roman;
+      font-family: "Avenir-Roman";
       font-style: normal;
       font-weight: normal;
       font-size: 16px;
@@ -137,7 +143,7 @@
     .request__text {
       color: #666666;
       font-size: 18px;
-      font-family: Avenir-Roman;
+      font-family: "Avenir-Roman";
       line-height: 32px;
       margin-left: 12px;
       margin-right: 12px;
@@ -153,7 +159,7 @@
     }
 
     .email__title {
-      font-family: SchnyderXL;
+      font-family: "SchnyderXL";
       font-style: normal;
       font-size: 48px;
       line-height: 41px;
@@ -164,7 +170,7 @@
     }
 
     .email_text {
-      font-family: 'Avenir-Roman';
+      font-family: "Avenir-Roman";
       font-style: normal;
       font-weight: normal;
       font-size: 20px;
@@ -230,7 +236,7 @@
     .footer_column_secretary__text {
       margin-top: 10px;
       font-size: 16px;
-      font-family: Avenir-Roman;
+      font-family: "Avenir-Roman";
     }
 
     .ps {

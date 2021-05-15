@@ -48,7 +48,7 @@ const sendEmail = async (to, locals, template) => {
     preview: true
   })
 
-  const { MOCK_SERVER_HOST, MOCK_SERVER_PORT, MOCK_SERVER_PROTOCOL } = process.env
+  // const { MOCK_SERVER_HOST, MOCK_SERVER_PORT, MOCK_SERVER_PROTOCOL } = process.env
 
   email
     .send({
@@ -57,7 +57,8 @@ const sendEmail = async (to, locals, template) => {
         to
       },
       locals: {
-        absoluteUrl: `${MOCK_SERVER_PROTOCOL}://${MOCK_SERVER_HOST}:${MOCK_SERVER_PORT}`,
+        // absoluteUrl: `${MOCK_SERVER_PROTOCOL}://${MOCK_SERVER_HOST}:${MOCK_SERVER_PORT}`,
+        absoluteUrl: 'https://api.columnhq.com',
         ...locals
       }
     })
