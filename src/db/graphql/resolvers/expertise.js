@@ -22,7 +22,7 @@ module.exports = {
       const expertises = await db.Expertise.search(query, page, limit)
       return expertises[0]
     },
-    getExpertiseRankingTable: (_parent, _body) => rankingLevelPointsUpperBorder
+    getExpertiseRankingTable: (_parent, _body) => Object.values(rankingLevelPointsUpperBorder).map(item => item)
   },
   Mutation: {
     createExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body) => {
