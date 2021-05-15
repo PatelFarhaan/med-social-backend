@@ -2,6 +2,7 @@
 const { postService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 const { can } = require('./../auth')
+const { postPublicFields } = require('../../../lib/constants/post.constant')
 
 module.exports = {
   Query: {
@@ -97,14 +98,37 @@ module.exports = {
       return dbPost.getAuthor({ [EXPECTED_OPTIONS_KEY]: context })
     },
     children: async (post, _args) => JSON.stringify(post.children),
-    stackedPosts: async (post, { limit = 10, page = 1, hierarchy = false }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+    stackedPosts: async (post, { limit = 10, page = 1, hierarchy = false }, { req, db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbPost = db.Post.build(exportSafeModel(post))
+      const { user } = req
+
+      const attributes = postPublicFields
+      if (user) {
+        attributes.push(
+          [
+            db.sequelize.literal(
+              `(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`
+            ),
+            'userVote'
+          ],
+          [
+            db.sequelize.literal(
+              `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+                user.id
+              }')`
+            ),
+            'userBookmark'
+          ]
+        )
+      }
+
       const includeChildren = hierarchy
         ? [
             'stackedChildren',
             {
               model: db.Post,
               as: 'descendents',
+              attributes,
               hierarchy,
               include: {
                 model: db.User,
@@ -119,8 +143,10 @@ module.exports = {
             }
           ]
         : ['stackedChildren']
+
       const children = await dbPost.getStackedChildren({
         include: includeChildren,
+        attributes,
         limit,
         page,
         [EXPECTED_OPTIONS_KEY]: context
