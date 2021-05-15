@@ -145,14 +145,14 @@ const inviteUserToColumn = async (
   const column = await Column.findByPk(columnSlug)
   if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column already exists' }))
 
-  const existingUser = await User.findOne({ email })
+  const existingUser = await User.findOne({ where: { email } })
 
   if (existingUser) {
     const columnAuthor = await column.getAuthor()
     if (column.type === columnTypes.PAID && columnAuthor.id !== user.id)
       throw new Error(JSON.stringify({ status: 403, message: 'Only Column owners in paid columns can invite users' }))
 
-    await columnService.subscribeToColumn({ body: { email } }, existingUser)
+    await columnService.subscribeToColumn({ body: { column } }, existingUser)
     return {
       status: 204,
       message: 'Successfully Subscribed User to Column'
