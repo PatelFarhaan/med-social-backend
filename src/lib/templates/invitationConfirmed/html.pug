@@ -1,13 +1,14 @@
-extends ../basicEmail
+extends ../basicEmail2
 
 block content
-  div(class="email-background", style=`background-image: url('${absoluteUrl}/static/images/request-confirmed.png'); background-repeat: no-repeat; background-size: cover;`)
-    div(class="email-wrapper-outer")
-      div(class="email")
-        p(class="email__name") Dear #{firstName},
-        p(class="email__text") Congratulations! Your invitation to join Column/ is confirmed. We’re excited for you to participate in the conversations.
-        p(class="email__text") Please follow link below to finish signing up.
-        a(class="email__button", href=`${linkToOnboarding}`) Click here to start.
-        p(class="email__footer-text gap-top-40") Yours sincerely,
-        p(class="email__footer-name") Jason Pontin
-        p(class="email__subtext") Editor in Chief, Column/
+  div(class="email")
+    p(class="email__name") Hi #{firstName},
+    p(class="email__title") We’ve reviewed your request and think you'd be a great addition to Column/.
+    p(class="email__text") You can finish signing up by clicking a button bellow.
+    a(class="email__button", href=`${callToActionUrl}`) FINISH SIGNING UP
+block ps
+  div(class="ps")
+    p(class="ps__text").
+      Column/ is a new social network dedicated to signal over noise. #[br]
+      If Twitter is a library crossed with a civil war, we’re a library crossed with a dinner party. #[br]#[br]
+      Can't wait to see you there!

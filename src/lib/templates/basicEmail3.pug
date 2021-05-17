@@ -1,0 +1,27 @@
+doctype strict
+html(xmlns="https://www.w3.org/1999/xhtml")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width initial-scale=1.0")
+    meta(name="color-scheme", content="only")
+    meta(name="supported-color-schemes", content="light")
+    style
+      include basicEmail3.css
+  body
+    div(class="email_content")
+      div(class="header")
+        div(class="header_statue_image__div", class="header_statue_image__logo", background=`${absoluteUrl}/static/images/statue.png`, valign="middle" style="text-align: center; background-position: center center !important; background-size: cover !important;")
+      block content
+      table(style="width: 100%;")
+        tbody
+          tr(class="footer")
+            td(style="display:inline;padding-left: 48px;")
+              p(class="footer_yours_sincerely__text") Yours sincerely,
+              br
+              img(class="footer_signature__logo", src=`${absoluteUrl}/static/images/signature.png`)
+              br
+              p(class="footer_alina__text") Alina Hart
+              br
+              p(class="footer_column_secretary__text") Social Secretary & Editor in Chief<br/> Column/
+            td(style="margin-left: 65%;")
+              img(class="footer_stamp__logo", src=`${absoluteUrl}/static/images/stamp.png`)

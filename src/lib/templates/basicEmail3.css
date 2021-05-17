@@ -1,0 +1,263 @@
+  @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@300;400;500&display=swap');
+
+  @font-face {
+    font-family: "Avenir-Roman";
+    src: url('https://api.columnhq.com/static/fonts/Avenir-Roman.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/Avenir-Roman.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/Avenir-Roman.ttf') format('truetype');
+  }
+
+  @font-face {
+    font-family: "SchnyderM-Demi-Web";
+    src: url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.ttf') format('truetype');
+  }
+
+  @font-face {
+    font-family: "SchnyderXL";
+    src: url('https://api.columnhq.com/static/fonts/SchnyderXL-Bold-Web.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/SchnyderXL-Bold-Web.ttf') format('ttf'),
+      url('https://api.columnhq.com/static/fonts/SchnyderXL-Bold-Web.woff') format('woff2');
+  }
+
+  @font-face {
+    font-family: "SchnyderL-Bold-Web";
+    src: url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.ttf') format('truetype');
+  }
+
+  .text_center {
+    text-align: center;
+  }
+
+  .div_center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .email_content {
+    margin: 0;
+    background-color: #fdfbf7;
+    background-image: url('https://api.columnhq.com/static/images/noise.png');
+    background-repeat: repeat;
+    font-family: "Avenir-Roman";
+    border: 3px solid #3d8f44;
+    border-radius: 2px;
+    margin: 60px 24px 24px 24px;
+  }
+
+  .header {
+    text-align: -webkit-center;
+  }
+
+  .header_statue_image__logo {
+    width: 63px;
+    height: 79px;
+    margin-top: -4%;
+    background-image: url('https://api.columnhq.com/static/images/statue.png');
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .footer_sincerely__div {
+    display: flex;
+    flex-direction: column;
+    flex: 5;
+  }
+
+  .footer_column_image__logo {
+    height: 195px;
+  }
+
+  .footer_yours_sincerely__text {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 25px;
+    color: #666666;
+    margin-bottom: 0;
+  }
+
+  .footer_signature__logo {
+    width: auto;
+    height: 97px;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 12px;
+  }
+
+  .footer_alina__text {
+    font-family: "SchnyderL-Bold-Web";
+    font-style: normal;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 32px;
+    color: #000000;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 4px;
+  }
+
+  .footer_column_secretary__text {
+    font-family: "Avenir-Roman";
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 22px;
+    color: #999999;
+    margin-top: 0;
+    margin-bottom: 60px;
+    padding-top: 4px;
+  }
+
+  .footer_stamp__div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 2;
+  }
+
+  .footer_signature__logo {
+    width: 139px;
+    height: 97px;
+    color: #e37158;
+    margin-top: 12px;
+  }
+
+  .footer_stamp__logo {
+    width: auto;
+    height: 139px;
+    margin-top: 36px;
+  }
+
+  .email {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+
+  .request__text {
+    color: #666666;
+    font-size: 18px;
+    font-family: "Avenir-Roman";
+    line-height: 32px;
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .email__name {
+    padding-top: 100px;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 33px;
+    color: #333333;
+  }
+
+  .email__title {
+    font-family: "SchnyderXL";
+    font-style: normal;
+    font-size: 40px;
+    letter-spacing: 0.07em;
+    color: #000000;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .email_text {
+    font-family: "Avenir-Roman";
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 32px;
+    color: #666666;
+  }
+
+  .email__button {
+    border-radius: 2px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #3d8f44;
+    background-color: #3d8f44;
+    text-align: center;
+    width: 180px;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    transform-style: preserve-3d;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    letter-spacing: 0.2em;
+    font-size: 12px;
+  }
+
+  .email__button:hover {
+    background-color: '#509a56';
+  }
+
+  .email__button::after {
+    content: '';
+    width: 311px;
+    height: 52px;
+    left: 4px;
+    top: 4px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #3d8f44;
+    border-radius: 2px;
+    position: absolute;
+    transform: translateZ(-4px);
+    background-color: #edece8;
+  }
+
+  @media (min-width: 750px) {
+    .email_content {
+      margin: 90px;
+    }
+
+    .header_statue_image__logo {
+      width: 83px;
+      height: 104px;
+    }
+
+    .footer_column_secretary__text {
+      margin-top: 10px;
+      font-size: 16px;
+      font-family: "Avenir-Roman";
+    }
+
+    .ps {
+      padding: 90px 60px;
+    }
+
+    .footer {
+      padding: 90px 60px;
+    }
+
+    .email {
+      padding: 90px 60px;
+    }
+
+    .email__name {
+      font-size: 24px;
+      line-height: 36px;
+    }
+
+    .email__title {
+      font-size: 48px;
+      line-height: 59px;
+    }
+
+    .email__button {
+      font-size: 24px;
+      width: 200px;
+    }
+  }

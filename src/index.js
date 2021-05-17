@@ -58,8 +58,16 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(compression())
 
-// eslint-disable-next-line prefer-const
-let origin = ['*', 'https://columnhq.com', 'https://www.columnhq.com', 'https://joincolumn.com', 'https://www.joincolumn.com', 'http://localhost:3000']
+const origin = [
+  '*',
+  'http://localhost:3005',
+  'http://0.0.0.0:3005',
+  'http://localhost:3000',
+  'https://columnhq.com',
+  'https://www.columnhq.com',
+  'https://joincolumn.com',
+  'https://www.joincolumn.com'
+]
 
 const adminBro = new AdminBro({
   databases: [db],
@@ -101,8 +109,15 @@ const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
 
 app.use(adminBro.options.rootPath, router)
 
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+  // credentials: true
+}
+
 // 3rd party middleware
-app.use(cors({ origin, credentials: true }))
+app.use(cors(corsOptions))
 
 app.use(bodyParser.json({ limit: process.env.BODY_PARSER_LIMIT || '300kb' }))
 app.use(bodyParser.urlencoded({ extended: true }))

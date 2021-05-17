@@ -1,0 +1,8 @@
+extends ../basicEmail2
+
+block content
+  div(class="email")
+    p(class="email__name") Hi #{firstName},
+    p(class="email__title") Thank you so much for applying as a Column/ Fellow.
+    p(class="email__text") We are reviewing your application now: please be patient with us! In the meantime, you can read our Daily Briefing.
+    a(class="email__button", href=`${callToActionUrl}`) READ DAILY BRIEFING
