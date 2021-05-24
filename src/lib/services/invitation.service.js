@@ -5,13 +5,12 @@ const db = require('../../db/models')
 const {
   stripe: { paidSubscriptionPriceId }
 } = require('../../../config/config')
-const { states } = require('../constants/invitation.constant')
+const { invitationTypes, states } = require('../constants/invitation.constant')
 const logger = require('../utils/logger')
 const columnService = require('./column.service')
 const stripeService = require('./stripe.service')
 const emailService = require('./email.service')
 const { columnTypes } = require('../constants/column.constant')
-const { invitationTypes, invitationStates } = require('../constants/invitation.constant')
 
 const LIMIT = 50
 
@@ -167,7 +166,7 @@ const inviteUserToColumn = async (
     lastName,
     email,
     type: invitationTypes.REGULAR,
-    state: invitationStates.APPROVED,
+    state: states.APPROVED,
     token
   })
 

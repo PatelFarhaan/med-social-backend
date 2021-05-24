@@ -40,7 +40,7 @@ const listUserNotifications = async ({ page = 1, limit = LIMIT, isRead = false }
     },
     limit,
     offset: limit * (page - 1),
-    order: [['isRead', 'ASC']],
+    order: [['createdAt', 'DESC']],
     ...loaderOpts
   })
 
