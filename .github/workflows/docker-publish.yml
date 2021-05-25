@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: Build base image
-        run: docker build . --file Dockerfile --tag column/base
+        run: docker build . --file Dockerfile.base --tag column/base
 
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
