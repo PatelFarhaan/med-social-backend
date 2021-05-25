@@ -48,6 +48,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      
+      - name: Build base image
+        run: docker build . --file Dockerfile --tag column/base
 
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME
