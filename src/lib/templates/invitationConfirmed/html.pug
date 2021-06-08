@@ -1,14 +1,371 @@
-extends ../basicEmail2
-
-block content
-  div(class="email")
-    p(class="email__name") Hi #{firstName},
-    p(class="email__title") We’ve reviewed your request and think you'd be a great addition to Column/.
-    p(class="email__text") You can finish signing up by clicking a button bellow.
-    a(class="email__button", href=`${callToActionUrl}`) FINISH SIGNING UP
-block ps
-  div(class="ps")
-    p(class="ps__text").
-      Column/ is a new social network dedicated to signal over noise. #[br]
-      If Twitter is a library crossed with a civil war, we’re a library crossed with a dinner party. #[br]#[br]
-      Can't wait to see you there!
+html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-color-schemes: light;')
+  head
+    base(target='_top')
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width initial-scale=1.0')
+    meta(name='color-scheme' content='only')
+    meta(name='supported-color-schemes' content='light')
+    meta(name='x-apple-disable-message-reformatting')
+    style.
+      @font-face {
+      font-family: 'Avenir-Roman';
+      src: url('https://column-static.s3.us-east-2.amazonaws.com/AvenirMedium.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/Avenir-Roman.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/Avenir-Roman.ttf') format('truetype');
+      }
+      @font-face {
+      font-family: 'SchnyderM';
+      src: url('https://column-static.s3.us-east-2.amazonaws.com/SchnyderM.woff') format('woff'),
+      url('https://column-static.s3.us-east-2.amazonaws.com/SchnyderM-Demi-Web.woff2') format('woff2');
+      font-weight: 600;
+      font-style: normal;
+      font-stretch: normal;
+      }
+      /*@font-face {
+      font-family: 'SchnyderM';
+      font-weight: 500;
+      font-style: normal;
+      }*/
+      @font-face {
+      font-family: 'SchnyderL-Bold-Web';
+      src: url('https://column-static.s3.us-east-2.amazonaws.com/SchnyderL-Bold-Web.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.ttf') format('truetype');
+      }
+      @media (min-width: 1px) {
+      .header_column_image__logo {
+      width: 52px !important;
+      height: 38px !important;
+      margin-top: 60px !important;
+      }
+      .outer_grid {
+      max-width: 600px;
+      border: 1px solid #e0e0e0;
+      }
+      .faux-absolute {
+      max-height: 0;
+      position: relative;
+      opacity: 0.999;
+      margin-top: 40px;
+      }
+      .faux-position {
+      margin-top: 16px;
+      display: inline-block;
+      color: white;
+      font-family: Avenir;
+      letter-spacing: 0.2em;
+      font-size: 12px;
+      }
+      .faux-absolute-header {
+      max-height: 0;
+      position: relative;
+      opacity: 0.999;
+      margin-top: 40px;
+      }
+      .faux-position-header {
+      margin-top: 80px;
+      display: inline-block;
+      margin-left: 32px;
+      }
+      .faux-absolute-column {
+      max-height: 0;
+      position: relative;
+      opacity: 0.999;
+      margin-top: 0px;
+      }
+      .faux-position-column {
+      margin-top: 14px;
+      display: inline-block;
+      margin-left: 0px;
+      font-family: SchnyderM;
+      font-size: 24px !important;
+      }
+      .faux-absolute-column-text {
+      max-height: 0;
+      position: relative;
+      opacity: 0.999;
+      margin-top: 0px;
+      }
+      .faux-position-column-text {
+      margin-top: 48px;
+      display: inline-block;
+      margin-left: 0px;
+      font-family: Avenir;
+      font-size: 14px !important;
+      }
+      .central_button {
+      max-width: 300px;
+      }
+      .header_statue_image__logo {
+      width: auto;
+      height: 302px;
+      margin-left: 328px;
+      margin-top: -60px;
+      }
+      .footer {
+      padding: 0 32px;
+      display: flex;
+      justify-content: space-around;
+      }
+      .footer_column_image__logo {
+      height: 195px;
+      width: 100vw;
+      }
+      .footer_yours_sincerely__text {
+      font-style: normal;
+      font-weight: normal;
+      font-size: 18px;
+      line-height: 25px;
+      color: #666666;
+      margin-bottom: 0;
+      }
+      .footer_signature__logo {
+      width: 149px;
+      height: 97px;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 12px;
+      }
+      .footer_alina__text {
+      font-family: SchnyderL-Bold-Web;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 24px;
+      line-height: 32px;
+      color: #000000;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 4px;
+      }
+      .footer_column_secretary__text {
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 22px;
+      color: #999999;
+      margin-top: 0;
+      margin-bottom: 60px;
+      padding-top: 4px;
+      }
+      .footer_signature__logo {
+      width: 139px;
+      height: 139px;
+      color: #e37158;
+      }
+      .footer_stamp__logo {
+      width: 139px;
+      height: 139px;
+      margin-right: 32px;
+      }
+      .email__name {
+      padding-top: 100px;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 24px;
+      line-height: 33px;
+      color: #333333;
+      }
+      .email__title {
+      font-family: SchnyderM;
+      font-style: normal;
+      font-weight: 500;
+      font-size: 36px !important;
+      line-height: 40px !important;
+      letter-spacing: 0.07em !important;
+      text-transform: uppercase;
+      color: #000000;
+      }
+      .email_text {
+      font-family: Avenir-Roman;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 20px !important;
+      line-height: 32px !important;
+      color: #666666 !important;
+      }
+      .ps_text {
+      font-family: Avenir-Roman;
+      font-size: 20px;
+      line-height: 32px;
+      color: #666666;
+      }
+      .ps_text__link {
+      color: #3d8f44;
+      cursor: pointer;
+      text-decoration: underline;
+      }
+      .social_div {
+      margin-left: 32px !important;
+      }
+      .button_gutter {
+      margin-top: 330px !important;
+      }
+      .image_gutter {
+      margin-top: 180px !important;
+      }
+      .backgroundFooter {
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+Illustration.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 600px 194px;
+      height: 194px;
+      width: 600px !important;
+      }
+      .column_img_name {
+      width: 500px !important;
+      height: 87px !important;
+      }
+      .columns-separator {
+      margin-top: 56px;
+      }
+      }
+      @media (min-width: 750px) {
+      .header_column_image__logo {
+      width: 52px !important;
+      height: 38px !important;
+      margin-top: 60px !important;
+      }
+      .outer_grid {
+      max-width: 600px;
+      border: 1px solid #e0e0e0;
+      }
+      .column_img_name {
+      width: 500px !important;
+      height: 87px !important;
+      }
+      .backgroundFooter {
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+Illustration.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100vw 194px;
+      height: 194px;
+      width: 600px !important;
+      margin-top: 90px;
+      }
+      .header_statue_image__logo {
+      width: auto !important;
+      height: 391px !important;
+      margin-left: 264px;
+      }
+      .footer_column_image__logo {
+      width: 100vw;
+      height: 244px;
+      }
+      .footer_column_secretary__text {
+      margin-bottom: 90px;
+      }
+      .footer_signature__div {
+      padding-top: 90px;
+      }
+      .footer {
+      padding: 90px 60px;
+      }
+      .email {
+      padding: 90px 60px;
+      }
+      .email_text {
+      font-family: Avenir-Roman;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 20px !important;
+      line-height: 54px !important;
+      color: #666666 !important;
+      }
+      .email__name {
+      font-size: 24px;
+      line-height: 36px;
+      }
+      .email__title {
+      font-size: 52px;
+      line-height: 60px;
+      font-family: SchnyderM;
+      font-style: normal;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #000000;
+      }
+      .button_gutter {
+      margin-top: 330px !important;
+      }
+      .image_gutter {
+      margin-top: 90px !important;
+      }
+      .columns-separator {
+      margin-top: 84px;
+      }
+      }
+      @media (prefers-color-scheme: dark) {
+      .email__name,
+      .email__footer-text,
+      .email__footer-name,
+      .email__subtext,
+      .email__text {
+      color: #666666 !important;
+      -webkit-text-fill-color: #666666 !important;
+      }
+      }
+  body(style="margin: 0px;padding:0px; background-color: #f5f4f0; background-image: url('https://api.columnhq.com/static/images/noise.png'); background-repeat: repeat; font-family:Avenir-Roman;")
+    table(width='100%' cellpadding='0' cellspacing='0' border='0' align='center' style='background-color:#f5f4f0;')
+      tbody
+        tr
+          td(align='center')
+            table(align='center' border='0' cellpadding='0' cellspacing='0' width='600' style='background-color:#f5f4f0;')
+              tbody
+                tr
+                  td(align='center')
+                    div(style='display: grid; place-items:center;')
+                      .outer_grid
+                        table(width='100%' border='0' cellspacing='0' cellpadding='0' role='presentation')
+                          tbody
+                            tr
+                              td
+                                .social_div
+                                  .header_column_image__div
+                                    img.header_column_image__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Logo.png')
+                            tr
+                              td
+                                .faux-absolute-header
+                                  .faux-position-header
+                                    p.ps_text Hi #{firstName},
+                                    p.email__title
+                                      | We’ve reviewed
+                                      br
+                                      |                                 your request and
+                                      br
+                                      |                                 think you'd be a
+                                      br
+                                      |                                 great addition
+                                      br
+                                      |                                 to Column/.
+                                img.header_statue_image__logo(src='https://column-static.s3.us-east-2.amazonaws.com/statue.png')
+                        .column_image.image_gutter
+                          .backgroundFooter
+                        table(width='100%' border='0' cellspacing='0' cellpadding='0' role='presentation')
+                          tbody
+                            tr
+                              td
+                                .social_div(style='margin-top: 90px')
+                                  p.ps_text(style='min-width:150px')
+                                    | Column/ is a new social network devoted to signal over noise, and each individual Column is meant to be the
+                                    | best source of news, information, and conversation on that topic.
+                                  p.ps_text Looking forward to seeing you there!
+                            tr
+                              td
+                                .social_div(style='text-align: center;')
+                                  .faux-absolute(style='margin-left:0')
+                                    .faux-position FINISH SIGNING UP
+                                  a(href=`${callToActionUrl}`)
+                                    img.central_button(src='https://column-static.s3.us-east-2.amazonaws.com/Shadow+Button.png')
+                        table
+                          tbody
+                            tr(style='text-align: left;')
+                              td(style='text-align: left;')
+                                .social_div(style='margin-top: 120px')
+                                  p.footer_yours_sincerely__text Yours sincerely,
+                                  img.footer_signature__logo(src='https://column-static.s3.us-east-2.amazonaws.com/signature.png')
+                                  p.footer_alina__text Alina Hart
+                                  p.footer_column_secretary__text Column/ Social Secretary
+                              td(style='text-align:right' width='100%')
+                                .footer_stamp__div(style='width:100%')
+                                  img.footer_stamp__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Circle+Stamp.png')

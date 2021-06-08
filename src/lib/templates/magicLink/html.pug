@@ -1,13 +1,322 @@
-extends ../basicEmail3
-
-block content
-  div(class="email")
-    p(class="email__title") SIGN IN
-    p(class="email__text").
-      Tap the button below to sign in your Column/ account on your mobile device. #[br]#[br]
-      This link will expire in 2 hours and can only be used once.
-    div(class="text_center")
-      a(class="email__button", href=`${callToActionUrl}`) SIGN IN TO COLUMN/
-    br
-    p(class="email__text").
-      If the button above doesn’t work, paste this link into your web browser: #{callToActionUrl}
+html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-color-schemes: light;')
+  head
+    base(target='_top')
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width initial-scale=1.0')
+    meta(name='color-scheme' content='only')
+    meta(name='supported-color-schemes' content='light')
+    meta(name='x-apple-disable-message-reformatting')
+    style.
+      @font-face {
+      font-family: 'Avenir-Roman';
+      src: url('https://api.columnhq.com/static/fonts/Avenir-Roman.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/Avenir-Roman.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/Avenir-Roman.ttf') format('truetype');
+      }
+      @font-face {
+      font-family: 'SchnyderM-Demi-Web';
+      src: url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/SchnyderM-Demi-Web.ttf') format('truetype');
+      }
+      @font-face {
+      font-family: SchnyderXL;
+      src: url('https://column-static.s3.us-east-2.amazonaws.com/SchnyderXL-Demi-Web.woff') format('woff');
+      }
+      @font-face {
+      font-family: 'SchnyderL-Bold-Web';
+      src: url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.woff') format('woff'),
+      url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.woff2') format('woff2'),
+      url('https://api.columnhq.com/static/fonts/SchnyderL-Bold-Web.ttf') format('truetype');
+      }
+      @media (min-width: 1px) {
+      body {
+      margin: 0;
+      background-color: #fdfbf7;
+      background-image: url('https://api.columnhq.com/static/images/noise.png');
+      background-repeat: repeat;
+      font-family: 'Avenir-Roman';
+      }
+      a{
+      color:#3d8f44 !important;
+      text-decoration:none;
+      }
+      .header {
+      margin-top: 36px;
+      margin-bottom: 0px;
+      border-left: 3px solid #3d8f44 !important;
+      border-right: 3px solid #3d8f44 !important;
+      border-bottom: 3px solid #3d8f44 !important;
+      border-radius: 2px !important;
+      margin-left:32px;
+      margin-right:32px;
+      min-width:600px;
+      }
+      .subhead {
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Top+Export+Desktop.png');
+      background-repeat: no-repeat;
+      background-size: 600px 114px;
+      background-position: center top;
+      margin-top: 0px;
+      background-color: #fdfbf7;
+      }
+      .header_statue_image__logo {
+      /*position: absolute;*/
+      width: 63px !important;
+      height: 79px !important;
+      /*top: 1%;*/
+      /*left: 45%;*/
+      }
+      .faux-absolute {
+      max-height: 0;
+      position: relative;
+      opacity: 0.999;
+      margin-top: 40px;
+      }
+      .faux-position {
+      margin-top: 16px;
+      display: inline-block;
+      color: white;
+      font-family: Avenir;
+      letter-spacing: 0.2em;
+      font-size: 12px;
+      }
+      .faux-absolute-statue {
+      max-height: 0;
+      position: relative;
+      opacity: 0.999;
+      margin-top: -40px;
+      }
+      .faux-position-statue {
+      margin-top: 16px;
+      display: inline-block;
+      color: white;
+      font-family: Avenir;
+      letter-spacing: 0.2em;
+      font-size: 12px;
+      }
+      .central_button {
+      max-width: 300px;
+      }
+      .footer_column_image__logo {
+      height: 195px;
+      }
+      .footer_yours_sincerely__text {
+      font-style: normal;
+      font-weight: normal;
+      font-size: 18px;
+      line-height: 25px;
+      color: #666666;
+      margin-bottom: 0;
+      }
+      .footer_signature__logo {
+      width: auto;
+      height: 97px;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 12px;
+      }
+      .footer_alina__text {
+      font-family: SchnyderL-Bold-Web;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 24px;
+      line-height: 32px;
+      color: #000000;
+      margin-top: 0;
+      margin-bottom: 0;
+      padding-top: 4px;
+      }
+      .footer_column_secretary__text {
+      font-family: Avenir-Roman;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 16px;
+      line-height: 22px;
+      color: #999999;
+      margin-top: 0;
+      margin-bottom: 60px;
+      padding-top: 4px;
+      }
+      .footer_signature__logo {
+      width: 149px;
+      height: 97px;
+      color: #e37158;
+      }
+      .footer_stamp__logo {
+      width: 139px;
+      height: 139px;
+      margin-right: 32px;
+      margin-bottom: 60px;
+      }
+      .email {
+      margin-top: 60px;
+      margin-left: 32px;
+      margin-right: 32px;
+      }
+      .request__text {
+      color: #666666;
+      font-size: 18px;
+      font-family: Avenir-Roman;
+      line-height: 32px;
+      margin-left: 12px;
+      margin-right: 12px;
+      }
+      .email__name {
+      padding-top: 100px;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 24px;
+      line-height: 33px;
+      color: #333333;
+      }
+      .email__title {
+      font-family: SchnyderXL;
+      font-style: normal;
+      font-size: 28px;
+      line-height: 41px;
+      letter-spacing: 0.07em;
+      color: #000000;
+      text-align: center;
+      white-space: nowrap;
+      }
+      .email_text {
+      font-family: 'Avenir-Roman';
+      font-style: normal;
+      font-weight: normal;
+      font-size: 20px;
+      line-height: 32px;
+      color: #666666;
+      }
+      .email__button {
+      position: 'relative';
+      border-radius: 2px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: #3d8f44;
+      background-color: #3d8f44;
+      text-align: center;
+      width: 311px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      transform-style: preserve-3d;
+      height: 52px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      letter-spacing: 0.2em;
+      font-size: 12px;
+      }
+      .email__button:hover {
+      background-color: '#509a56';
+      }
+      .email__button::after {
+      content: '';
+      width: 311px;
+      height: 52px;
+      left: 4px;
+      top: 4px;
+      border-width: 1px;
+      border-style: solid;
+      border-color: #3d8f44;
+      border-radius: 2px;
+      position: absolute;
+      transform: translateZ(-4px);
+      background-color: #edece8;
+      }
+      .topp_header {
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/CFI.png');
+      background-repeat: no-repeat;
+      background-size: 600px 110px;
+      height: 110px;
+      width: 600px;
+      }
+      }
+      @media (min-width: 600px) {
+      .header{
+      margin-left:90px;
+      margin-right:90px;
+      }
+      .footer_column_secretary__text {
+      margin-top: 10px;
+      font-size: 16px;
+      font-family: Avenir-Roman;
+      }
+      .ps {
+      padding: 90px 60px;
+      }
+      .central_button {
+      max-width: 311px;
+      }
+      .email__name {
+      font-size: 24px;
+      line-height: 36px;
+      }
+      .email__title {
+      font-size: 52px;
+      line-height: 59px;
+      }
+      .email__button {
+      font-size: 24px;
+      }
+      }
+      @media (prefers-color-scheme: dark) {
+      .email__name,
+      .email__footer-text,
+      .email__footer-name,
+      .email__subtext,
+      .email__text {
+      color: #666666 !important;
+      -webkit-text-fill-color: #666666 !important;
+      }
+      }
+  body
+    table(width='100%' cellpadding='0' cellspacing='0' border='0' align='center')
+      tbody
+        tr
+          td(align='center')
+            table(align='center' border='0' cellpadding='0' cellspacing='0' width='600')
+              tbody
+                tr
+                  td(align='center')
+                    .subhead
+                      p  
+                      .header
+                        table(width='100%' border='0' cellspacing='0' cellpadding='0')
+                          tbody
+                            tr
+                              td
+                                .email(style='margin-top:120px;')
+                                  p.email__title SIGN IN
+                                  p.request__text
+                                    | Tap the button below to sign in your Column/ account on your mobile device.
+                                  p.request__text
+                                    | This link will expire in 2 hours and can only be used once.
+                            tr
+                              td(style='text-align: center;')
+                                a(href='`${callToActionUrl}`')
+                                  .faux-absolute
+                                    .faux-position SIGN IN TO COLUMN/
+                                  img.central_button(src='https://column-static.s3.us-east-2.amazonaws.com/Shadow+Button.png')
+                            tr
+                              td
+                                .email(style='margin-top:60px;')
+                                  p.request__text
+                                    | If the button above doesn’t work, paste this link into your web browser: #{callToActionUrl}
+                        div(style='margin-left:32px')
+                          table
+                            tbody
+                              tr(style='text-align: left;vertical-align: bottom;')
+                                td(style='text-align: left;')
+                                  .social_div(style='margin-top: 120px')
+                                    p.footer_yours_sincerely__text Yours sincerely,
+                                    img.footer_signature__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Signature.png')
+                                    p.footer_alina__text Alina Hart
+                                    p.footer_column_secretary__text(style='word-wrap: nowrap;')
+                                      | Social Secretary & Editor in Chief Column/
+                                td(style='text-align:right' width='100%')
+                                  .footer_stamp__div(style='width:100%')
+                                    img.footer_stamp__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Circle+Stamp.png')

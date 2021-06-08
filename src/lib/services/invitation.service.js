@@ -143,7 +143,7 @@ const inviteUserToColumn = async (
   }
 
   const column = await Column.findByPk(columnSlug)
-  if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column already exists' }))
+  if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
 
   const existingUser = await User.findOne({ email })
 
@@ -177,8 +177,14 @@ const inviteUserToColumn = async (
 
   await emailService.sendEmail(
     invitation.email,
-    { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-    'invitationConfirmed'
+    {
+      firstName: invitation.firstName,
+      callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}`,
+      columnName: column.name,
+      columnMembers: column.MemberCount || 100,
+      columnPosts: column.PostCount || '1k'
+    },
+    'invitationColumn'
   )
 
   return {
