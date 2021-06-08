@@ -3,7 +3,7 @@ const db = require('../../db/models')
 const logger = require('../utils/logger')
 const { isStringJSON } = require('../utils/isStringJSON')
 const { columnStatuses, columnTypes } = require('../../lib/constants/column.constant')
-const { subscriptionTypes, paymentGateways } = require('../../lib/constants/subscription.constant')
+const { subscriptionTypes, paymentGateways, subscriptionStatuses } = require('../../lib/constants/subscription.constant')
 const stripeService = require('./stripe.service')
 const notificationService = require('./notification.service')
 const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
@@ -112,12 +112,25 @@ const createColumn = async (
   return column
 }
 
-const subscribeToColumn = async ({ body: { column } }, user, Subscription = db.Subscription) => {
+const subscribeToColumn = async ({ body }, user, Subscription = db.Subscription) => {
+  const { column } = body
   let subscription
   const columnAuthor = await column.getAuthor()
   // TODO: This check is for when the column creator needs to be the only one to invite within a private column
   // if (column.visibility === columnVisibilities.PRIVATE && columnAuthor.id !== user.id)
   //   throw new Error(JSON.stringify({ status: 403, message: 'Only column owners can invite to the column' }))
+
+  const existingSubscription = await Subscription.findOne({
+    where: {
+      type: subscriptionTypes.COLUMN,
+      email: user.email,
+      UserId: user.id,
+      ColumnSlug: column.slug,
+      state: subscriptionStatuses.ACTIVE
+    }
+  })
+
+  if (existingSubscription) throw new Error(JSON.stringify({ status: 400, message: 'User already subscribed to column' }))
 
   if (column.type === columnTypes.FREE) {
     subscription = await Subscription.create({

@@ -110,10 +110,10 @@ const router = AdminBroExpress.buildAuthenticatedRouter(adminBro, {
 app.use(adminBro.options.rootPath, router)
 
 const corsOptions = {
-  origin: process.env.CORS_ALLOW_ORIGIN || '*',
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+  // credentials: true
 }
 
 // 3rd party middleware
