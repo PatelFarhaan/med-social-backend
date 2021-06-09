@@ -1,0 +1,18 @@
+extends ../basicEmail2
+
+block content
+  div(class="email")
+    p(class="email__name") Hi #{firstName},
+    p(class="email__title") Thank you so much for applying to join Column/.
+    p(class="email__text").
+      Please be patient with us as we review applications. #[br]
+      There’s a long waiting list, and we will get to you! #[br]#[br]
+      In meantime, you can read the public #[br]
+      conversations in Column/.
+    a(class="email__button", href=`${callToActionUrl}`) READ NEWSPAPER
+block ps
+  div(class="ps")
+    p(class="ps__text")
+      span(class="ps__text_ps") P.S.&nbsp;
+      span If you’re very eager to join, there are ways to&nbsp;
+      a(class="ps_text__link" href=`${skipToFrontUrl}`) skip to the front.

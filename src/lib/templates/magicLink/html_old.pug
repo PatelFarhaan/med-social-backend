@@ -1,0 +1,13 @@
+extends ../basicEmail3
+
+block content
+  div(class="email")
+    p(class="email__title") SIGN IN
+    p(class="email__text").
+      Tap the button below to sign in your Column/ account on your mobile device. #[br]#[br]
+      This link will expire in 2 hours and can only be used once.
+    div(class="text_center")
+      a(class="email__button", href=`${callToActionUrl}`) SIGN IN TO COLUMN/
+    br
+    p(class="email__text").
+      If the button above doesn’t work, paste this link into your web browser: #{callToActionUrl}

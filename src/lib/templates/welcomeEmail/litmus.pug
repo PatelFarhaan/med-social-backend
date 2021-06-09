@@ -28,6 +28,13 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       height: 38px !important;
       margin-top: 60px !important;
       }
+      a {
+      text-decoration: none;
+      }
+      .outer_grid {
+      max-width: 600px;
+      border: 1px solid #e0e0e0;
+      }
       .faux-absolute {
       max-height: 0;
       position: relative;
@@ -49,7 +56,7 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       margin-top: 40px;
       }
       .faux-position-header {
-      margin-top: 16px;
+      margin-top: 80px;
       display: inline-block;
       margin-left: 32px;
       }
@@ -59,7 +66,7 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       .header_statue_image__logo {
       width: auto;
       height: 302px;
-      margin-left: 100px;
+      margin-left: 328px;
       margin-top: -60px;
       }
       .footer {
@@ -129,9 +136,9 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       font-family: SchnyderM;
       font-style: normal;
       font-weight: 500;
-      font-size: 36px;
-      line-height: 40px;
-      letter-spacing: 0.07em;
+      font-size: 36px !important;
+      line-height: 40px !important;
+      letter-spacing: 0.07em !important;
       text-transform: uppercase;
       color: #000000;
       }
@@ -139,9 +146,9 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       font-family: Avenir-Roman;
       font-style: normal;
       font-weight: normal;
-      font-size: 20px;
-      line-height: 32px;
-      color: #666666;
+      font-size: 20px !important;
+      line-height: 32px !important;
+      color: #666666 !important;
       }
       .ps_text {
       font-family: Avenir-Roman;
@@ -160,6 +167,25 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       .button_gutter {
       margin-top: 330px !important;
       }
+      .image_gutter {
+      margin-top: 240px !important;
+      }
+      .backgroundFooter {
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+Illustration.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 600px 194px;
+      height: 194px;
+      width: 600px !important;
+      }
+      .column_img_name {
+      width: 500px !important;
+      height: 87px !important;
+      margin-top: -60px !important;
+      }
+      .columns-separator {
+      margin-top: 56px;
+      }
       }
       @media (min-width: 750px) {
       .header_column_image__logo {
@@ -167,10 +193,28 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       height: 38px !important;
       margin-top: 60px !important;
       }
+      .outer_grid {
+      max-width: 600px;
+      border: 1px solid #e0e0e0;
+      }
+      .column_img_name {
+      width: 500px !important;
+      height: 87px !important;
+      margin-top: -60px !important;
+      }
+      .backgroundFooter {
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+Illustration.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 100vw 194px;
+      height: 194px;
+      width: 600px !important;
+      margin-top: 90px;
+      }
       .header_statue_image__logo {
       width: auto !important;
       height: 391px !important;
-      margin-left: 600px;
+      margin-left: 264px;
       }
       .footer_column_image__logo {
       width: 100vw;
@@ -182,9 +226,6 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       .footer_signature__div {
       padding-top: 90px;
       }
-      .ps {
-      padding: 90px 60px;
-      }
       .footer {
       padding: 90px 60px;
       }
@@ -195,9 +236,9 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       font-family: Avenir-Roman;
       font-style: normal;
       font-weight: normal;
-      font-size: 20px;
-      line-height: 54px;
-      color: #666666;
+      font-size: 20px !important;
+      line-height: 54px !important;
+      color: #666666 !important;
       }
       .email__name {
       font-size: 24px;
@@ -216,6 +257,12 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       .button_gutter {
       margin-top: 330px !important;
       }
+      .image_gutter {
+      margin-top: 90px !important;
+      }
+      .columns-separator {
+      margin-top: 84px;
+      }
       }
       @media (prefers-color-scheme: dark) {
       .email__name,
@@ -223,66 +270,65 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       .email__footer-name,
       .email__subtext,
       .email__text {
-      color: #000000 !important;
-      -webkit-text-fill-color: #000000 !important;
+      color: #666666 !important;
+      -webkit-text-fill-color: #666666 !important;
       }
       }
   body(style="margin: 0; background-color: #f5f4f0; background-image: url('https://api.columnhq.com/static/images/noise.png'); background-repeat: repeat; font-family:Avenir-Roman;")
-    table(width='100%' border='0' cellspacing='0' cellpadding='0' role='presentation')
+    table(width='100%' cellpadding='0' cellspacing='0' border='0' align='center')
       tbody
         tr
-          td
-            .social_div
-              .header_column_image__div
-                img.header_column_image__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Logo.png')
-        tr
-          td
-            .faux-absolute-header
-              .faux-position-header
-                p.email__name Hi #{firstName},
-                p.email__title
-                  | Thank you so 
-                  br
-                  |                 much for
-                  br
-                  |                 applying to
-                  br
-                  |  join Column/.
-                p.email__text
-                  | Please be patient with us as we review applications. 
-                  br
-                  |                 There’s a long waiting list, and we will get to you! 
-                  br
-                  br
-                  |                 In meantime, you can read the public 
-                  br
-                  |                 conversations in Column/.
-            img.header_statue_image__logo(src='https://column-static.s3.us-east-2.amazonaws.com/statue.png')
-        tr
-          td
-            .social_div.button_gutter(style='text-align: left;')
-              .faux-absolute(style='margin-left: 80px')
-                .faux-position READ NEWSPAPER
-              img.central_button(src='https://column-static.s3.us-east-2.amazonaws.com/Shadow+Button.png')
-    .column_image(style='margin-top:90px')
-      .column_image__div
-        img.footer_column_image__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Columns+Illustration.png')
-    table(width='100%' border='0' cellspacing='0' cellpadding='0' role='presentation')
-      tbody
-        tr
-          td
-            .social_div(style='margin-top: 90px')
-              p.ps__text(style='min-width:150px')
-                span.ps__text_ps P.S. 
-                span If you’re very eager to join, there are ways to 
-                a.ps_text__link(href='undefined') skip to the front.
-        tr(style='text-align: left;')
-          td(style='text-align: left;')
-            .social_div(style='margin-top: 120px')
-              p.footer_yours_sincerely__text Yours sincerely,
-              img.footer_signature__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Signature.png')
-              p.footer_alina__text Alina Hart
-              p.footer_column_secretary__text Column/ Social Secretary
-          td(style='text-align: center;')
-            .footer_stamp__div
-              img.footer_stamp__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Circle+Stamp.png')
+          td(align='center')
+            table(align='center' border='0' cellpadding='0' cellspacing='0' width='600')
+              tbody
+                tr
+                  td(align='center')
+                    div(style='display: grid; place-items:center;')
+                      .outer_grid
+                        table(width='100%' border='0' cellspacing='0' cellpadding='0' role='presentation')
+                          tbody
+                            tr
+                              td
+                                .social_div
+                                  .header_column_image__div
+                                    img.header_column_image__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Logo.png')
+                            tr
+                              td
+                                .faux-absolute-header
+                                  .faux-position-header
+                                    p.email__title Welcome
+                                    p.ps_text
+                                      | Hi Jasmine, 
+                                      br
+                                      br
+                                      |                                 Welcome to Column/.
+                                      br
+                                      |                                 We look forward to the conversation.
+                                      br
+                                      |                                 Now that you’ve created a profile,
+                                      br
+                                      |                                 here are some more Columns you might enjoy:
+                                img.header_statue_image__logo(src='https://column-static.s3.us-east-2.amazonaws.com/statue.png')
+                        .column_image.image_gutter
+                          .backgroundFooter
+                        block central_content
+                        table(width='100%' border='0' cellspacing='0' cellpadding='0' role='presentation')
+                          tbody
+                            tr
+                              td
+                                block central_content_two
+                            tr
+                              td
+                                block button_content
+                        table
+                          tbody
+                            tr(style='text-align: left;')
+                              td(style='text-align: left;')
+                                .social_div(style='margin-top: 120px')
+                                  p.footer_yours_sincerely__text Yours sincerely,
+                                  img.footer_signature__logo(src='https://column-static.s3.us-east-2.amazonaws.com/signature.png')
+                                  p.footer_alina__text Alina Hart
+                                  p.footer_column_secretary__text Column/ Social Secretary
+                              td(style='text-align:right' width='100%')
+                                .footer_stamp__div(style='width:100%')
+                                  img.footer_stamp__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Circle+Stamp.png')

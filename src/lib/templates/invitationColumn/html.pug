@@ -6,7 +6,6 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
     meta(name='color-scheme' content='only')
     meta(name='supported-color-schemes' content='light')
     meta(name='x-apple-disable-message-reformatting')
-    link(href='https://column-static.s3.us-east-2.amazonaws.com/SchnyderM.woff' rel='stylesheet')
     style.
       @font-face {
       font-family: 'Avenir-Roman';
@@ -16,17 +15,8 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       }
       @font-face {
       font-family: 'SchnyderM';
-      src: url(https://column-static.s3.us-east-2.amazonaws.com/SchnyderM.woff) format('woff'),
-      url(https://column-static.s3.us-east-2.amazonaws.com/SchnyderM-Demi-Web.woff2) format('woff2');
-      font-weight: 600;
-      font-style: normal;
-      font-stretch: normal;
+      src: url('https://column-static.s3.us-east-2.amazonaws.com/SchnyderM.woff') format('woff');
       }
-      /*@font-face {
-      font-family: 'SchnyderM';
-      font-weight: 500;
-      font-style: normal;
-      }*/
       @font-face {
       font-family: 'SchnyderL-Bold-Web';
       src: url('https://column-static.s3.us-east-2.amazonaws.com/SchnyderL-Bold-Web.woff') format('woff'),
@@ -38,6 +28,9 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       width: 52px !important;
       height: 38px !important;
       margin-top: 60px !important;
+      }
+      a {
+      text-decoration: none;
       }
       .outer_grid {
       max-width: 600px;
@@ -202,10 +195,10 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       margin-top: 330px !important;
       }
       .image_gutter {
-      margin-top: 180px !important;
+      margin-top: 240px !important;
       }
       .backgroundFooter {
-      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+IllustrationJoined.png');
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+Illustration.png');
       background-repeat: no-repeat;
       background-position: center;
       background-size: 600px 194px;
@@ -217,7 +210,7 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       height: 87px !important;
       }
       .columns-separator {
-      margin-top: 56px;
+      margin-top: 72px;
       }
       }
       @media (min-width: 750px) {
@@ -235,7 +228,7 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       height: 87px !important;
       }
       .backgroundFooter {
-      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+IllustrationJoined.png');
+      background-image: url('https://column-static.s3.us-east-2.amazonaws.com/Columns+Illustration.png');
       background-repeat: no-repeat;
       background-position: center;
       background-size: 100vw 194px;
@@ -290,10 +283,10 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       margin-top: 330px !important;
       }
       .image_gutter {
-      margin-top: 120px !important;
+      margin-top: 90px !important;
       }
       .columns-separator {
-      margin-top: 84px;
+      margin-top: 24px;
       }
       }
       @media (prefers-color-scheme: dark) {
@@ -306,7 +299,7 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
       -webkit-text-fill-color: #666666 !important;
       }
       }
-  body(style="margin: 0;padding:0; background-color: #f5f4f0; background-image: url('https://api.columnhq.com/static/images/noise.png'); background-repeat: repeat; font-family:Avenir-Roman;")
+  body(style="margin: 0px;padding:0px; background-color: #f5f4f0; background-image: url('https://api.columnhq.com/static/images/noise.png'); background-repeat: repeat; font-family:Avenir-Roman;")
     table(width='100%' cellpadding='0' cellspacing='0' border='0' align='center' style='background-color:#f5f4f0;')
       tbody
         tr
@@ -343,37 +336,36 @@ html(xmlns='https://www.w3.org/1999/xhtml' style='color-scheme: only; supported-
                         .column_image.image_gutter
                           .backgroundFooter
                         div
-                          .faux-absolute-column(style='margin-left: 20px;')
-                            .faux-position-column #{columnName}
+                          .faux-absolute-column(style='margin-left: 20px')
+                            .faux-position-column  #{columnName}
                           .faux-absolute-column-text
-                            .faux-position-column-text #{columnMembers} members #{columnPosts} posts
-                          a(href=`${callToActionUrl}`)
-                            img.column_img_name(src='https://column-static.s3.us-east-2.amazonaws.com/BlankColumn.png')
+                            .faux-position-column-text #{columnMembers} members 365 posts
+                          img.column_img_name(src='https://column-static.s3.us-east-2.amazonaws.com/BlankColumn.png')
                         table(width='100%' border='0' cellspacing='0' cellpadding='0' role='presentation')
                           tbody
                             tr
                               td
-                                .social_div(style='margin-top: 90px;')
-                                  p.ps_text(style='min-width:150px;')
+                                .social_div(style='margin-top: 90px')
+                                  p.ps_text(style='min-width:150px')
                                     | Column/ is a new social network devoted to signal over noise, and each individual Column is meant to be the
                                     | best source of news, information, and conversation on that topic.
                                   p.ps_text Looking forward to seeing you there!
                             tr
                               td
-                                .social_div(style='text-align: left;')
-                                  .faux-absolute(style='margin-left: 90px;')
-                                    .faux-position JOIN COLUMN/
-                                  a(href=`${callToActionUrl}`)
+                                a(href=`${callToActionUrl}`)
+                                  .social_div(style='text-align: left;')
+                                    .faux-absolute(style='margin-left: 90px')
+                                      .faux-position JOIN COLUMN/
                                     img.central_button(src='https://column-static.s3.us-east-2.amazonaws.com/Shadow+Button.png')
                         table
                           tbody
                             tr(style='text-align: left;')
                               td(style='text-align: left;')
-                                .social_div(style='margin-top: 120px;')
+                                .social_div(style='margin-top: 120px')
                                   p.footer_yours_sincerely__text Yours sincerely,
-                                  img.footer_signature__logo(src='https://column-static.s3.us-east-2.amazonaws.com/signature.png')
+                                  img.footer_signature__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Signature.png')
                                   p.footer_alina__text Alina Hart
                                   p.footer_column_secretary__text Column/ Social Secretary
-                              td(style='text-align:right;' width='100%')
-                                .footer_stamp__div(style='width:100%;')
+                              td(style='text-align:right' width='100%')
+                                .footer_stamp__div(style='width:100%')
                                   img.footer_stamp__logo(src='https://column-static.s3.us-east-2.amazonaws.com/Circle+Stamp.png')
