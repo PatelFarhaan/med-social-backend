@@ -58,7 +58,7 @@ const sendEmail = async (to, locals, template) => {
       },
       locals: {
         // absoluteUrl: `${MOCK_SERVER_PROTOCOL}://${MOCK_SERVER_HOST}:${MOCK_SERVER_PORT}`,
-        absoluteUrl: 'https://api.columnhq.com',
+        absoluteUrl: 'https://api.joincolumn.com',
         ...locals
       }
     })
