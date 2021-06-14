@@ -39,6 +39,7 @@ const columnSchema = gql`
     PostCount: Int
     MemberCount: Int
     author: User
+    topPeople: User
   }
 
   enum columnVisibility {

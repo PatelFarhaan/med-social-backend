@@ -37,6 +37,8 @@ module.exports = (sequelize, DataTypes) => {
         field: 'muted_notification_categories'
       },
       settings: types.get('settings'),
+      vip: { type: DataTypes.BOOLEAN, defaultValue: false },
+      twitterUsername: { type: DataTypes.STRING },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt'),
       deactivatedAt: types.get('deactivatedAt')
@@ -96,6 +98,11 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     User.hasMany(models.Notification, { as: 'notificationAuthor' })
+
+    User.belongsToMany(models.Column, {
+      through: models.TopPeople,
+      as: 'topColumns'
+    })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {
