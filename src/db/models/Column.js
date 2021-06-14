@@ -63,6 +63,11 @@ module.exports = (sequelize, DataTypes) => {
     Column.hasMany(models.Post)
 
     Column.hasMany(models.ReportedContent)
+
+    Column.belongsToMany(models.User, {
+      through: models.TopPeople,
+      as: 'topPeople'
+    })
   }
 
   /* eslint-disable no-param-reassign */
