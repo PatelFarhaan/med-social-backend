@@ -23,7 +23,7 @@ const postSchema = gql`
     createComment(content: String!, id: Int!, files: [Upload]): Post
     createPostBookmark(id: Int!): Post
     deletePost(id: Int!): DefaultPayload
-    createPostVote(id: Int!, type: voteTypes): Post
+    createPostVote(id: Int!, type: voteTypes, points: Int!): Post
     editPost(id: Int!, content: String!): Post
     reportPost(id: Int!, reason: String!): DefaultPayload
     reviewPost(id: Int!, state: reportedContentStatuses!): DefaultPayload
