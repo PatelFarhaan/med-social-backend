@@ -41,9 +41,9 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
   const user = await User.build({ ...body, roleId })
 
   // Set default Profile Picture
-  const randomInt = getRandomInt(129)
-  const fileName = await encode(randomInt)
-  user.profilePicture = getS3URL(fileName)
+  // const randomInt = getRandomInt(129)
+  // const fileName = await encode(randomInt)
+  // user.profilePicture = getS3URL(fileName)
 
   // Check if user email is unique
   if ((await User.count({ where: { email } })) > 0) {
