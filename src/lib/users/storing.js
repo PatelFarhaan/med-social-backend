@@ -9,8 +9,8 @@ const { subscriptionStatuses } = require('../constants/subscription.constant')
 const { tokenTypes } = require('../constants/token.constant')
 const logger = require('../utils/logger')
 const { calculatePoints } = require('../services/reputation.service')
-const { encode } = require('../services/defaultImageNameGenerator.service')
 const { reputationSources } = require('../constants/reputation.constant')
+const { fileNames } = require('../constants/defaultProfileImages.constant')
 const previousAPIService = require('../services/previousAPI.service')
 const config = require('../../../config/config')
 
@@ -18,7 +18,7 @@ const BCRYPT_SALT_ROUNDS = 10
 
 const getRandomInt = max => Math.ceil(Math.random() * max)
 
-const getS3URL = fileName => `https://column-static.s3.us-east-2.amazonaws.com/default_images/${fileName}.png`
+const getS3URL = fileName => `https://column-static.s3.us-east-2.amazonaws.com/default_images/${fileName}`
 
 const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, Subscription = db.Subscription }) => {
   const { email, password, interests, expertises, passwordRepeat, roleId = 3, token, isSeed = false } = body
@@ -42,7 +42,7 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
 
   // Set default Profile Picture
   const randomInt = getRandomInt(129)
-  const fileName = await encode(randomInt)
+  const fileName = fileNames[randomInt]
   user.profilePicture = getS3URL(fileName)
 
   // Check if user email is unique
