@@ -1,3 +1,5 @@
+const types = require('../types')
+
 module.exports = (sequelize, DataTypes) => {
   const PseudoUser = sequelize.define(
     'PseudoUser',
@@ -12,14 +14,17 @@ module.exports = (sequelize, DataTypes) => {
       joinTime: { type: DataTypes.STRING(255), field: 'join_time' },
       tweets: { type: DataTypes.INTEGER, allowNull: false },
       following: { type: DataTypes.INTEGER, allowNull: false },
-      follwers: { type: DataTypes.INTEGER, allowNull: false },
+      followers: { type: DataTypes.INTEGER, allowNull: false },
       likes: { type: DataTypes.INTEGER },
       media: { type: DataTypes.INTEGER },
       private: { type: DataTypes.BOOLEAN, allowNull: false },
       verified: { type: DataTypes.BOOLEAN, allowNull: false },
       profileImageUrl: { type: DataTypes.TEXT, field: 'profile_image_url' },
       backgroundImage: { type: DataTypes.TEXT, field: 'background_image' },
-      active: { type: DataTypes.BOOLEAN, allowNull: true }
+      active: { type: DataTypes.BOOLEAN, allowNull: true },
+      createdAt: types.get('createdAt'),
+      updatedAt: types.get('updatedAt'),
+      deactivatedAt: types.get('deactivatedAt')
     },
     {
       freezeTableName: true
