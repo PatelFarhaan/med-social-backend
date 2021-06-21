@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     'PseudoUser',
     {
       username: { type: DataTypes.STRING(255), primaryKey: true, allowNull: false },
-      id: { type: DataTypes.INTEGER, allowNull: false },
+      id: { type: DataTypes.STRING(255), allowNull: false },
       name: { type: DataTypes.STRING(255) },
       bio: { type: DataTypes.TEXT },
       location: { type: DataTypes.TEXT },

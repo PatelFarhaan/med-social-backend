@@ -2,7 +2,7 @@
 
 CREATE TABLE "PseudoUser" (
     "username" character varying(255) NOT NULL PRIMARY KEY,
-    "id" integer NOT NULL,
+    "id" character varying(255) NOT NULL,
     "name" character varying(255) NOT NULL,
     "bio" TEXT,
     "location" TEXT,

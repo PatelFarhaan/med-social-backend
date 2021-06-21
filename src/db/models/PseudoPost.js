@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   const PseudoPost = sequelize.define(
     'PseudoPost',
     {
-      id: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+      id: { type: DataTypes.STRING(255), allowNull: false, primaryKey: true },
       conversationId: { type: DataTypes.STRING(255), field: 'conversation_id' },
       createdAt: { type: DataTypes.STRING(255), field: 'created_at' },
       date: { type: DataTypes.STRING(255) },

@@ -1,7 +1,7 @@
 -- rambler up
 
 CREATE TABLE "PseudoPost" (
-    "id" integer NOT NULL PRIMARY KEY,
+    "id" character varying(255) NOT NULL PRIMARY KEY,
     "conversation_id" character varying(255) NOT NULL,
     "created_at" character varying(255) NOT NULL,
     "date" character varying(255) NOT NULL,
