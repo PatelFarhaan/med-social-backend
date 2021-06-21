@@ -18,6 +18,10 @@ const postPublicFields = [
   'order',
   'stackParentId'
 ]
+
+const maxVotePoints = 50
+
 module.exports = {
-  postPublicFields
+  postPublicFields,
+  maxVotePoints
 }
