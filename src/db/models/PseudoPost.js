@@ -1,8 +1,8 @@
 const sanitizeHtml = require('sanitize-html')
 
 module.exports = (sequelize, DataTypes) => {
-  const PsuedoPost = sequelize.define(
-    'PsuedoPost',
+  const PseudoPost = sequelize.define(
+    'PseudoPost',
     {
       id: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
       conversationId: { type: DataTypes.STRING(255), field: 'conversation_id' },
@@ -45,23 +45,23 @@ module.exports = (sequelize, DataTypes) => {
     }
   )
 
-  PsuedoPost.addHook('beforeCreate', instance => {
+  PseudoPost.addHook('beforeCreate', instance => {
     instance.tweet = sanitizeHtml(instance.tweet)
   })
 
-  PsuedoPost.addHook('beforeBulkCreate', instances => {
+  PseudoPost.addHook('beforeBulkCreate', instances => {
     for (const instance of instances) {
       instance.tweet = sanitizeHtml(instance.tweet)
     }
   })
 
-  PsuedoPost.addHook('beforeSave', instance => {
+  PseudoPost.addHook('beforeSave', instance => {
     instance.tweet = sanitizeHtml(instance.tweet)
   })
 
-  PsuedoPost.addHook('beforeUpdate', instance => {
+  PseudoPost.addHook('beforeUpdate', instance => {
     instance.tweet = sanitizeHtml(instance.tweet)
   })
 
-  return PsuedoPost
+  return PseudoPost
 }

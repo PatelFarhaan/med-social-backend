@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  const PsuedoUser = sequelize.define(
-    'PsuedoUser',
+  const PseudoUser = sequelize.define(
+    'PseudoUser',
     {
       username: { type: DataTypes.STRING(255), primaryKey: true, allowNull: false },
       id: { type: DataTypes.INTEGER, allowNull: false },
@@ -18,11 +18,12 @@ module.exports = (sequelize, DataTypes) => {
       private: { type: DataTypes.BOOLEAN, allowNull: false },
       verified: { type: DataTypes.BOOLEAN, allowNull: false },
       profileImageUrl: { type: DataTypes.TEXT, field: 'profile_image_url' },
-      backgroundImage: { type: DataTypes.TEXT, field: 'background_image' }
+      backgroundImage: { type: DataTypes.TEXT, field: 'background_image' },
+      active: { type: DataTypes.BOOLEAN, allowNull: true }
     },
     {
       freezeTableName: true
     }
   )
-  return PsuedoUser
+  return PseudoUser
 }

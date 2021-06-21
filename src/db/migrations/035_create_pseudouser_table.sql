@@ -17,7 +17,8 @@ CREATE TABLE "PseudoUser" (
     "private" boolean NOT NULL,
     "verified" boolean NOT NULL,
     "profile_image_url" TEXT,
-    "background_image" TEXT
+    "background_image" TEXT,
+    "active" boolean NOT NULL DEFAULT TRUE
 );
 
 -- rambler down
