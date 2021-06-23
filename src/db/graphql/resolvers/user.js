@@ -8,7 +8,8 @@ const {
   signup,
   setPassword,
   resetPassword,
-  passwordChange
+  passwordChange,
+  updateNotificationSettings
 } = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
@@ -258,7 +259,12 @@ module.exports = {
     },
     passwordChange: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { oldPassword, newPassword }, { req }) =>
       passwordChange(req.user, oldPassword, newPassword)
-    )
+    ),
+    createUpdateUserNotificationSettings: async (_parent, args, { req }) => {
+      const { user } = req
+      const notificationSettings = await updateNotificationSettings(user.id, args)
+      return notificationSettings
+    }
   },
   User: {
     expertises: async (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
