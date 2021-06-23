@@ -269,6 +269,57 @@ const updatePrimaryUserRole = async (userId, roleId) => {
   })
 }
 
+const updateNotificationSettings = async (userId, settings) => {
+  const {
+    pushNotifications,
+    upVote,
+    downVote,
+    repliesAndQuotes,
+    bookmarks,
+    columns,
+    invitations,
+    yourReputation,
+    reminders,
+    admin
+  } = settings
+  const notification = await db.NotificationSettings.findOne({ where: { userId } })
+  let notificationSettingsToReturn = {}
+  try {
+    if (notification) {
+      notification.pushNotifications = pushNotifications
+      notification.upVote = upVote
+      notification.downVote = downVote
+      notification.repliesAndQuotes = repliesAndQuotes
+      notification.bookmarks = bookmarks
+      notification.columns = columns
+      notification.invitations = invitations
+      notification.yourReputation = yourReputation
+      notification.reminders = reminders
+      notification.admin = admin
+      await notification.save()
+      notificationSettingsToReturn = { ...notification }
+    } else {
+      const newNotificationSettings = await db.NotificationSettings.create({
+        pushNotifications,
+        upVote,
+        downVote,
+        repliesAndQuotes,
+        bookmarks,
+        columns,
+        invitations,
+        yourReputation,
+        reminders,
+        admin,
+        userId
+      })
+      notificationSettingsToReturn = { ...newNotificationSettings }
+    }
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+  return notificationSettingsToReturn
+}
+
 module.exports = {
   signup,
   authenticate,
@@ -279,5 +330,6 @@ module.exports = {
   updateUser,
   updatePrimaryUserRole,
   authenticateToken,
-  passwordChange
+  passwordChange,
+  updateNotificationSettings
 }
