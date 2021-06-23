@@ -71,8 +71,38 @@ const userSchema = gql`
     setPassword(password: String!): User
     resetPassword(password: String!, token: String!): User
     passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
+    createUpdateUserNotificationSettings(settings: SettingsInput!): Settings
   }
 
+  input SettingsInput {
+    pushNotifications: Boolean!
+    upVote: Boolean!
+    downVote: Boolean!
+    repliesAndQuotes: Boolean!
+    bookmarks: Boolean!
+    columns: Boolean!
+    invitations: Boolean!
+    yourReputation: Boolean!
+    reminders: Boolean!
+    admin: Boolean!
+  }
+
+  type Settings {
+    id: ID!
+    pushNotifications: Boolean!
+    upVote: Boolean!
+    downVote: Boolean!
+    repliesAndQuotes: Boolean!
+    bookmarks: Boolean!
+    columns: Boolean!
+    invitations: Boolean!
+    yourReputation: Boolean!
+    reminders: Boolean!
+    admin: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    userId: ID!
+  }
   type Users {
     list: [User]
     count: Int!
