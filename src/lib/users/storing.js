@@ -284,7 +284,7 @@ const updatePrimaryUserRole = async (userId, roleId) => {
   })
 }
 
-const updateNotificationSetting = async (userId, { settings }) => {
+const updateNotificationSetting = async (UserId, { settings }) => {
   const {
     pushNotifications,
     upVote,
@@ -297,7 +297,8 @@ const updateNotificationSetting = async (userId, { settings }) => {
     reminders,
     admin
   } = settings
-  const notification = await db.NotificationSetting.findOne({ where: { userId } })
+  const notification = await db.NotificationSetting.findOne({ where: { UserId } })
+  // console.log({ notification })
   try {
     if (notification) {
       notification.pushNotifications = pushNotifications
