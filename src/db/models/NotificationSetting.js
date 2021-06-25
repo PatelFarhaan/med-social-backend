@@ -2,7 +2,7 @@ const types = require('../types')
 
 module.exports = (sequelize, DataTypes) => {
   const NotificationSetting = sequelize.define(
-    'NotificationSettings',
+    'NotificationSetting',
     {
       id: types.get('id'),
       pushNotifications: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
