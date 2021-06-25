@@ -2,7 +2,7 @@
 -- Name: NotificationSettings; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE "NotificationSettings" (
+CREATE TABLE "NotificationSetting" (
     id serial NOT NULL PRIMARY KEY,
     "pushNotifications" BOOLEAN DEFAULT TRUE,
     "upVote" BOOLEAN DEFAULT TRUE,
@@ -20,4 +20,4 @@ CREATE TABLE "NotificationSettings" (
 );
 
 -- rambler down
-DROP TABLE "NotificationSettings";
+DROP TABLE "NotificationSetting";

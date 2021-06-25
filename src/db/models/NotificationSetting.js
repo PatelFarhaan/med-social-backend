@@ -1,7 +1,7 @@
 const types = require('../types')
 
 module.exports = (sequelize, DataTypes) => {
-  const NotificationSettings = sequelize.define(
+  const NotificationSetting = sequelize.define(
     'NotificationSettings',
     {
       id: types.get('id'),
@@ -23,9 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   )
 
-  NotificationSettings.associate = models => {
-    NotificationSettings.belongsTo(models.User)
+  NotificationSetting.associate = models => {
+    NotificationSetting.belongsTo(models.User)
   }
 
-  return NotificationSettings
+  return NotificationSetting
 }

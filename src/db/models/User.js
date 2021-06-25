@@ -49,13 +49,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   User.associate = models => {
-    User.hasOne(models.NotificationSettings, {
-      foreignKey: {
-        type: DataTypes.UUIDV4,
-        allowNull: false,
-        name: 'userId'
-      }
-    })
+    User.hasOne(models.NotificationSetting)
 
     User.belongsTo(models.Role, {
       as: 'role',
