@@ -9,7 +9,7 @@ const {
   setPassword,
   resetPassword,
   passwordChange,
-  updateNotificationSettings
+  updateNotificationSetting
 } = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
@@ -260,11 +260,11 @@ module.exports = {
     passwordChange: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { oldPassword, newPassword }, { req }) =>
       passwordChange(req.user, oldPassword, newPassword)
     ),
-    createUpdateUserNotificationSettings: async (_parent, args, { req }) => {
+    updateUserNotificationSetting: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
       const { user } = req
-      const notificationSettings = await updateNotificationSettings(user.id, args)
+      const notificationSettings = await updateNotificationSetting(user.id, args)
       return notificationSettings
-    }
+    })
   },
   User: {
     expertises: async (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
@@ -280,6 +280,10 @@ module.exports = {
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    notificationSetting: (user, _args, { db }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getNotificationSetting()
     }
   },
   UserExpertise: {
