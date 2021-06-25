@@ -71,7 +71,7 @@ const userSchema = gql`
     setPassword(password: String!): User
     resetPassword(password: String!, token: String!): User
     passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
-    createUpdateUserNotificationSettings(settings: SettingsInput!): Settings
+    updateUserNotificationSetting(settings: SettingsInput!): NotificationSetting
   }
 
   input SettingsInput {
@@ -87,7 +87,7 @@ const userSchema = gql`
     admin: Boolean!
   }
 
-  type Settings {
+  type NotificationSetting {
     id: ID!
     pushNotifications: Boolean!
     upVote: Boolean!
@@ -159,6 +159,7 @@ const userSchema = gql`
     invitedBy: [User]
     userExpertises: [UserExpertise]
     paymentMethod: UserPaymentMethod
+    notificationSetting: NotificationSetting
   }
 `
 
