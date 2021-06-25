@@ -101,7 +101,7 @@ const userSchema = gql`
     admin: Boolean!
     createdAt: String!
     updatedAt: String!
-    userId: ID!
+    UserId: ID!
   }
   type Users {
     list: [User]
