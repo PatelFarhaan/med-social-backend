@@ -60,6 +60,21 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
   try {
     // Save
     savedUser = await user.save()
+    const notificationSetting = await db.NotificationSetting.create({
+      UserId: savedUser.id,
+      pushNotifications: true,
+      upVote: true,
+      downVote: true,
+      repliesAndQuotes: true,
+      bookmarks: true,
+      columns: true,
+      invitations: true,
+      yourReputation: true,
+      reminders: true,
+      admin: true
+    })
+
+    savedUser = { ...savedUser, notificationSetting }
 
     if (interests) {
       const dbInterests = await db.Interest.findAll({ where: { id: interests } })
@@ -269,7 +284,7 @@ const updatePrimaryUserRole = async (userId, roleId) => {
   })
 }
 
-const updateNotificationSettings = async (userId, settings) => {
+const updateNotificationSetting = async (userId, { settings }) => {
   const {
     pushNotifications,
     upVote,
@@ -282,8 +297,7 @@ const updateNotificationSettings = async (userId, settings) => {
     reminders,
     admin
   } = settings
-  const notification = await db.NotificationSettings.findOne({ where: { userId } })
-  let notificationSettingsToReturn = {}
+  const notification = await db.NotificationSetting.findOne({ where: { userId } })
   try {
     if (notification) {
       notification.pushNotifications = pushNotifications
@@ -297,27 +311,11 @@ const updateNotificationSettings = async (userId, settings) => {
       notification.reminders = reminders
       notification.admin = admin
       await notification.save()
-      notificationSettingsToReturn = { ...notification }
-    } else {
-      const newNotificationSettings = await db.NotificationSettings.create({
-        pushNotifications,
-        upVote,
-        downVote,
-        repliesAndQuotes,
-        bookmarks,
-        columns,
-        invitations,
-        yourReputation,
-        reminders,
-        admin,
-        userId
-      })
-      notificationSettingsToReturn = { ...newNotificationSettings }
     }
   } catch (e) {
     logger.warn(`updatePrimaryUserRole ${e}`)
   }
-  return notificationSettingsToReturn
+  return notification
 }
 
 module.exports = {
@@ -331,5 +329,5 @@ module.exports = {
   updatePrimaryUserRole,
   authenticateToken,
   passwordChange,
-  updateNotificationSettings
+  updateNotificationSetting
 }
