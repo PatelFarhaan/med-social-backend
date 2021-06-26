@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUIDV4
       },
       lookupId: types.get('lookupId'),
-      email: { type: DataTypes.STRING, allowNull: false, validate: { min: 3 } },
+      email: { type: DataTypes.STRING, validate: { min: 3 } },
       firstName: { type: DataTypes.STRING, field: 'first_name' },
       lastName: { type: DataTypes.STRING, field: 'last_name' },
       fullName: { type: DataTypes.STRING },

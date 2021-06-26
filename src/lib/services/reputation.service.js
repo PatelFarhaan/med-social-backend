@@ -67,17 +67,6 @@ const calculateDeletedPostByModerator = async (post, Reputation = db.Reputation)
   return 0
 }
 
-// const reputationPoints = async (userExpertise, post, author, voteValue) => ({
-//   [reputationSources.ONBOARDED]: 100,
-//   [reputationSources.POSTED]: 1,
-//   [reputationSources.BOOKMARKED]: 10,
-//   [reputationSources.OPENED_COLUMN]: 100,
-//   [reputationSources.DELETED_POST_BY_MODERATOR]: await calculateDeletedPostByModerator(post),
-//   [reputationSources.DELETED_REPORTED_POST_BY_MODERATOR]: await calculateReportedPostDeletedByModerator(post),
-//   [reputationSources.VOTED]: await calculateVotedPoints(userExpertise, post, author, voteValue),
-//   [reputationSources.PROVIDED_BY_ADMIN]: 0
-// })
-
 const reputationPoints = async (userExpertise, post, author, voteValue, source) => {
   switch (source) {
     case reputationSources.ONBOARDED:
@@ -123,9 +112,9 @@ const calculatePoints = async (
   const reputation = await Reputation.create({
     UserExpertiseId: userExpertise.id,
     value: points,
-    PostId: post.id,
-    authorId: author.id,
-    ColumnSlug: column.slug,
+    PostId: post ? post.id : null,
+    authorId: author ? author.id : null,
+    ColumnSlug: column ? column.slug : null,
     source
   })
 
