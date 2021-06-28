@@ -298,7 +298,6 @@ const updateNotificationSetting = async (UserId, { settings }) => {
     admin
   } = settings
   const notification = await db.NotificationSetting.findOne({ where: { UserId } })
-  // console.log({ notification })
   try {
     if (notification) {
       notification.pushNotifications = pushNotifications
