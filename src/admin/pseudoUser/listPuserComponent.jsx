@@ -1,9 +1,9 @@
-import { useRecords } from 'admin-bro'
+import { useRecords, RecordsTable } from 'admin-bro'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Box, Pagination, Text } from '@admin-bro/design-system'
 import React, { useEffect } from 'react'
 
-const NO_OF_COLUMNS = 4
+const NO_OF_COLUMNS = 5
 
 // Each object in derivedProperties represents a column whose value is derived from other resources.
 const derivedProperties = [
@@ -27,7 +27,7 @@ const derivedProperties = [
   }
 ]
 
-function listPuserComponent(props) {
+const listPuserComponent = props => {
   const { records, loading, direction, sortBy, page, total, perPage } = useRecords(props.resource.id)
   useEffect(() => {
     if (props.resource.listProperties.length === NO_OF_COLUMNS) {
@@ -76,8 +76,6 @@ function listPuserComponent(props) {
     search.set('page', pageNumber.toString())
     history.push({ search: search.toString() })
   }
-
-  console.log(props.resource.listProperties)
 
   return (
     <Box variant="white">

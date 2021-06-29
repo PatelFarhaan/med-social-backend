@@ -189,7 +189,9 @@ const ViewPostsComponent = props => {
     <Layout>
       <Container>
         <CardContainer>
-          <ApproveUser onClick={() => approveUser(records[0]?.params.username)}>Approve User</ApproveUser>
+          {records[0]?.params.active ? null : (
+            <ApproveUser onClick={() => approveUser(records[0]?.params.username)}>Approve User</ApproveUser>
+          )}
           {records &&
             records.map((record, key) => (
               <Card key={key}>

@@ -6,7 +6,7 @@ const PER_PAGE_LIMIT = 500
 
 const options = {
   editProperties: ['url'],
-  listProperties: ['name', 'posts', 'columns', 'expertises'],
+  listProperties: ['name', 'active', 'posts', 'columns', 'expertises'],
   actions: {
     new: {
       isVisible: true,
