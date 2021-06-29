@@ -171,6 +171,18 @@ const subscribeToColumn = async ({ body }, user, Subscription = db.Subscription)
       throw new Error(JSON.stringify({ status: 400, message: 'Stripe Subscription creation was cancelled' }))
     }
   }
+
+  if (user.vip) {
+    const columnTopPosters = await column.getTopPosters()
+    if (columnTopPosters.length < 3) {
+      await column.addTopPoster(user, { through: { order: columnTopPosters.length + 1 } })
+    } else {
+      const lastTopPoster = columnTopPosters[2]
+      await column.removeTopPoster(lastTopPoster)
+      await column.addTopPoster(user, { through: { order: 3 } })
+    }
+  }
+
   return subscription
 }
 

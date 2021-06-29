@@ -73,9 +73,11 @@ module.exports = {
         message: 'Email Sent'
       }
     },
-    getUser: async (_parent, { id }, { db, req }) => {
+    getUser: async (_parent, { id, username }, { db, req }) => {
+      if (!id && !username) throw new Error(JSON.stringify({ status: 400, message: 'id or username is required' }))
       const attributes = req.user && req.user.id === id ? privateFields : publicFields
-      const user = await db.User.findOne({ where: { id }, attributes })
+      const where = id ? { id } : { username }
+      const user = await db.User.findOne({ where, attributes })
       if (!user) throw new Error(JSON.stringify({ status: 404, message: 'Id provided is not valid' }))
       return user
     },

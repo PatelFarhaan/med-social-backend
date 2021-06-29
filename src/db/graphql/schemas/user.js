@@ -3,7 +3,7 @@ const { gql } = require('apollo-server-express')
 const userSchema = gql`
   type Query {
     login(email: String!, password: String, token: String): Session
-    getUser(id: String!): User
+    getUser(id: String, username: String): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
     resetPasswordLink(email: String!): DefaultPayload

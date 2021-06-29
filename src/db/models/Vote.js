@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       id: types.get('id'),
       type: { type: DataTypes.ENUM(Object.keys(voteTypes)), allowNull: false, defaultValue: voteTypes.UP },
+      points: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt')
     },

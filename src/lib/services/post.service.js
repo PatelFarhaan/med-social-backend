@@ -9,6 +9,7 @@ const { calculatePoints } = require('./reputation.service')
 const { reputationSources } = require('../constants/reputation.constant')
 const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
 const { notify } = require('./notification.service')
+const { maxVotePoints } = require('../constants/post.constant')
 
 const LIMIT = 50
 
@@ -475,17 +476,17 @@ const uploadFileToPost = async ({ body: { id, files = [] } }, Post = db.Post) =>
   return DBpost
 }
 
-const updateVoteValue = async (voteType, post) => {
+const updateVoteValue = async (voteType, points, post) => {
   if (voteType === 'UP') {
-    await post.increment('votes', { by: 1 })
-    return 1
+    await post.increment('votes', { by: points })
+    return points
   }
-  await post.decrement('votes', { by: 1 })
-  return -1
+  await post.decrement('votes', { by: points })
+  return -1 * points
 }
 
 const votePost = async (
-  { body: { id, type } },
+  { body: { id, type, points } },
   user,
   Post = db.Post,
   Vote = db.Vote,
@@ -496,6 +497,7 @@ const votePost = async (
   let post
   try {
     let voteValue = 0
+    if (points > maxVotePoints) throw new Error({ status: 400, message: 'Max points to be given is only up to 50' })
     post = await Post.findByPk(id)
     if (!post) throw new Error({ status: 404, message: 'Post not found' })
     const existingVote = await Vote.findOne({ where: { PostId: post.id, UserId: user.id } })
@@ -520,11 +522,12 @@ const votePost = async (
         }
       })
       if (existingVote.type === type) {
+        await updateVoteValue(type, -1 * points, post)
         await existingVote.destroy()
       } else {
         existingVote.type = type
         await existingVote.save()
-        voteValue = await updateVoteValue(type, post)
+        voteValue = await updateVoteValue(type, points, post)
         // TODO: Refactor this after the 0.5 release to adhere with DRY
         await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
         if (voteValue > 0 && postAuthor.id !== user.id) {
@@ -544,8 +547,8 @@ const votePost = async (
         }
       }
     } else {
-      await post.addUserVote(user, { through: { type } })
-      voteValue = await updateVoteValue(type, post)
+      await post.addUserVote(user, { through: { type, points } })
+      voteValue = await updateVoteValue(type, points, post)
       await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
       if (voteValue > 0 && postAuthor.id !== user.id) {
         await notify(
