@@ -1,7 +1,7 @@
 const db = require('../../db/models')
 // const logger = require('../utils/logger')
 
-const approvePost = async (conversationId, ColumnSlug, loaderOpts) => {
+const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   const pseudoPosts = await db.PseudoPost.findAll({
     where: { conversationId },
     order: [['created_at', 'ASC']],

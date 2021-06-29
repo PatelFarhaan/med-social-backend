@@ -1,3 +1,4 @@
+const axios = require('axios')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const { reputationSources } = require('../constants/reputation.constant')
@@ -42,6 +43,33 @@ const approveUser = async (username, body, loaderOpts) => {
   return savedUser
 }
 
+const addPseudoUser = async url => {
+  console.log(url)
+  const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
+  console.log(_handle)
+  await axios.post('http://host.docker.internal/pusers', {
+    handle: _handle
+  })
+  return 'success'
+}
+
+const fetchPseudoUsersList = async () => db.PseudoUser.findAll()
+
+const fetchPostCountByUserName = async (record, _username) => {
+  record.params.posts = await db.PseudoPost.count({ where: { username: _username.toLowerCase() } })
+  if (!record.params.active) {
+    record.params.columns = 0
+    record.params.expertises = 0
+  } else if (record.params.active) {
+    record.params.columns = 1
+    record.params.expertises = 1
+  }
+  return { record }
+}
+
 module.exports = {
-  approveUser
+  approveUser,
+  addPseudoUser,
+  fetchPseudoUsersList,
+  fetchPostCountByUserName
 }
