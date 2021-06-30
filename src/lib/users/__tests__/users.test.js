@@ -18,6 +18,8 @@ const getUserDefaults = async () => {
 
 describe('Users', () => {
   afterAll(async () => {
+    const user = await db.User.findOne({ where: { email: 'sam-dev@fakenodeapp.com' } })
+    await db.NotificationSetting.destroy({ where: { UserId: user.id } })
     await db.User.destroy({ where: { email: 'sam-dev@fakenodeapp.com' } })
     await teardownDb()
   })
@@ -28,7 +30,9 @@ describe('Users', () => {
     delete signupParams.password
     const user = await signup({ body: signupParams })
     expect(user).not.toBeNull()
-    return user.destroy()
+    const userToDestory = await db.User.findOne({ where: { email: 'sam-dev@fakenodeapp.com' } })
+    await db.NotificationSetting.destroy({ where: { UserId: userToDestory.id } })
+    await userToDestory.destroy()
   })
 
   test('It should not be able to sign up a user without passwordRepeat', async () => {
@@ -50,7 +54,8 @@ describe('Users', () => {
     })
     expect(!user.password)
     expect(user.hash.length).toBe(60)
-    return user.destroy()
+    await db.NotificationSetting.destroy({ where: { UserId: user.id } })
+    await user.destroy()
   })
 
   test('It should not allow duplicate users', async () => {
@@ -64,7 +69,8 @@ describe('Users', () => {
     }).catch(e => {
       expect(e.message).toMatch('already')
     })
-    return user.destroy()
+    await db.NotificationSetting.destroy({ where: { UserId: user.id } })
+    await user.destroy()
   })
 
   test('It should authenticate properly', async () => {
@@ -93,7 +99,8 @@ describe('Users', () => {
     const user = await authenticate(email, password)
     expect(user.email).toBe(email)
     const retrievedUser = await db.User.findOne({ where: { email } })
-    return retrievedUser.destroy()
+    await db.NotificationSetting.destroy({ where: { UserId: user.id } })
+    await retrievedUser.destroy()
   })
 
   test('It should be able to check a role', () => {
@@ -121,6 +128,7 @@ describe('Users', () => {
     })
     expect(user.hash.length).toBe(60)
     expect(!!exportSafeUser(user).hash).toBe(false)
+    await db.NotificationSetting.destroy({ where: { UserId: user.id } })
     await user.destroy()
   })
 
