@@ -1,197 +1,84 @@
 import { useRecords } from 'admin-bro'
 import axios from 'axios'
-import React from 'react'
-import styled from 'styled-components'
+import { useEffect, useState } from 'react'
+import {
+  ApproveUser,
+  Delete,
+  Left,
+  Right,
+  Post,
+  Select,
+  ButtonBar,
+  CardText,
+  CardTitle,
+  CardContent,
+  CardImage,
+  Card,
+  CardContainer,
+  Container,
+  Layout
+} from './viewPostsComponentStyles'
 
-const ApproveUser = styled.button`
-  color: #fff;
-  padding: 0.8rem;
-  font-size: 14px;
-  text-transform: uppercase;
-  border-radius: 4px;
-  font-weight: 400;
-  display: block;
-  width: 40%;
-  cursor: pointer;
-  border: 1px solid rgba(61, 143, 68, 1);
-  background: #3d8f44;
-  &:hover {
-    background-color: rgba(61, 143, 68, 0.9);
-  }
-  margin-bottom: 20px;
-  justify-self: flex-end;
-`
-
-const Delete = styled.button`
-  color: #3d8f44;
-  padding: 0.8rem;
-  font-size: 14px;
-  text-transform: uppercase;
-  border-radius: 4px;
-  font-weight: 400;
-  display: block;
-  width: 50%;
-  cursor: pointer;
-  border: 1px solid rgba(61, 143, 68, 1);
-  background: transparent;
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.75);
-  }
-`
-
-const Left = styled.div`
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-`
-
-const Post = styled.button`
-  color: #fff;
-  padding: 0.8rem;
-  font-size: 14px;
-  text-transform: uppercase;
-  border-radius: 4px;
-  font-weight: 400;
-  display: block;
-  width: 50%;
-  cursor: pointer;
-  border: none;
-  background: #3d8f44;
-  &:hover {
-    background-color: rgba(61, 143, 68, 0.9);
-  }
-`
-const Select = styled.div`
-  margin-bottom: 10px;
-  select {
-    height: 20px;
-  }
-`
-const Right = styled.div`
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-`
-
-const ButtonBar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const CardText = styled.p`
-  color: #000;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin-bottom: 1.25rem;
-  font-weight: 400;
-`
-
-const CardTitle = styled.h2`
-  color: #000;
-  font-size: 1.1rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: capitalize;
-  margin: 0px;
-`
-
-const CardContent = styled.div`
-  padding: 1rem;
-`
-
-const CardImage = styled.img`
-  height: auto;
-  max-width: 40%;
-  vertical-align: middle;
-`
-
-const Card = styled.div`
-  border: 1px solid rgba(61, 143, 68, 1);
-
-  background: #fdfbf7;
-  a {
-    color: #f9f9f9;
-    text-decoration: none;
-  }
-  border-radius: 0.25rem;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-  margin-bottom: 20px;
-  width: auto;
-`
-
-const CardContainer = styled.li`
-  a {
-    color: #f9f9f9;
-    text-decoration: none;
-  }
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  justify-content: space-between;
-  width: auto;
-`
-
-const Container = styled.ul`
-  display: flex;
-  flex-wrap: wrap;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-`
-
-const Layout = styled.div`
-  /* max-width: 1200px; */
-  margin: 0 auto;
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  html {
-    background-color: #ecf9ff;
-  }
-
-  body {
-    color: #272727;
-    font-family: 'Quicksand', serif;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: 0;
-    padding: 1rem;
-  }
-`
 const ViewPostsComponent = props => {
   const { records } = useRecords(props.resource.id)
+  const [columns, setColumns] = useState([])
 
   const approveUser = async username => {
-    const response = await axios.get(`http://localhost:3005/admin/api/resources/PseudoUser/records/${username}/approveUser`)
-    console.log(response.data)
+    await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/PseudoUser/records/${username}/approveUser`)
     // eslint-disable-next-line no-undef
     window.location.reload(false)
   }
 
   const deleteUser = async id => {
-    const response = await axios.get(`http://localhost:3005/admin/api/resources/PseudoPost/records/${id}/delete`)
-    console.log(response.data)
+    await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/records/${id}/delete`)
     // eslint-disable-next-line no-undef
     window.location.reload(false)
   }
 
-  const changeSelect = e => {
-    console.log(e.target.value)
+  useEffect(() => {
+    const getColumns = async () => {
+      const response = await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/Column/actions/list`)
+      setColumns(response.data.records)
+    }
+
+    getColumns()
+  }, [])
+
+  const changeSelect = (id, e) => {
+    /**
+     * fetch record using id
+     * insert into record object; column
+     */
+    records.forEach(record => {
+      if (record.params.id === id) {
+        record.params.column = e.target.value
+      }
+    })
   }
 
+  const post = id => {
+    /**
+     * fetch record using id
+     * get column and conversationId from the record
+     * iff column is present hit api
+     */
+    records.forEach(async record => {
+      if (record.params.id === id && record.params.column) {
+        await axios.get(
+          `${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/records/${id}/approvePost?slug=${
+            record.params.column
+          }&conversationId=${record.params.conversationId}`
+        )
+        // eslint-disable-next-line no-undef
+        window.location.reload(false)
+      }
+    })
+  }
   return (
     <Layout>
       <Container>
         <CardContainer>
-          {records[0]?.params.active ? null : (
-            <ApproveUser onClick={() => approveUser(records[0]?.params.username)}>Approve User</ApproveUser>
-          )}
+          <ApproveUser onClick={() => approveUser(records[0]?.params.username)}>Approve User</ApproveUser>
           {records &&
             records.map((record, key) => (
               <Card key={key}>
@@ -205,15 +92,19 @@ const ViewPostsComponent = props => {
                     </Left>
                     <Right>
                       <Select>
-                        <select defaultValue="default" onChange={changeSelect}>
-                          <option value="default" disabled>
+                        <select defaultValue="default" onChange={e => changeSelect(record?.params.id, e)}>
+                          <option value="default" disabled={true}>
                             Choose where to post
                           </option>
-                          <option value="column">Column</option>
-                          <option value="square">Square</option>
+                          {columns &&
+                            columns?.map((column, i) => (
+                              <option key={i} value={column.params.slug}>
+                                {column.params.name}
+                              </option>
+                            ))}
                         </select>
                       </Select>
-                      <Post> Post </Post>
+                      <Post onClick={() => post(record?.params.id)}> Post </Post>
                     </Right>
                   </ButtonBar>
                 </CardContent>

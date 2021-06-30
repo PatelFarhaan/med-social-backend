@@ -12,8 +12,7 @@ const options = {
       isVisible: true,
       handler: async (request, _, context) => {
         const { url } = request.fields
-        const { h, resource, currentAdmin } = context
-        console.log(currentAdmin)
+        const { h, resource } = context
         await pseudoUserService.addPseudoUser(url)
         return {
           record: request.fields.url,
@@ -40,13 +39,7 @@ const options = {
         }
         page = Number(page) || 1
 
-        // const listProperties = resource.decorate().getListProperties()
-        // const firstProperty = listProperties.find(p => p.isSortable())
         const sort = { direction: 'asc', sortBy: 'id' }
-        // if (firstProperty) {
-        //   sort = sortSetter({ sortBy, direction }, firstProperty.name(), resource.decorate().options)
-        // }
-
         const filter = await new Filter(filters, resource).populate()
         const records = await resource.find(filter, {
           limit: perPage,
@@ -85,8 +78,7 @@ const options = {
         return {
           redirectUrl: `PseudoPost?filters.username=${params.username}`,
           records: [],
-          record: context.record.toJSON(context.currentAdmin),
-          notice: { type: 'success', message: 'message' }
+          record: context.record.toJSON(context.currentAdmin)
         }
       },
       component: false
@@ -96,8 +88,7 @@ const options = {
       isVisible: true,
       handler: async (_, __, context) => ({
         records: [],
-        record: context.record.toJSON(context.currentAdmin),
-        notice: { type: 'success', message: 'message' }
+        record: context.record.toJSON(context.currentAdmin)
       }),
       component: AdminBro.bundle('./listPpostComponent.jsx')
     },

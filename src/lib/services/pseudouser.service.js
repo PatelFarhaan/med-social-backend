@@ -44,10 +44,8 @@ const approveUser = async (username, body, loaderOpts) => {
 }
 
 const addPseudoUser = async url => {
-  console.log(url)
   const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
-  console.log(_handle)
-  await axios.post('http://host.docker.internal/pusers', {
+  await axios.post(`${process.env.RESEARCH_APP}/pusers`, {
     handle: _handle
   })
   return 'success'

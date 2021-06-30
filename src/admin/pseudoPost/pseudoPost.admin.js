@@ -1,5 +1,6 @@
 const { default: AdminBro } = require('admin-bro')
 const { flat, Filter } = require('admin-bro')
+const { approvePost } = require('../../lib/services/pseudopost.service')
 
 const PER_PAGE_LIMIT = 500
 
@@ -17,6 +18,9 @@ const options = {
     },
     list: {
       isVisible: true,
+      custom: {
+        baseUrl: process.env.BASE_URL
+      },
       handler: async (request, _, context) => {
         const { query } = request
         const { filters = {} } = flat.unflatten(query || {})
@@ -52,7 +56,26 @@ const options = {
         }
       },
       component: AdminBro.bundle('./viewPostsComponent.jsx')
+    },
+    approvePost: {
+      isVisible: false,
+      actionType: 'record',
+      handler: async (request, _, context) => {
+        const { h, resource } = context
+        const { slug, conversationId } = request.query
+        await approvePost(conversationId, slug)
+        return {
+          record: context.record.toJSON(context.currentAdmin),
+          redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
+          notice: {
+            message: 'Successfully Posted',
+            type: 'success'
+          }
+        }
+      },
+      component: false
     }
   }
 }
+
 module.exports = options
