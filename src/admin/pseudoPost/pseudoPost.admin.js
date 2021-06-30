@@ -41,7 +41,6 @@ const options = {
           offset: (page - 1) * perPage,
           sort
         })
-
         context.records = records
         const total = await resource.count(filter)
         return {

@@ -27,7 +27,7 @@ export const Delete = styled.button`
   border-radius: 4px;
   font-weight: 400;
   display: block;
-  width: 50%;
+  width: 120px;
   cursor: pointer;
   border: 1px solid rgba(61, 143, 68, 1);
   background: transparent;
@@ -37,7 +37,7 @@ export const Delete = styled.button`
 `
 
 export const Left = styled.div`
-  width: 50%;
+  width: 300px;
   display: flex;
   flex-direction: column;
 `
@@ -95,6 +95,7 @@ export const CardTitle = styled.h2`
 
 export const CardContent = styled.div`
   padding: 1rem;
+  width: 100%;
 `
 
 export const CardImage = styled.img`
