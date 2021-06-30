@@ -109,22 +109,23 @@ describe('Post Service', () => {
     })
 
     test('It should create a vote for a post when valid parameters are passed', async () => {
-      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP' } }, user2)
+      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP', points: 1 } }, user2)
       const postVotes = await post.getUserVotes()
       expect(postVotes.length).toBe(1)
       expect(post.votes).toBe(1)
       expect(postVotes[0].Vote.type).toBe('UP')
       const reputationCount = await db.Reputation.count({ PostId: post.id, source: reputationSources.VOTED })
       expect(reputationCount).toBe(1)
-      const notifications = await db.Notification.findAll({})
+      const notifications = await db.Notification.findAll()
       expect(notifications.length).toBe(1)
       const notificationReceipients = await notifications[0].getReceipients()
       expect(notificationReceipients.length).toBe(1)
     })
 
     test('It should delete the vote for a post if it already exists', async () => {
-      await db.Vote.create({ postId: defaultPost.id, userId: user.id, type: 'UP' })
-      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP' } }, user)
+      // await db.Vote.create({ postId: defaultPost.id, userId: user.id, type: 'UP', points: 1 })
+      await postService.votePost({ body: { id: defaultPost.id, type: 'UP', points: 1 } }, user)
+      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'UP', points: 1 } }, user)
       const postVotes = await post.getUserVotes()
       expect(postVotes.length).toBe(0)
       expect(post.votes).toBe(0)
@@ -135,8 +136,9 @@ describe('Post Service', () => {
     })
 
     test('It should update the original vote for the post if it has a different vote type and create a new one', async () => {
-      await db.Vote.create({ postId: defaultPost.id, userId: user.id, type: 'UP' })
-      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'DOWN' } }, user)
+      // await db.Vote.create({ postId: defaultPost.id, userId: user.id, type: 'UP' })
+      await postService.votePost({ body: { id: defaultPost.id, type: 'UP', points: 1 } }, user)
+      const post = await postService.votePost({ body: { id: defaultPost.id, type: 'DOWN', points: 2 } }, user)
       const postVotes = await post.getUserVotes()
       expect(postVotes.length).toBe(1)
       expect(postVotes[0].Vote.type).toBe('DOWN')
