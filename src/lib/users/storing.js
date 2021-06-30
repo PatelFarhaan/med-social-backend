@@ -74,7 +74,8 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
       admin: true
     })
 
-    savedUser = { ...savedUser, notificationSetting }
+    savedUser.notificationSetting = notificationSetting
+    await savedUser.save()
 
     if (interests) {
       const dbInterests = await db.Interest.findAll({ where: { id: interests } })
