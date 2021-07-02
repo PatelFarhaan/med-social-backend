@@ -9,7 +9,12 @@ const {
   setPassword,
   resetPassword,
   passwordChange,
-  updateNotificationSetting
+  updateNotificationSetting,
+  updateSocialLink,
+  addCustomLink,
+  updateCustomLink,
+  deleteCustomLink,
+  updateTitle
 } = require('../../../lib/users')
 const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
@@ -207,18 +212,26 @@ module.exports = {
       return savedUser
     }),
     // eslint-disable-next-line camelcase
-    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email, profile_description }, { req, db }) => {
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(
       // eslint-disable-next-line camelcase
-      if (!email && !profile_description)
-        throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
+      async (_parent, { email, title, profile_description, social_link, custom_link }, { req, db }) => {
+        // eslint-disable-next-line camelcase
+        if (!email && !profile_description)
+          throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
 
-      const updatePayload = {}
-      if (email) updatePayload.email = email
-      // eslint-disable-next-line camelcase
-      if (profile_description) updatePayload.profileDescription = profile_description
-      const updatedUser = await db.User.update(updatePayload, { where: { id: req.user.id }, returning: true, plain: true })
-      return updatedUser[1]
-    }),
+        const updatePayload = {}
+        if (email) updatePayload.email = email
+        if (title) updatePayload.title = title
+        // eslint-disable-next-line camelcase
+        if (profile_description) updatePayload.profileDescription = profile_description
+        // eslint-disable-next-line camelcase
+        if (social_link) updatePayload.socialLink = social_link
+        // eslint-disable-next-line camelcase
+        if (custom_link) updatePayload.customLink = custom_link
+        const updatedUser = await db.User.update(updatePayload, { where: { id: req.user.id }, returning: true, plain: true })
+        return updatedUser[1]
+      }
+    ),
     createUser: async (_parent, body) => {
       const user = await signup({ body, roleId: '3' })
       const tokens = await tokenService.generateAuthTokens(user)
@@ -264,6 +277,31 @@ module.exports = {
       const { user } = req
       const notificationSettings = await updateNotificationSetting(user.id, args)
       return notificationSettings
+    }),
+    updateUserSocialLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const upadatedUser = await updateSocialLink(user.id, args)
+      return upadatedUser
+    }),
+    addUserCustomLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await addCustomLink(user.id, args)
+      return updatedUser
+    }),
+    updateUserCustomLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await updateCustomLink(user.id, args)
+      return updatedUser
+    }),
+    deleteUserCustomLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await deleteCustomLink(user.id, args)
+      return updatedUser
+    }),
+    updateUserTitle: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await updateTitle(user.id, args)
+      return updatedUser
     })
   },
   User: {
