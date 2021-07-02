@@ -60,6 +60,21 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
   try {
     // Save
     savedUser = await user.save()
+    const notificationSetting = await db.NotificationSetting.create({
+      UserId: savedUser.id,
+      pushNotifications: true,
+      upVote: true,
+      downVote: true,
+      repliesAndQuotes: true,
+      bookmarks: true,
+      columns: true,
+      invitations: true,
+      yourReputation: true,
+      reminders: true,
+      admin: true
+    })
+
+    savedUser = { ...savedUser, notificationSetting }
 
     if (interests) {
       const dbInterests = await db.Interest.findAll({ where: { id: interests } })
@@ -269,6 +284,40 @@ const updatePrimaryUserRole = async (userId, roleId) => {
   })
 }
 
+const updateNotificationSetting = async (UserId, { settings }) => {
+  const {
+    pushNotifications,
+    upVote,
+    downVote,
+    repliesAndQuotes,
+    bookmarks,
+    columns,
+    invitations,
+    yourReputation,
+    reminders,
+    admin
+  } = settings
+  const notification = await db.NotificationSetting.findOne({ where: { UserId } })
+  try {
+    if (notification) {
+      notification.pushNotifications = pushNotifications
+      notification.upVote = upVote
+      notification.downVote = downVote
+      notification.repliesAndQuotes = repliesAndQuotes
+      notification.bookmarks = bookmarks
+      notification.columns = columns
+      notification.invitations = invitations
+      notification.yourReputation = yourReputation
+      notification.reminders = reminders
+      notification.admin = admin
+      await notification.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+  return notification
+}
+
 module.exports = {
   signup,
   authenticate,
@@ -279,5 +328,6 @@ module.exports = {
   updateUser,
   updatePrimaryUserRole,
   authenticateToken,
-  passwordChange
+  passwordChange,
+  updateNotificationSetting
 }

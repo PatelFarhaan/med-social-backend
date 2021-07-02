@@ -1,0 +1,22 @@
+.font_size{
+    font-size:46px;
+    line-height:56px;
+    }
+    .button_link{
+    padding: 14px 115px;
+    }
+    .left_buffer{
+    margin:auto;
+    }
+    @media only screen and (max-width: 600px){
+    .font_size{
+    font-size:32px;
+    line-height:40px;
+    }
+    .button_link{
+    padding: 14px 64px
+    }
+    .left_buffer{
+    margin-left:20px;
+    }
+    }
