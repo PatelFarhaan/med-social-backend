@@ -198,7 +198,7 @@ const userSchema = gql`
     notificationSetting: NotificationSetting
     title: String
     socialLink: SocialLink
-    customLink: CustomLink
+    customLink: [CustomLink]
   }
 `
 
