@@ -43,8 +43,13 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: types.get('updatedAt'),
       deactivatedAt: types.get('deactivatedAt'),
       title: { type: DataTypes.STRING },
-      socialLink: { type: DataTypes.JSONB, field: 'social_link', defaultValue: { twitter: '', facebook: '', linkedin: '', instagram: '' } },
-      customLink: { type: DataTypes.JSONB, field: 'custom_link', defaultValue: [] }
+      socialLink: {
+        type: DataTypes.JSONB,
+        field: 'social_link',
+        allowNull: false,
+        defaultValue: {}
+      },
+      customLink: { type: DataTypes.JSONB, field: 'custom_link', allowNull: false, defaultValue: [] }
     },
     {
       freezeTableName: true
