@@ -38,13 +38,7 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
   }
 
   // if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
-  const user = await User.build({
-    ...body,
-    roleId,
-    title: '',
-    socialLink: { twitter: '', facebook: '', linkedin: '', instagram: '' },
-    customLink: []
-  })
+  const user = await User.build({ ...body, roleId })
 
   // Set default Profile Picture
   const randomInt = getRandomInt(129)
@@ -80,8 +74,7 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
       admin: true
     })
 
-    savedUser.notificationSetting = notificationSetting
-    await savedUser.save()
+    savedUser = { ...savedUser, notificationSetting }
 
     if (interests) {
       const dbInterests = await db.Interest.findAll({ where: { id: interests } })
@@ -325,75 +318,6 @@ const updateNotificationSetting = async (UserId, { settings }) => {
   return notification
 }
 
-const updateSocialLink = async (userId, { socialLink }) => {
-  const user = db.User.findByPk(userId)
-  try {
-    if (user) {
-      user.socialLink = socialLink
-      await user.save()
-    }
-  } catch (e) {
-    logger.warn(`updatePrimaryUserRole ${e}`)
-  }
-  return user
-}
-
-const addCustomLink = async (userId, { newLink }) => {
-  const user = db.User.findByPk(userId)
-  newLink.linkId = `${new Date()}`
-  try {
-    if (user) {
-      user.customLink = [...user.customLink, newLink]
-      await user.save()
-    }
-  } catch (e) {
-    logger.warn(`updatePrimaryUserRole ${e}`)
-  }
-  return user
-}
-
-const updateCustomLink = async (userId, { link }) => {
-  const user = db.User.findByPk(userId)
-  try {
-    if (user) {
-      const linkIndex = user.customLink.findIndex(item => item.linkId === link.linkId)
-      if (linkIndex !== -1) {
-        user.customLink[linkIndex] = link
-        await user.save()
-      }
-    }
-  } catch (e) {
-    logger.warn(`updatePrimaryUserRole ${e}`)
-  }
-  return user
-}
-
-const deleteCustomLink = async (userId, { link }) => {
-  const user = db.User.findByPk(userId)
-  try {
-    if (user) {
-      const linkIndex = user.customLink.findIndex(item => item.linkId === link.linkId)
-      if (linkIndex !== -1) {
-        user.customLink.splice(linkIndex, 1)
-        await user.save()
-      }
-    }
-  } catch (e) {
-    logger.warn(`updatePrimaryUserRole ${e}`)
-  }
-  return user
-}
-
-const updateTitle = async (userId, { title }) => {
-  const user = db.User.findByPk(userId)
-  try {
-    user.title = title
-    await user.save()
-  } catch (e) {
-    logger.warn(`updatePrimaryUserRole ${e}`)
-  }
-}
-
 module.exports = {
   signup,
   authenticate,
@@ -405,10 +329,5 @@ module.exports = {
   updatePrimaryUserRole,
   authenticateToken,
   passwordChange,
-  updateNotificationSetting,
-  updateSocialLink,
-  addCustomLink,
-  updateCustomLink,
-  deleteCustomLink,
-  updateTitle
+  updateNotificationSetting
 }

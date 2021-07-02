@@ -27,9 +27,6 @@ CREATE TABLE "User" (
     "linkedin_user_id" character varying(150),
     "twitter_user_id" character varying(150),
     "deactivatedAt" timestamptz,
-    "title" character varying(255),
-    "social_link" jsonb NOT NULL DEFAULT '{}',
-    "custom_link" jsonb NOT NULL DEFAULT '[]',
     "createdAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz,
     "updatedAt" timestamptz NOT NULL DEFAULT timezone('utc', now())::timestamptz
 );
