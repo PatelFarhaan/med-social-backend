@@ -29,7 +29,7 @@ const options = {
         if (perPage) {
           perPage = +perPage > PER_PAGE_LIMIT ? PER_PAGE_LIMIT : +perPage
         } else {
-          perPage = 10 // default
+          perPage = PER_PAGE_LIMIT
         }
         page = Number(page) || 1
 
@@ -54,7 +54,7 @@ const options = {
           records: records.map(r => r.toJSON(context.currentAdmin))
         }
       },
-      component: AdminBro.bundle('./viewPostsComponent.jsx')
+      component: AdminBro.bundle('./components/ViewPosts/ViewPostsComponent.jsx')
     },
     approvePost: {
       isVisible: false,

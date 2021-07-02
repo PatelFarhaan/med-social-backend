@@ -1,5 +1,11 @@
 import styled from 'styled-components'
 
+export const Buttons = styled.button`
+  display: flex;
+  flex-direction: row;
+  background-color: red;
+`
+
 export const ApproveUser = styled.button`
   color: #fff;
   padding: 0.8rem;
@@ -15,6 +21,22 @@ export const ApproveUser = styled.button`
   &:hover {
     background-color: rgba(61, 143, 68, 0.9);
   }
+  margin-bottom: 20px;
+  justify-self: flex-end;
+`
+
+export const UserApproved = styled.button`
+  color: #fff;
+  padding: 0.8rem;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  font-weight: 400;
+  display: block;
+  width: 40%;
+  cursor: not-allowed;
+  border: 1px solid rgba(61, 143, 68, 1);
+  background: #77a97c;
   margin-bottom: 20px;
   justify-self: flex-end;
 `
@@ -50,7 +72,8 @@ export const Post = styled.button`
   border-radius: 4px;
   font-weight: 400;
   display: block;
-  width: 50%;
+  width: 200px;
+  margin-right: 16px;
   cursor: pointer;
   border: none;
   background: #3d8f44;
@@ -65,7 +88,7 @@ export const Select = styled.div`
   }
 `
 export const Right = styled.div`
-  width: 50%;
+  width: 60%;
   display: flex;
   flex-direction: column;
 `

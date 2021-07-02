@@ -38,7 +38,6 @@ const options = {
           perPage = 10 // default
         }
         page = Number(page) || 1
-
         const sort = { direction: 'asc', sortBy: 'id' }
         const filter = await new Filter(filters, resource).populate()
         const records = await resource.find(filter, {
@@ -115,6 +114,18 @@ const options = {
           }
         }
       },
+      component: false
+    },
+    getUser: {
+      isVisible: true,
+      actionType: 'record',
+      handler: async (_, __, context) => ({
+        record: context.record.toJSON(context.currentAdmin),
+        notice: {
+          message: 'Successfully Posted',
+          type: 'success'
+        }
+      }),
       component: false
     }
   }
