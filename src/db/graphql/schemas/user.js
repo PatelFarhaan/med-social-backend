@@ -71,8 +71,38 @@ const userSchema = gql`
     setPassword(password: String!): User
     resetPassword(password: String!, token: String!): User
     passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
+    updateUserNotificationSetting(settings: SettingsInput!): NotificationSetting
   }
 
+  input SettingsInput {
+    pushNotifications: Boolean!
+    upVote: Boolean!
+    downVote: Boolean!
+    repliesAndQuotes: Boolean!
+    bookmarks: Boolean!
+    columns: Boolean!
+    invitations: Boolean!
+    yourReputation: Boolean!
+    reminders: Boolean!
+    admin: Boolean!
+  }
+
+  type NotificationSetting {
+    id: ID!
+    pushNotifications: Boolean!
+    upVote: Boolean!
+    downVote: Boolean!
+    repliesAndQuotes: Boolean!
+    bookmarks: Boolean!
+    columns: Boolean!
+    invitations: Boolean!
+    yourReputation: Boolean!
+    reminders: Boolean!
+    admin: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    UserId: ID!
+  }
   type Users {
     list: [User]
     count: Int!
@@ -129,6 +159,7 @@ const userSchema = gql`
     invitedBy: [User]
     userExpertises: [UserExpertise]
     paymentMethod: UserPaymentMethod
+    notificationSetting: NotificationSetting
   }
 `
 
