@@ -24,7 +24,8 @@ module.exports = (sequelize, DataTypes) => {
       active: { type: DataTypes.BOOLEAN, allowNull: true },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt'),
-      deactivatedAt: types.get('deactivatedAt')
+      deactivatedAt: types.get('deactivatedAt'),
+      expertises: { type: DataTypes.JSONB, defaultValue: [] }
     },
     {
       freezeTableName: true
