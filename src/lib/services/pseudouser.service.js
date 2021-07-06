@@ -77,7 +77,8 @@ const updatePUserExpertise = async ({ username, expertises }) => {
   } catch (e) {
     logger.warn(`updatePUserExpertise ${e}`)
   }
-  return pseudoUser.expertises
+  const pseudoUserExpertises = await db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
+  return pseudoUserExpertises
 }
 
 module.exports = {
