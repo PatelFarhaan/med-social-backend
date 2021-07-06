@@ -365,3 +365,5 @@ const Check = () => (
     />
   </svg>
 )
+
+export default Select

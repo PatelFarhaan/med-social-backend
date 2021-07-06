@@ -53,7 +53,7 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
       <Modal show={show}>
         <ModalHeader>
           <ModalText>
-            <Name>{user.username} is not Approved</Name>
+            <Name errorText>{user.username} is not Approved</Name>
             <Name>Choose expertises and approve user</Name>
           </ModalText>
           <Close onClick={handleClose}>Close</Close>
@@ -69,7 +69,9 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
               multiple
             />
           </Multiselect>
-          <ApproveUser onClick={() => approveUser(user.username)}>Approve User</ApproveUser>
+          <ApproveUser onClick={() => approveUser(user.username)} disabled={!selectedExpertises.length}>
+            Approve User
+          </ApproveUser>
         </ModalContent>
       </Modal>
     </ModalContainer>

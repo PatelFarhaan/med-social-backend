@@ -16,14 +16,24 @@ export const ApproveUser = styled.button`
   font-weight: 400;
   display: block;
   width: 40%;
-  cursor: pointer;
   border: 1px solid rgba(61, 143, 68, 1);
-  background: #3d8f44;
-  &:hover {
-    background-color: rgba(61, 143, 68, 0.9);
-  }
   margin-bottom: 20px;
   justify-self: flex-end;
+  ${props =>
+    props.disabled &&
+    `
+    background: #77a97c;
+    cursor: default;
+  `}
+  ${props =>
+    !props.disabled &&
+    `
+    cursor: pointer;
+    background: #3d8f44;
+    &:hover {
+      background-color: rgba(61, 143, 68, 0.9);
+    }
+  `}
 `
 
 export const Save = styled.button`
@@ -79,19 +89,17 @@ export const ModalContent = styled.div`
 `
 
 export const Name = styled.div`
-  color: #000;
+  color: ${({ errorText }) => (errorText ? 'red' : '#000')};
   font-size: 1.1rem;
   font-weight: normal;
   letter-spacing: 1px;
   text-transform: capitalize;
-  margin: 0px;
+  margin-bottom: 16px;
 `
 
 export const ModalHeader = styled.div`
   display: flex;
   flex-direction: row;
-  height: 40px;
-  width: auto;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
