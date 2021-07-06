@@ -1,11 +1,11 @@
 import styled from 'styled-components'
 
-export const Buttons = styled.button`
+export const Buttons = styled.div`
   display: flex;
   flex-direction: row;
-  background-color: red;
+  width: 100%;
+  justify-content: space-between;
 `
-
 export const ApproveUser = styled.button`
   color: #fff;
   padding: 0.8rem;
@@ -72,8 +72,7 @@ export const Post = styled.button`
   border-radius: 4px;
   font-weight: 400;
   display: block;
-  width: 200px;
-  margin-right: 16px;
+  width: 240px;
   cursor: pointer;
   border: none;
   background: #3d8f44;

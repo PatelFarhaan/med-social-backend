@@ -1,7 +1,8 @@
 import { useRecords } from 'admin-bro'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { useLocation } from 'react-router-dom'
+
 import {
   ApproveUser,
   UserApproved,
@@ -18,7 +19,8 @@ import {
   Card,
   CardContainer,
   Container,
-  Layout
+  Layout,
+  Buttons
 } from './ViewPostsComponentStyles'
 
 import ShowThreadsComponent from '../ShowThreads/ShowThreadsComponent'
@@ -31,12 +33,7 @@ const ViewPostsComponent = props => {
   const [modal, setModal] = useState(false)
   const [notApproved, setNotApproved] = useState(false)
   const [conversationId, setConversationId] = useState(0)
-
-  const approveUser = async username => {
-    await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/PseudoUser/records/${username}/approveUser`)
-    // eslint-disable-next-line no-undef
-    window.location.reload(false)
-  }
+  const location = useLocation()
 
   const deleteUser = async id => {
     await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/records/${id}/delete`)
@@ -65,17 +62,13 @@ const ViewPostsComponent = props => {
     setNotApproved(true)
   }
 
-  const Buttons = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-  `
-
   useEffect(() => {
     const getColumns = async () => {
       const response = await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/Column/actions/list`)
       setColumns(response.data.records)
+    }
+    if (location.search.indexOf('approve=true') !== -1) {
+      setNotApproved(true)
     }
 
     getColumns()
@@ -149,7 +142,7 @@ const ViewPostsComponent = props => {
             <UserApproved disabled>User Approved</UserApproved>
           ) : (
             <>
-              <ApproveUser onClick={() => approveUser(records[0]?.params.username)}>Approve User</ApproveUser>
+              <ApproveUser onClick={showNotApproved}>Approve User</ApproveUser>
             </>
           )}
           {records &&

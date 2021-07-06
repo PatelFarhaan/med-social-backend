@@ -1,5 +1,12 @@
 import styled from 'styled-components'
 
+export const Multiselect = styled.div`
+  margin-bottom: 20px;
+`
+export const ModalText = styled.div`
+  line-height: 22px;
+`
+
 export const ApproveUser = styled.button`
   color: #fff;
   padding: 0.8rem;
@@ -126,7 +133,7 @@ export const Modal = styled.section`
   position: fixed;
   background: white;
   width: 80%;
-  height: 30%;
+  height: 50%;
   min-height: 200px;
   top: 50%;
   left: 50%;

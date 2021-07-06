@@ -75,24 +75,56 @@ const options = {
         } = context
 
         return {
-          redirectUrl: `PseudoPost?filters.username=${params.username}`,
+          redirectUrl: `/admin/resources/PseudoPost?filters.username=${params.username}`,
           records: [],
           record: context.record.toJSON(context.currentAdmin)
         }
       },
       component: false
     },
-    show: {
+    viewProfile: {
       actionType: 'record',
       isVisible: true,
+      custom: {
+        baseUrl: process.env.BASE_URL
+      },
       handler: async (_, __, context) => ({
         records: [],
         record: context.record.toJSON(context.currentAdmin)
       }),
-      component: AdminBro.bundle('./listPpostComponent.jsx')
+      component: AdminBro.bundle('./components/Profile/Profile.jsx')
+    },
+    approve: {
+      actionType: 'record',
+      isVisible: true,
+      handler: async (_, __, context) => {
+        const {
+          h,
+          resource,
+          record: { params }
+        } = context
+        if (!params.active) {
+          return {
+            redirectUrl: `/admin/resources/PseudoPost?filters.username=${params.username}&approve=true`,
+            records: [],
+            record: context.record.toJSON(context.currentAdmin)
+          }
+        }
+        return {
+          redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
+          records: [],
+          record: context.record.toJSON(context.currentAdmin),
+          notice: {
+            message: 'Already approved',
+            type: 'success'
+          }
+        }
+      },
+      component: false
     },
     approveUser: {
       actionType: 'record',
+      isVisible: false,
       handler: async (_req, _res, context) => {
         const {
           record: { params },
@@ -100,10 +132,12 @@ const options = {
           resource,
           currentAdmin
         } = context
+        params.expertises = _req.headers.expertises.split(',').map(x => +x)
 
         // Need to delete this as it violates insert query for User table.
         // This should be fixed at service level inside approveUser
         delete params.id
+
         await pseudoUserService.approveUser(params.username, params)
         return {
           record: context.record.toJSON(currentAdmin),
@@ -117,7 +151,22 @@ const options = {
       component: false
     },
     getUser: {
-      isVisible: true,
+      isVisible: false,
+      actionType: 'record',
+      handler: async (_, __, context) => ({
+        record: context.record.toJSON(context.currentAdmin),
+        notice: {
+          message: 'Successfully Posted',
+          type: 'success'
+        }
+      }),
+      component: false
+    },
+    edit: {
+      isVisible: false
+    },
+    show: {
+      isVisible: false,
       actionType: 'record',
       handler: async (_, __, context) => ({
         record: context.record.toJSON(context.currentAdmin),
