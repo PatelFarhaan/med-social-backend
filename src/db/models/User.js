@@ -41,7 +41,15 @@ module.exports = (sequelize, DataTypes) => {
       twitterUsername: { type: DataTypes.STRING },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt'),
-      deactivatedAt: types.get('deactivatedAt')
+      deactivatedAt: types.get('deactivatedAt'),
+      title: { type: DataTypes.STRING },
+      socialLink: {
+        type: DataTypes.JSONB,
+        field: 'social_link',
+        allowNull: false,
+        defaultValue: {}
+      },
+      customLink: { type: DataTypes.JSONB, field: 'custom_link', allowNull: false, defaultValue: [] }
     },
     {
       freezeTableName: true
