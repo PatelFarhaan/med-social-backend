@@ -85,7 +85,7 @@ const ViewPostsComponent = props => {
       }
       getUser(records[0]?.params.username)
     },
-    [records]
+    [records, props.location]
   )
 
   const changeSelect = (id, e) => {

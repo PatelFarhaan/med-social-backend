@@ -24,11 +24,22 @@ export const Container = styled.div`
   height: 70%;
 `
 
-export const Image = styled.img`
+export const Image = styled.div`
   height: 200px;
   width: 200px;
   border-radius: 50%;
+  position: relative;
+  overflow: hidden;
   margin-bottom: 54px;
+  display: flex;
+  justify-content: center;
+
+  img {
+    display: inline;
+    margin: 0 auto;
+    height: 100%;
+    width: auto;
+  }
 `
 
 export const Bio = styled.div`

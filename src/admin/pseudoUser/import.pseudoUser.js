@@ -133,7 +133,13 @@ const options = {
           currentAdmin
         } = context
         params.expertises = _req.headers.expertises.split(',').map(x => +x)
-
+        params.firstName = params.name.substr(0, params.name.indexOf(' '))
+        params.lastName = params.name.substr(params.name.indexOf(' ') + 1)
+        if (!params.firstName) {
+          params.firstName = params.name
+          params.lastName = null
+        }
+        params.fullName = params.name
         // Need to delete this as it violates insert query for User table.
         // This should be fixed at service level inside approveUser
         delete params.id
