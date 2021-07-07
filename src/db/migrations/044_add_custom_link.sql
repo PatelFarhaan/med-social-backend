@@ -1,7 +1,0 @@
--- rambler up
-ALTER TABLE "User"
-ADD COLUMN "custom_link" jsonb DEFAULT '[]';
-
--- rambler down
-ALTER TABLE "User"
-DROP COLUMN "custom_link";
