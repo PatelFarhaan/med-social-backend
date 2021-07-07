@@ -25,7 +25,7 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
         expertises: _expertises
       }
     })
-    history.push(`/admin/resources/PseudoPost?filters.username=${username}`)
+    history.push(`/admin/resources/PseudoPost?filters.username=${username}&refresh=true`)
     handleClose()
   }
 
