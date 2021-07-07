@@ -35,7 +35,8 @@ CREATE TABLE "PseudoPost" (
     "retweet_date" TEXT,
     "translate" TEXT,
     "trans_src" TEXT,
-    "trans_dest" TEXT
+    "trans_dest" TEXT,
+    "approved_post_id" serial
 );
 
 -- rambler down

@@ -38,7 +38,8 @@ module.exports = (sequelize, DataTypes) => {
       retweetDate: { type: DataTypes.TEXT, field: 'retweet_date' },
       translate: { type: DataTypes.TEXT },
       transSrc: { type: DataTypes.TEXT, field: 'trans_src' },
-      transDest: { type: DataTypes.TEXT, field: 'trans_dest' }
+      transDest: { type: DataTypes.TEXT, field: 'trans_dest' },
+      approvedPostId: { type: DataTypes.INTEGER, field: 'approved_post_id' }
     },
     {
       freezeTableName: true
