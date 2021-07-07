@@ -14,8 +14,8 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
     where: { twitterUsername: pseudoPosts[0].username }
   })
 
-  const postPromises = pseudoPosts.map(async (pseudoPost, index) =>
-    db.Post.create({
+  const postPromises = pseudoPosts.map(async (pseudoPost, index) => {
+    const post = await db.Post.create({
       ColumnSlug,
       content: pseudoPost.tweet,
       isStacked: pseudoPosts.length !== 1,
@@ -27,8 +27,11 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
       comments: 0,
       author
     })
-  )
-  return Promise.all(postPromises)
+    pseudoPost.approvedPostId = post.id
+    await pseudoPost.save()
+    return post
+  })
+  return postPromises
 }
 
 module.exports = {
