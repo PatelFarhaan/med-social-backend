@@ -3,6 +3,7 @@ const { postService } = require('../../../lib/services')
 const { exportSafeModel } = require('../../../lib/utils/exportSafeModel')
 const { can } = require('./../auth')
 const { postPublicFields } = require('../../../lib/constants/post.constant')
+const { getTopPostsForNewspaper } = require('../../../lib/services/post.service')
 
 module.exports = {
   Query: {
@@ -48,6 +49,10 @@ module.exports = {
     searchPosts: async (_parent, { query, page, limit }, { db }) => {
       const posts = await db.Post.search(query, page, limit)
       return posts[0]
+    },
+    getTopPosts: async (_parent, { start, end }) => {
+      const posts = await getTopPostsForNewspaper(start, end)
+      return posts
     }
   },
   Mutation: {

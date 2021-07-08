@@ -658,6 +658,22 @@ const notifyMentionedUser = async (post, mentionedUsers) => {
   )
 }
 
+const getTopPostsForNewspaper = async (start, end) => {
+  const startDate = new Date(start)
+  const endDate = new Date(end)
+  console.log(startDate, endDate, startDate.toISOString(), endDate.toISOString())
+  const posts = await db.Post.findAll({
+    where: {
+      createdAt: {
+        [Op.between]: [startDate.toISOString(), endDate.toISOString()]
+      }
+    },
+    order: [['votes', 'DESC']],
+    limit: 15
+  })
+  return posts
+}
+
 module.exports = {
   getPost,
   listColumnPosts,
@@ -672,5 +688,6 @@ module.exports = {
   reviewReportedPost,
   uploadFileToPost,
   listUserAuthoredPosts,
-  listUserBookmarks
+  listUserBookmarks,
+  getTopPostsForNewspaper
 }

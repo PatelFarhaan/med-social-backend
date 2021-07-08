@@ -8,6 +8,7 @@ const postSchema = gql`
     listUserBookmarks(id: String!, page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
     listUserPosts(page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
     searchPosts(query: String!, page: Int, limit: Int): [Post]
+    getTopPosts(start: String!, end: String!): [Post]
   }
 
   type Mutation {
