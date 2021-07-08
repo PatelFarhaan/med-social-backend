@@ -132,6 +132,19 @@ describe('Users', () => {
     await user.destroy()
   })
 
+  test('It should update notification settings', async () => {
+    const signupParams = await getUserDefaults()
+    const user = await signup({
+      body: signupParams
+    })
+    const notificationSetting = await db.NotificationSetting.findOne({ where: { UserId: user.id } })
+    notificationSetting.pushNotifications = true
+    await notificationSetting.save()
+    expect(notificationSetting.pushNotifications).toBe(true)
+    await db.NotificationSetting.destroy({ where: { UserId: user.id } })
+    await user.destroy()
+  })
+
   test('It should allow user archiving', async () => {
     expect.assertions(2)
     const signupParams = await getUserDefaults()
