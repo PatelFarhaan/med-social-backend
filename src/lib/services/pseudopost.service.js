@@ -25,7 +25,8 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
       order: index + 1,
       votes: 0,
       comments: 0,
-      author_id: author.id
+      author_id: author.id,
+      pseudoPost: true
     })
   )
   return Promise.all(postPromises)

@@ -122,6 +122,41 @@ const ViewPostsComponent = props => {
       }
     })
   }
+
+  const replaceUrl = (tweet, params) => {
+    /**
+     * 1. Find N; N is the number of urls to be replaced
+     * 2. If N === 0; return original tweet
+     * 2. For Nth replacement, replace the substr with the url.n key from the params
+     * 3. return processed tweet
+     */
+
+    const n = (tweet.match(/https:\/\/t.co/g) || []).length
+    let refinedTweet = tweet
+    if (!n) {
+      return refinedTweet
+    }
+    let i = 0
+    while (i < n) {
+      const preString = 'https://t.co/'
+      const searchString = ' '
+      const preIndex = refinedTweet.indexOf(preString)
+      const searchIndex = preIndex + refinedTweet.substring(preIndex).indexOf(searchString)
+      if (preIndex > searchIndex) {
+        refinedTweet = refinedTweet.replace(refinedTweet.substring(preIndex), params[`urls.${i}`])
+      } else {
+        refinedTweet = refinedTweet.replace(refinedTweet.substring(preIndex, searchIndex), params[`urls.${i}`])
+      }
+      i += 1
+    }
+    return refinedTweet
+  }
+
+  const formatHtml = content => {
+    const reg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g
+    return content.replace(reg, "<a href='$1$2' target='_blank' rel='noopener noreferrer'>$1$2</a>")
+  }
+
   return (
     <Layout>
       <Container>
@@ -152,7 +187,7 @@ const ViewPostsComponent = props => {
                   {/* <CardImage src="https://picsum.photos/500/300/?image=10" /> */}
                   <CardContent>
                     <CardTitle>{record.params.username}</CardTitle>
-                    <CardText>{record.params.tweet}</CardText>
+                    <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
                     <ButtonBar>
                       <Left>
                         <Delete onClick={() => deleteUser(record?.params.id)}>Delete</Delete>

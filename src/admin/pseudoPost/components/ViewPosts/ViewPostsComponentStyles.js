@@ -104,6 +104,9 @@ export const CardText = styled.p`
   line-height: 1.5;
   margin-bottom: 1.25rem;
   font-weight: 400;
+  a {
+    color: blue;
+  }
 `
 
 export const CardTitle = styled.h2`
@@ -130,7 +133,7 @@ export const Card = styled.div`
   border: 1px solid rgba(61, 143, 68, 1);
   background: #fdfbf7;
   a {
-    color: #f9f9f9;
+    color: blue;
     text-decoration: none;
   }
   border-radius: 0.25rem;
@@ -143,7 +146,7 @@ export const Card = styled.div`
 
 export const CardContainer = styled.li`
   a {
-    color: #f9f9f9;
+    color: blue;
     text-decoration: none;
   }
   display: flex;

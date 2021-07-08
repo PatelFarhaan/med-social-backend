@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         field: 'muted_notification_categories'
       },
+      pseudoUser: { type: DataTypes.BOOLEAN, field: 'pseudouser', defaultValue: false },
       settings: types.get('settings'),
       vip: { type: DataTypes.BOOLEAN, defaultValue: false },
       twitterUsername: { type: DataTypes.STRING },
