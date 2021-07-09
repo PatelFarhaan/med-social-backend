@@ -64,7 +64,7 @@ const ViewPostsComponent = props => {
 
   useEffect(() => {
     const getColumns = async () => {
-      const response = await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/Column/actions/list`)
+      const response = await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/Column/actions/list?perPage=500`)
       setColumns(response.data.records)
     }
     if (location.search.indexOf('approve=true') !== -1) {
