@@ -19,7 +19,6 @@ CREATE TABLE "PseudoUser" (
     "profile_image_url" TEXT,
     "background_image" TEXT,
     "active" boolean NOT NULL DEFAULT TRUE,
-    "expertises" jsonb DEFAULT '[]'
 );
 
 -- rambler down
