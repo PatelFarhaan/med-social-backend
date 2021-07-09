@@ -19,7 +19,8 @@ const approveUser = async (username, body, loaderOpts) => {
     roleId: 3,
     twitterUsername: pseudoUser.username,
     pseudoUser: true,
-    profilePicture: body.profilePicture ? body.profilePicture : pseudoUser.profileImageUrl
+    profilePicture: body.profilePicture ? body.profilePicture : pseudoUser.profileImageUrl,
+    profileDescription: body.profileDescription
   })
 
   let savedUser

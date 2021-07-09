@@ -141,6 +141,7 @@ const options = {
         }
         params.fullName = params.name
         params.profilePicture = params.profileImageUrl.replace('_normal', '')
+        params.profileDescription = params.bio
         // Need to delete this as it violates insert query for User table.
         // This should be fixed at service level inside approveUser
         delete params.id
