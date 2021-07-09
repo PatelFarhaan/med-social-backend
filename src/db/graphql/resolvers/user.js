@@ -85,6 +85,7 @@ module.exports = {
       const where = id ? { id } : { username }
       const user = await db.User.findOne({ where, attributes })
       if (!user) throw new Error(JSON.stringify({ status: 404, message: 'Id provided is not valid' }))
+      console.log(user)
       return user
     },
     getUserColumns: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { limit = 10, page = 1 }, { db, req }) => {

@@ -188,6 +188,7 @@ const userSchema = gql`
     profilePicture: String
     profileDescription: String
     isAnonymousUser: Boolean
+    pseudoUser: Boolean
     notificationsSeenAt: DateTime
     settings: JSON
     expertises(limit: Int, page: Int): [Expertise]
