@@ -659,13 +659,13 @@ const notifyMentionedUser = async (post, mentionedUsers) => {
 }
 
 const getTopPostsForNewspaper = async (start, end) => {
-  const startDate = new Date(start)
-  const endDate = new Date(end)
-  console.log(startDate, endDate, startDate.toISOString(), endDate.toISOString())
+  const startDate = new Date(start).toISOString()
+  const endDate = new Date(end).toISOString()
+  console.log({ startDate, endDate })
   const posts = await db.Post.findAll({
     where: {
       createdAt: {
-        [Op.between]: [startDate.toISOString(), endDate.toISOString()]
+        [Op.between]: [startDate, endDate]
       }
     },
     order: [['votes', 'DESC']],
