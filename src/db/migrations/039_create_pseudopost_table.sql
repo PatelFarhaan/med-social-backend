@@ -36,7 +36,6 @@ CREATE TABLE "PseudoPost" (
     "translate" TEXT,
     "trans_src" TEXT,
     "trans_dest" TEXT,
-    "approved_post_id" serial
 );
 
 -- rambler down
