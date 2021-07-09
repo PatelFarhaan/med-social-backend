@@ -345,7 +345,9 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
   try {
     const existingColumn = await Column.findByPk(column)
     if (!existingColumn) throw new Error({ status: 404, message: 'Column not found' })
+    console.log(postFields)
     post = await Post.create({ ...postFields, ColumnSlug: column, author_id: user.id, isStacked: stackedPosts.length > 0 })
+    console.log(post)
     if (stackedPosts.length > 0) {
       await Promise.all(
         stackedPosts.map(async (stackedPost, index) =>
