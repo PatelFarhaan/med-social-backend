@@ -31,7 +31,7 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
 
   useEffect(() => {
     const getExpertises = async () => {
-      const response = await axios.get(`${baseUrl}/admin/api/resources/Expertise/actions/list`)
+      const response = await axios.get(`${baseUrl}/admin/api/resources/Expertise/actions/list?perPage=500`)
 
       setExpertises(response.data.records)
       const _values = response.data.records.map(record => {
