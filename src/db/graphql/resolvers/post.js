@@ -50,10 +50,7 @@ module.exports = {
       const posts = await db.Post.search(query, page, limit)
       return posts[0]
     },
-    getTopPosts: async (_parent, { start, end }) => {
-      const posts = await getTopPostsForNewspaper(start, end)
-      return posts
-    }
+    getTopPosts: async (_parent, { start, end }) => getTopPostsForNewspaper(start, end)
   },
   Mutation: {
     createPost: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, body, { req }) => {
