@@ -1,8 +1,10 @@
 const axios = require('axios')
+const { Op } = require('sequelize')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const { reputationSources } = require('../constants/reputation.constant')
 const { calculatePoints } = require('./reputation.service')
+const { sequelize } = require('../../db/models')
 
 const approveUser = async (username, body, loaderOpts) => {
   const pseudoUser = await db.PseudoUser.findOne({
@@ -17,7 +19,8 @@ const approveUser = async (username, body, loaderOpts) => {
     roleId: 3,
     twitterUsername: pseudoUser.username,
     pseudoUser: true,
-    profilePicture: body.profilePicture ? body.profilePicture : pseudoUser.profileImageUrl
+    profilePicture: body.profilePicture ? body.profilePicture : pseudoUser.profileImageUrl,
+    profileDescription: body.profileDescription
   })
 
   let savedUser
@@ -54,7 +57,14 @@ const addPseudoUser = async url => {
 const fetchPseudoUsersList = async () => db.PseudoUser.findAll()
 
 const fetchPostCountByUserName = async (record, _username) => {
-  record.params.posts = await db.PseudoPost.count({ where: { username: _username.toLowerCase() } })
+  record.params.posts = await db.PseudoPost.count({
+    where: {
+      username: _username.toLowerCase(),
+      id: {
+        [Op.eq]: sequelize.col('conversation_id')
+      }
+    }
+  })
   if (!record.params.active) {
     record.params.columns = 0
     record.params.expertises = 0

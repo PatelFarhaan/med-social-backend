@@ -49,7 +49,7 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(email: String, profile_description: String): User
+    updateUser(email: String, profile_description: String, title: String, social_link: SocialLinkInput, custom_link: [LinkInput]): User
     createUser(
       email: String!
       firstName: String!
@@ -72,6 +72,17 @@ const userSchema = gql`
     resetPassword(password: String!, token: String!): User
     passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
     updateUserNotificationSetting(settings: SettingsInput!): NotificationSetting
+    updateUserSocialLink(socialLink: SocialLinkInput!): User
+    addUserCustomLink(newLink: CustomLinkInput!): User
+    updateUserCustomLink(link: LinkInput!): User
+    deleteUserCustomLink(link: LinkInput!): User
+    updateUserTitle(title: String!): User
+  }
+
+  input LinkInput {
+    linkId: String!
+    type: String!
+    url: String!
   }
 
   input SettingsInput {
@@ -141,6 +152,31 @@ const userSchema = gql`
     expire_month: Int
   }
 
+  type SocialLink {
+    twitter: String
+    facebook: String
+    linkedin: String
+    instagram: String
+  }
+
+  input SocialLinkInput {
+    twitter: String!
+    facebook: String!
+    linkedin: String!
+    instagram: String!
+  }
+
+  type CustomLink {
+    linkId: String!
+    type: String!
+    url: String!
+  }
+
+  input CustomLinkInput {
+    type: String!
+    url: String!
+  }
+
   type User {
     id: String
     email: String!
@@ -152,6 +188,7 @@ const userSchema = gql`
     profilePicture: String
     profileDescription: String
     isAnonymousUser: Boolean
+    pseudoUser: Boolean
     notificationsSeenAt: DateTime
     settings: JSON
     expertises(limit: Int, page: Int): [Expertise]
@@ -160,6 +197,9 @@ const userSchema = gql`
     userExpertises: [UserExpertise]
     paymentMethod: UserPaymentMethod
     notificationSetting: NotificationSetting
+    title: String
+    socialLink: SocialLink
+    customLink: [CustomLink]
   }
 `
 

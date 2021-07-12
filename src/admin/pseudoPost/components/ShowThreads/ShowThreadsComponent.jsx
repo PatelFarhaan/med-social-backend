@@ -23,7 +23,7 @@ const ShowThreadsComponent = ({ handleClose, show, user, conversationId, baseUrl
         thread.edit = false
         const formData = new FormData()
         formData.set('tweet', thread.params.tweet)
-        const response = await axios.post(`${baseUrl}/admin/api/resources/PseudoPost/records/${id}/edit`, formData, {
+        await axios.post(`${baseUrl}/admin/api/resources/PseudoPost/records/${id}/edit`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
       }
@@ -72,7 +72,6 @@ const ShowThreadsComponent = ({ handleClose, show, user, conversationId, baseUrl
             threads.map((thread, key) => (
               <ThreadPost key={key}>
                 <Tweet
-                  showCount
                   maxLength={280}
                   onChange={e => updateTweet(thread.params.id, e)}
                   disabled={!thread?.edit}

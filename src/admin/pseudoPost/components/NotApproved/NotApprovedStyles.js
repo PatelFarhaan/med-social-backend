@@ -1,5 +1,12 @@
 import styled from 'styled-components'
 
+export const Multiselect = styled.div`
+  margin-bottom: 20px;
+`
+export const ModalText = styled.div`
+  line-height: 22px;
+`
+
 export const ApproveUser = styled.button`
   color: #fff;
   padding: 0.8rem;
@@ -9,14 +16,24 @@ export const ApproveUser = styled.button`
   font-weight: 400;
   display: block;
   width: 40%;
-  cursor: pointer;
   border: 1px solid rgba(61, 143, 68, 1);
-  background: #3d8f44;
-  &:hover {
-    background-color: rgba(61, 143, 68, 0.9);
-  }
   margin-bottom: 20px;
   justify-self: flex-end;
+  ${props =>
+    props.disabled &&
+    `
+    background: #77a97c;
+    cursor: default;
+  `}
+  ${props =>
+    !props.disabled &&
+    `
+    cursor: pointer;
+    background: #3d8f44;
+    &:hover {
+      background-color: rgba(61, 143, 68, 0.9);
+    }
+  `}
 `
 
 export const Save = styled.button`
@@ -72,19 +89,17 @@ export const ModalContent = styled.div`
 `
 
 export const Name = styled.div`
-  color: #000;
+  color: ${({ errorText }) => (errorText ? 'red' : '#000')};
   font-size: 1.1rem;
   font-weight: normal;
   letter-spacing: 1px;
   text-transform: capitalize;
-  margin: 0px;
+  margin-bottom: 16px;
 `
 
 export const ModalHeader = styled.div`
   display: flex;
   flex-direction: row;
-  height: 40px;
-  width: auto;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
@@ -126,7 +141,7 @@ export const Modal = styled.section`
   position: fixed;
   background: white;
   width: 80%;
-  height: 30%;
+  height: 50%;
   min-height: 200px;
   top: 50%;
   left: 50%;

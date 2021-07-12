@@ -1,11 +1,11 @@
 import styled from 'styled-components'
 
-export const Buttons = styled.button`
+export const Buttons = styled.div`
   display: flex;
   flex-direction: row;
-  background-color: red;
+  width: 100%;
+  justify-content: space-between;
 `
-
 export const ApproveUser = styled.button`
   color: #fff;
   padding: 0.8rem;
@@ -72,8 +72,7 @@ export const Post = styled.button`
   border-radius: 4px;
   font-weight: 400;
   display: block;
-  width: 200px;
-  margin-right: 16px;
+  width: 240px;
   cursor: pointer;
   border: none;
   background: #3d8f44;
@@ -105,6 +104,9 @@ export const CardText = styled.p`
   line-height: 1.5;
   margin-bottom: 1.25rem;
   font-weight: 400;
+  a {
+    color: blue;
+  }
 `
 
 export const CardTitle = styled.h2`
@@ -131,7 +133,7 @@ export const Card = styled.div`
   border: 1px solid rgba(61, 143, 68, 1);
   background: #fdfbf7;
   a {
-    color: #f9f9f9;
+    color: blue;
     text-decoration: none;
   }
   border-radius: 0.25rem;
@@ -144,7 +146,7 @@ export const Card = styled.div`
 
 export const CardContainer = styled.li`
   a {
-    color: #f9f9f9;
+    color: blue;
     text-decoration: none;
   }
   display: flex;

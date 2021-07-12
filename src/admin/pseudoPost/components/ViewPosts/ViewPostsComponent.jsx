@@ -1,7 +1,8 @@
 import { useRecords } from 'admin-bro'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { useLocation } from 'react-router-dom'
+
 import {
   ApproveUser,
   UserApproved,
@@ -18,7 +19,8 @@ import {
   Card,
   CardContainer,
   Container,
-  Layout
+  Layout,
+  Buttons
 } from './ViewPostsComponentStyles'
 
 import ShowThreadsComponent from '../ShowThreads/ShowThreadsComponent'
@@ -31,12 +33,7 @@ const ViewPostsComponent = props => {
   const [modal, setModal] = useState(false)
   const [notApproved, setNotApproved] = useState(false)
   const [conversationId, setConversationId] = useState(0)
-
-  const approveUser = async username => {
-    await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/PseudoUser/records/${username}/approveUser`)
-    // eslint-disable-next-line no-undef
-    window.location.reload(false)
-  }
+  const location = useLocation()
 
   const deleteUser = async id => {
     await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/records/${id}/delete`)
@@ -65,17 +62,13 @@ const ViewPostsComponent = props => {
     setNotApproved(true)
   }
 
-  const Buttons = styled.div`
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
-  `
-
   useEffect(() => {
     const getColumns = async () => {
-      const response = await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/Column/actions/list`)
+      const response = await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/Column/actions/list?perPage=500`)
       setColumns(response.data.records)
+    }
+    if (location.search.indexOf('approve=true') !== -1) {
+      setNotApproved(true)
     }
 
     getColumns()
@@ -92,7 +85,7 @@ const ViewPostsComponent = props => {
       }
       getUser(records[0]?.params.username)
     },
-    [records]
+    [records, props.location]
   )
 
   const changeSelect = (id, e) => {
@@ -129,6 +122,41 @@ const ViewPostsComponent = props => {
       }
     })
   }
+
+  const replaceUrl = (tweet, params) => {
+    /**
+     * 1. Find N; N is the number of urls to be replaced
+     * 2. If N === 0; return original tweet
+     * 2. For Nth replacement, replace the substr with the url.n key from the params
+     * 3. return processed tweet
+     */
+
+    const n = (tweet.match(/https:\/\/t.co/g) || []).length
+    let refinedTweet = tweet
+    if (!n) {
+      return refinedTweet
+    }
+    let i = 0
+    while (i < n) {
+      const preString = 'https://t.co/'
+      const searchString = ' '
+      const preIndex = refinedTweet.indexOf(preString)
+      const searchIndex = preIndex + refinedTweet.substring(preIndex).indexOf(searchString)
+      if (preIndex > searchIndex) {
+        refinedTweet = refinedTweet.replace(refinedTweet.substring(preIndex), params[`urls.${i}`])
+      } else {
+        refinedTweet = refinedTweet.replace(refinedTweet.substring(preIndex, searchIndex), params[`urls.${i}`])
+      }
+      i += 1
+    }
+    return refinedTweet
+  }
+
+  const formatHtml = content => {
+    const reg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g
+    return content.replace(reg, "<a href='$1$2' target='_blank' rel='noopener noreferrer'>$1$2</a>")
+  }
+
   return (
     <Layout>
       <Container>
@@ -149,7 +177,7 @@ const ViewPostsComponent = props => {
             <UserApproved disabled>User Approved</UserApproved>
           ) : (
             <>
-              <ApproveUser onClick={() => approveUser(records[0]?.params.username)}>Approve User</ApproveUser>
+              <ApproveUser onClick={showNotApproved}>Approve User</ApproveUser>
             </>
           )}
           {records &&
@@ -159,7 +187,7 @@ const ViewPostsComponent = props => {
                   {/* <CardImage src="https://picsum.photos/500/300/?image=10" /> */}
                   <CardContent>
                     <CardTitle>{record.params.username}</CardTitle>
-                    <CardText>{record.params.tweet}</CardText>
+                    <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
                     <ButtonBar>
                       <Left>
                         <Delete onClick={() => deleteUser(record?.params.id)}>Delete</Delete>
