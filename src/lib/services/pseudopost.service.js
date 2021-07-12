@@ -32,10 +32,13 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
     pseudoPost: true
   })
 
+  parentPost.approvedPostId = post.id
+  await parentPost.save()
+
   if (postsArray.length > 0) {
     await Promise.all(
-      postsArray.map(async (stackedPost, index) =>
-        post.createStackedChild(
+      postsArray.map(async (stackedPost, index) => {
+        const stackedChild = await post.createStackedChild(
           {
             content: stackedPost.tweet,
             isStacked: true,
@@ -47,7 +50,10 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
           },
           { through: { order: index + 1 } }
         )
-      )
+        stackedPost.approvedPostId = stackedChild.id
+        await stackedPost.save()
+        return stackedChild
+      })
     )
   }
 

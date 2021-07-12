@@ -75,9 +75,58 @@ const fetchPostCountByUserName = async (record, _username) => {
   return { record }
 }
 
+const updatePUserExpertise = async ({ username, expertises }) => {
+  const pseudoUser = await db.PseudoUser.findOne({
+    where: { username }
+  })
+  try {
+    if (pseudoUser) {
+      pseudoUser.expertises = expertises
+      await pseudoUser.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePUserExpertise ${e}`)
+  }
+  return db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
+}
+
+const addPUserExpertise = async ({ username, expertises }) => {
+  const pseudoUser = await db.PseudoUser.findOne({
+    where: { username }
+  })
+  try {
+    if (pseudoUser) {
+      const updatedExpertise = [...pseudoUser.expertises, ...expertises].filter((value, index, self) => self.indexOf(value) === index)
+      pseudoUser.expertises = updatedExpertise
+      await pseudoUser.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePUserExpertise ${e}`)
+  }
+  return db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
+}
+
+const removePUserExpertise = async ({ username, expertises }) => {
+  const pseudoUser = await db.PseudoUser.findOne({
+    where: { username }
+  })
+  try {
+    if (pseudoUser) {
+      const updatedExpertise = [...pseudoUser.expertises].filter(item => !expertises.includes(item))
+      pseudoUser.expertises = updatedExpertise
+      await pseudoUser.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePUserExpertise ${e}`)
+  }
+  return db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
+}
 module.exports = {
   approveUser,
   addPseudoUser,
   fetchPseudoUsersList,
-  fetchPostCountByUserName
+  fetchPostCountByUserName,
+  updatePUserExpertise,
+  addPUserExpertise,
+  removePUserExpertise
 }
