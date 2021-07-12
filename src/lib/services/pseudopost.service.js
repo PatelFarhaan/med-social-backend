@@ -3,7 +3,7 @@ const db = require('../../db/models')
 
 const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   const pseudoPosts = await db.PseudoPost.findAll({
-    where: { conversationId },
+    where: { conversationId, retweet: false, reply_to: [] },
     order: [['created_at', 'ASC']],
     ...loaderOpts
   })
