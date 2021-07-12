@@ -16,7 +16,7 @@ const {
   deleteCustomLink,
   updateTitle
 } = require('../../../lib/users')
-const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
+const { tokenService, emailService, socialService, stripeService, uploadService, expertiseService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
@@ -302,7 +302,13 @@ module.exports = {
       const { user } = req
       const updatedUser = await updateTitle(user.id, args)
       return updatedUser
-    })
+    }),
+    setPrimaryExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { expertiseId }, { req }) =>
+      expertiseService.setExpertisePrimary(req.user, expertiseId)
+    ),
+    setSecondaryExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { expertiseId }, { req }) =>
+      expertiseService.setExpertiseSecondary(req.user, expertiseId)
+    )
   },
   User: {
     expertises: async (user, { limit = 1, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {

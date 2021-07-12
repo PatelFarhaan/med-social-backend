@@ -46,8 +46,47 @@ const createExpertise = async ({ body: { name, interests }, Expertise = db.Exper
   return expertise
 }
 
+const setExpertisePrimary = async (user, expertiseId) => {
+  const userExpertises = await user.getUserExpertises()
+  const expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === expertiseId)
+  expertise.isPrimary = true
+  const primaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isPrimary)
+  const secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
+
+  if (primaryUserExpertise) {
+    primaryUserExpertise.isPrimary = false
+    primaryUserExpertise.isSecondary = true
+    await primaryUserExpertise.save()
+  }
+
+  if (secondaryUserExpertise) {
+    secondaryUserExpertise.isPrimary = false
+    secondaryUserExpertise.isSecondary = true
+    await secondaryUserExpertise.save()
+  }
+
+  return expertise.save()
+}
+
+const setExpertiseSecondary = async (user, expertiseId) => {
+  const userExpertises = await user.getUserExpertises()
+  const expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === expertiseId)
+  expertise.isSecondary = true
+  const secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
+
+  if (secondaryUserExpertise) {
+    secondaryUserExpertise.isPrimary = false
+    secondaryUserExpertise.isSecondary = true
+    await secondaryUserExpertise.save()
+  }
+
+  return expertise.save()
+}
+
 module.exports = {
   getExpertises,
   createExpertise,
-  getExpertise
+  getExpertise,
+  setExpertisePrimary,
+  setExpertiseSecondary
 }

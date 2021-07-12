@@ -77,6 +77,8 @@ const userSchema = gql`
     updateUserCustomLink(link: LinkInput!): User
     deleteUserCustomLink(link: LinkInput!): User
     updateUserTitle(title: String!): User
+    setPrimaryExpertise(expertiseId: String!): UserExpertise
+    setSecondaryExpertise(expertiseId: String!): UserExpertise
   }
 
   input LinkInput {
