@@ -47,8 +47,8 @@ describe('User', () => {
 
   test('It should be able to search users by username', async () => {
     const user = await db.User.create({ email: 'new@me.com', username: 'new', roleId: 3 })
-    const queryByUsername = await db.User.search('new')
-    expect(queryByUsername[0][0].username).toBe(user.username)
+    const queryByUsername = await db.User.findAll({ where: { username: 'new' } })
+    expect(queryByUsername[0].username).toBe(user.username)
     await user.destroy()
   })
 })
