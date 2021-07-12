@@ -77,8 +77,7 @@ const updatePUserExpertise = async ({ username, expertises }) => {
   } catch (e) {
     logger.warn(`updatePUserExpertise ${e}`)
   }
-  const pseudoUserExpertises = await db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
-  return pseudoUserExpertises
+  return db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
 }
 
 const addPUserExpertise = async ({ username, expertises }) => {
@@ -94,8 +93,7 @@ const addPUserExpertise = async ({ username, expertises }) => {
   } catch (e) {
     logger.warn(`updatePUserExpertise ${e}`)
   }
-  const pseudoUserExpertises = await db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
-  return pseudoUserExpertises
+  return db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
 }
 
 const removePUserExpertise = async ({ username, expertises }) => {
@@ -111,8 +109,7 @@ const removePUserExpertise = async ({ username, expertises }) => {
   } catch (e) {
     logger.warn(`updatePUserExpertise ${e}`)
   }
-  const pseudoUserExpertises = await db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
-  return pseudoUserExpertises
+  return db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
 }
 module.exports = {
   approveUser,
