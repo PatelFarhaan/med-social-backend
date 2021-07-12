@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUIDV4
       },
       lookupId: types.get('lookupId'),
-      email: { type: DataTypes.STRING, allowNull: false, validate: { min: 3 } },
+      email: { type: DataTypes.STRING, validate: { min: 3 } },
       firstName: { type: DataTypes.STRING, field: 'first_name' },
       lastName: { type: DataTypes.STRING, field: 'last_name' },
       fullName: { type: DataTypes.STRING },
@@ -36,12 +36,21 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         field: 'muted_notification_categories'
       },
+      pseudoUser: { type: DataTypes.BOOLEAN, field: 'pseudouser', defaultValue: false },
       settings: types.get('settings'),
       vip: { type: DataTypes.BOOLEAN, defaultValue: false },
       twitterUsername: { type: DataTypes.STRING },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt'),
-      deactivatedAt: types.get('deactivatedAt')
+      deactivatedAt: types.get('deactivatedAt'),
+      title: { type: DataTypes.STRING },
+      socialLink: {
+        type: DataTypes.JSONB,
+        field: 'social_link',
+        allowNull: false,
+        defaultValue: {}
+      },
+      customLink: { type: DataTypes.JSONB, field: 'custom_link', allowNull: false, defaultValue: [] }
     },
     {
       freezeTableName: true

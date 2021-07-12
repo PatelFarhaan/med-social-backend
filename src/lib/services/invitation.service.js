@@ -177,13 +177,13 @@ const inviteUserToColumn = async (
   await emailService.sendEmail(
     invitation.email,
     {
-      firstName: invitation.firstName,
+      fromFirstName: user.firstName.toUpperCase(),
+      firstName: invitation.firstName.toUpperCase(),
       callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}`,
       columnName: column.name,
-      columnMembers: column.MemberCount || 100,
-      columnPosts: column.PostCount || '1k'
+      columnSlug: column.slug
     },
-    'invitationColumn'
+    'sendInvitation'
   )
 
   return {

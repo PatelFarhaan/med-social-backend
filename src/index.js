@@ -22,6 +22,8 @@ const bcrypt = require('bcrypt')
 AdminBro.registerAdapter(AdminBroSequelize)
 const AdminBroExpress = require('@admin-bro/express')
 const invitationAdmin = require('./admin/invitation/invitation.admin')
+const pseudoUserAdmin = require('./admin/pseudoUser/import.pseudoUser')
+const pseudoPostAdmin = require('./admin/pseudoPost/pseudoPost.admin')
 
 const { jwtStrategy } = require('./middleware/passport')
 const logger = require('./lib/utils/logger')
@@ -75,6 +77,14 @@ const adminBro = new AdminBro({
     {
       resource: db.sequelize.models.Invitation,
       options: invitationAdmin
+    },
+    {
+      resource: db.sequelize.models.PseudoUser,
+      options: pseudoUserAdmin
+    },
+    {
+      resource: db.sequelize.models.PseudoPost,
+      options: pseudoPostAdmin
     }
   ],
   rootPath: '/admin'

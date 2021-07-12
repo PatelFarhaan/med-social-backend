@@ -1,0 +1,114 @@
+.font_size{
+    font-size:46px;
+    line-height:56px;
+    }
+    .button_link{
+    padding: 14px 115px;
+    }
+    .left_buffer{
+    margin:auto;
+    }
+    .button_link_join{
+    padding: 6px 16px
+    }
+    .column_content{
+    max-width:400px;
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    }
+    .column_content_paid{
+    max-width:350px;
+    }
+    .column_button{
+    max-width:120px;
+    }
+    .column_button_paid{
+    max-width:160px;
+    }
+    .button_link_subscribe{
+    padding: 6px 16px
+    }
+    .button_content{
+    margin-top:24px;
+    }
+    @media only screen and (max-width: 768px){
+    .font_size{
+    font-size:32px;
+    line-height:40px;
+    }
+    .button_link{
+    padding: 14px 64px
+    }
+    .button_link_join{
+    padding: 6px 24px
+    }
+    .button_link_subscribe{
+    padding: 6px 25px
+    }
+    .left_buffer{
+    margin-left:20px;
+    }
+    .column_content{
+    max-width:320px;
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    }
+    .column_content_paid{
+    max-width:340px;
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    }
+    .column_button{
+    max-width:200px;
+    }
+    .column_button_paid{
+    max-width:180px;
+    }
+    }
+    @media only screen and (max-width: 560px){
+    .font_size{
+    font-size:32px;
+    line-height:40px;
+    }
+    .button_link{
+    padding: 14px 64px
+    }
+    .button_link_join{
+    padding: 6px 105px
+    }
+    .button_link_subscribe{
+    padding: 6px 80px
+    }
+    .left_buffer{
+    margin-left:20px;
+    }
+    .column_content{
+    max-width:260px;
+    white-space:nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    }
+    .column_content_paid{
+    max-width:260px;
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+    }
+    .column_button{
+    max-width:unset;
+    }
+    .column_button_paid{
+    max-width:unset;
+    }
+    .button_content{
+    margin-top:0px;
+    }
+    .column_name_content{
+    max-width:260px;
+    overflow:hidden;
+    text-overflow:ellipsis
+    }
+    }

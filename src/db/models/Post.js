@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       order: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       votes: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
       comments: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+      pseudoPost: { type: DataTypes.BOOLEAN, allowNull: false, field: 'pseudopost', defaultValue: false },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt')
     },
