@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       translate: { type: DataTypes.TEXT },
       transSrc: { type: DataTypes.TEXT, field: 'trans_src' },
       transDest: { type: DataTypes.TEXT, field: 'trans_dest' },
-      approvedPostId: { type: DataTypes.INTEGER, field: 'approved_post_id' }
+      approvedPostId: { type: DataTypes.INTEGER, allowNull: true, field: 'approved_post_id' }
     },
     {
       freezeTableName: true

@@ -60,6 +60,20 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   return post
 }
 
+const getThreadCount = async (username, loaderOpts = {}) => {
+  const threadCountArray = await db.PseudoPost.count({
+    where: { username },
+    attributes: ['conversation_id'],
+    group: 'conversation_id',
+    ...loaderOpts
+  })
+  return threadCountArray.reduce((map, obj) => {
+    map[obj.conversation_id] = obj.count
+    return map
+  }, {})
+}
+
 module.exports = {
-  approvePost
+  approvePost,
+  getThreadCount
 }

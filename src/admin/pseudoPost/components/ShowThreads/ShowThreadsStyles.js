@@ -1,6 +1,51 @@
 import styled from 'styled-components'
 
+export const SelectContainer = styled.div`
+  width: 200px;
+  margin: 0px 10px 10px 0px;
+`
+
 export const Save = styled.button`
+  color: #fff;
+  padding: 0.8rem;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  font-weight: 400;
+  display: block;
+  width: ${props => (props.width ? props.width : '120px')};
+  height: 40px;
+  cursor: pointer;
+  border: none;
+  background: #3d8f44;
+  &:hover {
+    background-color: rgba(61, 143, 68, 0.9);
+  }
+  margin-right: 10px;
+  cursor: pointer;
+`
+
+export const Edit = styled.button`
+  color: #3d8f44;
+  padding: 0.8rem;
+  font-size: 14px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  font-weight: 400;
+  display: block;
+  width: ${props => (props.width ? props.width : '120px')};
+  height: 40px;
+  cursor: pointer;
+  border: #3d8f44;
+  background: #efefef;
+  &:hover {
+    background-color: rgba(230, 230, 230, 0.9);
+  }
+  margin-right: 10px;
+  cursor: pointer;
+`
+
+export const Delete = styled.button`
   color: #fff;
   padding: 0.8rem;
   font-size: 14px;
@@ -12,12 +57,13 @@ export const Save = styled.button`
   height: 40px;
   cursor: pointer;
   border: none;
-  background: #3d8f44;
+  background: #ff4567;
   &:hover {
-    background-color: rgba(61, 143, 68, 0.9);
+    background-color: rgba(255, 71, 105, 0.9);
   }
   margin-right: 10px;
   cursor: pointer;
+  margin-bottom: 10px;
 `
 
 export const ThreadPost = styled.div`
@@ -37,6 +83,18 @@ export const ThreadPost = styled.div`
   align-items: center;
   height: 20%;
 `
+export const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`
+
+export const Buttons = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`
+
 export const Tweet = styled.textarea`
   display: flex;
   width: 75%;
@@ -45,6 +103,16 @@ export const Tweet = styled.textarea`
   word-wrap: normal;
   resize: none;
   height: 100%;
+`
+
+export const TweetPosted = styled.div`
+  background: #fdfbf7;
+  word-wrap: normal;
+  resize: none;
+  height: 100%;
+  text-align: left;
+  width: ${props => (props.approved ? '100%' : '45%')};
+  border: ${props => (props.focus ? '1px solid #3d8f44' : 'none')};
 `
 
 export const ModalContent = styled.div`
@@ -100,6 +168,7 @@ export const ModalContainer = styled.div`
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
+  z-index: 10;
 `
 
 export const Modal = styled.section`

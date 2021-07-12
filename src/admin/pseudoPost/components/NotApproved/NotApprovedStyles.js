@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 export const Multiselect = styled.div`
   margin-bottom: 20px;
+  width: 40%;
 `
 export const ModalText = styled.div`
   line-height: 22px;
@@ -135,6 +136,7 @@ export const ModalContainer = styled.div`
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
+  z-index: 12;
 `
 
 export const Modal = styled.section`

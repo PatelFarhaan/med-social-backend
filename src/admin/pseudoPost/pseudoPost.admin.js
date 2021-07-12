@@ -1,6 +1,6 @@
 const { default: AdminBro } = require('admin-bro')
 const { flat, Filter } = require('admin-bro')
-const { approvePost } = require('../../lib/services/pseudopost.service')
+const { approvePost, getThreadCount } = require('../../lib/services/pseudopost.service')
 
 const PER_PAGE_LIMIT = 500
 
@@ -73,6 +73,26 @@ const options = {
         }
       },
       component: false
+    },
+    getThreadCount: {
+      isVisible: false,
+      actionType: 'record',
+      handler: async (request, _, context) => {
+        const { h, resource } = context
+        const { username } = request.query
+        const threadCountMap = await getThreadCount(username)
+        return {
+          meta: {
+            threadCountMap
+          },
+          record: null,
+          redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
+          notice: {
+            message: 'Successfully Posted',
+            type: 'success'
+          }
+        }
+      }
     }
   }
 }

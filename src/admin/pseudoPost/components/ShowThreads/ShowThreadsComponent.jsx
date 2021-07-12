@@ -1,9 +1,40 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { ModalContainer, Modal, ModalHeader, ModalContent, Name, Close, ThreadPost, Tweet, Save } from './ShowThreadsStyles'
+import Select from 'react-select'
+import { truncate } from 'lodash'
+import {
+  ModalContainer,
+  Modal,
+  ModalHeader,
+  ModalContent,
+  Name,
+  Close,
+  ThreadPost,
+  TweetPosted,
+  TweetPostedEditable,
+  Save,
+  ButtonContainer,
+  Buttons,
+  Delete,
+  Edit,
+  SelectContainer
+} from './ShowThreadsStyles'
 
-const ShowThreadsComponent = ({ handleClose, show, user, conversationId, baseUrl }) => {
+const ShowThreadsComponent = ({
+  columns,
+  handleClose,
+  show,
+  user,
+  conversationId,
+  baseUrl,
+  replaceUrl,
+  formatHtml,
+  approved,
+  deletePost,
+  handleChange,
+  post
+}) => {
   const [threads, setThreads] = useState([])
 
   const edit = id => {
@@ -35,7 +66,7 @@ const ShowThreadsComponent = ({ handleClose, show, user, conversationId, baseUrl
     const _threads = JSON.parse(JSON.stringify(threads))
     _threads.map(thread => {
       if (thread.id === id) {
-        thread.params.tweet = e.target.value
+        thread.params.tweet = e
       }
     })
     setThreads(_threads)
@@ -71,19 +102,48 @@ const ShowThreadsComponent = ({ handleClose, show, user, conversationId, baseUrl
           {threads &&
             threads.map((thread, key) => (
               <ThreadPost key={key}>
-                <Tweet
+                <TweetPosted
+                  approved
+                  contentEditable={thread?.edit}
                   maxLength={280}
-                  onChange={e => updateTweet(thread.params.id, e)}
-                  disabled={!thread?.edit}
+                  onBlur={e => {
+                    updateTweet(thread.params.id, e.currentTarget.textContent)
+                  }}
                   type="text"
-                  defaultValue={thread.params.tweet}
+                  dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(thread.params.tweet, thread.params)) }}
                   focus={thread?.edit}
                 />
-                {thread?.edit ? (
-                  <Save onClick={() => save(thread.params.id)}>Save</Save>
-                ) : (
-                  <Save onClick={() => edit(thread.params.id)}>Edit</Save>
-                )}
+                {!approved ? (
+                  <ButtonContainer>
+                    {key === 0 ? (
+                      <Buttons>
+                        <SelectContainer>
+                          <Select
+                            classNamePrefix="react-select"
+                            placeholder="Select column"
+                            options={columns}
+                            menuPortalTarget={document.body}
+                            styles={{ menuPortal: base => ({ ...base, zIndex: 12 }) }}
+                            onChange={e => {
+                              handleChange(thread.params.id, e)
+                            }}
+                          />
+                        </SelectContainer>
+                        <Save width={'200px'} onClick={() => post(thread.params.id)}>
+                          Post
+                        </Save>
+                      </Buttons>
+                    ) : null}
+                    <Buttons>
+                      <Delete onClick={() => deletePost(thread.params.id)}>Delete</Delete>
+                      {thread?.edit ? (
+                        <Save onClick={() => save(thread.params.id)}>Save</Save>
+                      ) : (
+                        <Edit onClick={() => edit(thread.params.id)}>Edit</Edit>
+                      )}
+                    </Buttons>
+                  </ButtonContainer>
+                ) : null}
               </ThreadPost>
             ))}
         </ModalContent>
