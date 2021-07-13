@@ -253,6 +253,27 @@ const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Col
   })
 }
 
+const getPopularcolumnists = async () =>
+  db.Column.findAll({
+    where: { state: columnStatuses.APPROVED },
+    limit: 10,
+    attributes: [
+      'slug',
+      'description',
+      'name',
+      'createdAt',
+      'price',
+      'visibility',
+      'state',
+      'type',
+      'authorId',
+      'ExpertiseId',
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
+    ],
+    order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
+  })
+
 const isUserSubscribedToColumn = async ({ column }, user, loaderOpts, Subscription = db.Subscription) => {
   const subscription = await Subscription.findOne({ where: { UserId: user.id, ColumnSlug: column }, ...loaderOpts })
   if (subscription) return true
@@ -267,5 +288,6 @@ module.exports = {
   unsubscribeToColumn,
   banUser,
   getPopularColumns,
-  isUserSubscribedToColumn
+  isUserSubscribedToColumn,
+  getPopularcolumnists
 }
