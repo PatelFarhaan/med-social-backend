@@ -2,12 +2,11 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useHistory } from 'react-router-dom'
+import Select from 'react-select'
 import { ApproveUser, ModalContainer, Modal, ModalHeader, ModalContent, Name, Close, Multiselect, ModalText } from './NotApprovedStyles'
-import Select from '../Select/Select'
 
 const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
   const [expertises, setExpertises] = useState([])
-  const [values, setValues] = useState([])
   const [selectedExpertises, setSelectedExpertises] = useState([])
   const history = useHistory()
 
@@ -15,7 +14,7 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
     const _expertises = []
     expertises.map(expertise => {
       selectedExpertises.map(selectedExpertise => {
-        if (selectedExpertise === expertise.params.name) {
+        if (selectedExpertise.params.name === expertise.params.name) {
           _expertises.push(expertise.params.id)
         }
       })
@@ -25,20 +24,21 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
         expertises: _expertises
       }
     })
-    history.push(`/admin/resources/PseudoPost?filters.username=${username}&refresh=true`)
+    history.push(`/admin/resources/PseudoPost?filters.username=${username}&direction=desc&sortBy=createdAt&refresh=true`)
     handleClose()
   }
 
   useEffect(() => {
     const getExpertises = async () => {
       const response = await axios.get(`${baseUrl}/admin/api/resources/Expertise/actions/list?perPage=500`)
-
-      setExpertises(response.data.records)
-      const _values = response.data.records.map(record => {
-        record.params.value = record.params.name
-        return record.params
+      if (!response.data.records) {
+        return
+      }
+      response.data.records.forEach(_record => {
+        _record.value = _record.params.name
+        _record.label = _record.params.name
       })
-      setValues(_values)
+      setExpertises(response.data.records)
     }
 
     getExpertises()
@@ -47,7 +47,9 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
   const changeSelected = _values => {
     setSelectedExpertises(_values)
   }
-
+  if (!expertises) {
+    return <h2>Loading..</h2>
+  }
   return (
     <ModalContainer>
       <Modal show={show}>
@@ -61,15 +63,16 @@ const NotApprovedComponent = ({ handleClose, show, user, baseUrl }) => {
         <ModalContent>
           <Multiselect>
             <Select
-              label="Expertises:"
-              placeholder="Choose expertises"
-              options={values}
-              changeSelected={changeSelected}
-              selectedExpertises={selectedExpertises}
-              multiple
+              isMulti
+              classNamePrefix="react-select"
+              placeholder="Select expertises"
+              options={expertises}
+              menuPortalTarget={document.body}
+              styles={{ menuPortal: base => ({ ...base, zIndex: 12 }) }}
+              onChange={changeSelected}
             />
           </Multiselect>
-          <ApproveUser onClick={() => approveUser(user.username)} disabled={!selectedExpertises.length}>
+          <ApproveUser onClick={() => approveUser(user.username)} disabled={!selectedExpertises?.length}>
             Approve User
           </ApproveUser>
         </ModalContent>

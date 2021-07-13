@@ -18,12 +18,6 @@ const derivedProperties = [
     label: 'Columns',
     type: 'number',
     propertyPath: 'columns'
-  },
-  {
-    name: 'expertises',
-    label: 'Expertises',
-    type: 'number',
-    propertyPath: 'expertises'
   }
 ]
 
@@ -33,7 +27,6 @@ const listPuserComponent = props => {
     if (props.resource.listProperties.length === NO_OF_COLUMNS) {
       return
     }
-
     let i = 0
     while (i < derivedProperties.length) {
       props.resource.listProperties.push({

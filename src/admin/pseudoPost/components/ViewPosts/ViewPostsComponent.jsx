@@ -2,7 +2,9 @@ import { useRecords } from 'admin-bro'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import Select from 'react-select'
 
+import styled from 'styled-components'
 import {
   ApproveUser,
   UserApproved,
@@ -10,7 +12,7 @@ import {
   Left,
   Right,
   Post,
-  Select,
+  SelectDiv,
   ButtonBar,
   CardText,
   CardTitle,
@@ -20,7 +22,12 @@ import {
   CardContainer,
   Container,
   Layout,
-  Buttons
+  Buttons,
+  MainContainer,
+  PostsContainer,
+  Posts,
+  TabBar,
+  Tab
 } from './ViewPostsComponentStyles'
 
 import ShowThreadsComponent from '../ShowThreads/ShowThreadsComponent'
@@ -33,9 +40,12 @@ const ViewPostsComponent = props => {
   const [modal, setModal] = useState(false)
   const [notApproved, setNotApproved] = useState(false)
   const [conversationId, setConversationId] = useState(0)
+  const [tabOne, setTabOne] = useState(true)
+  const [tabTwo, setTabTwo] = useState(false)
+  const [threadCountMap, setThreadCountMap] = useState({})
   const location = useLocation()
 
-  const deleteUser = async id => {
+  const deletePost = async id => {
     await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/records/${id}/delete`)
     // eslint-disable-next-line no-undef
     window.location.reload(false)
@@ -65,6 +75,13 @@ const ViewPostsComponent = props => {
   useEffect(() => {
     const getColumns = async () => {
       const response = await axios.get(`${props.action.custom.baseUrl}/admin/api/resources/Column/actions/list?perPage=500`)
+      if (!response.data.records) {
+        return
+      }
+      response.data.records.forEach(_record => {
+        _record.value = _record.params.slug
+        _record.label = _record.params.name
+      })
       setColumns(response.data.records)
     }
     if (location.search.indexOf('approve=true') !== -1) {
@@ -88,17 +105,21 @@ const ViewPostsComponent = props => {
     [records, props.location]
   )
 
-  const changeSelect = (id, e) => {
-    /**
-     * fetch record using id
-     * insert into record object; column
-     */
-    records.forEach(record => {
-      if (record.params.id === id) {
-        record.params.column = e.target.value
+  useEffect(
+    () => {
+      const getThreadCount = async username => {
+        if (!username) {
+          return
+        }
+        const response = await axios.get(
+          `${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/actions/getThreadCount?username=${username}`
+        )
+        setThreadCountMap(response.data.meta.threadCountMap)
       }
-    })
-  }
+      getThreadCount(user.username)
+    },
+    [user, records, props.location]
+  )
 
   const post = id => {
     /**
@@ -107,6 +128,7 @@ const ViewPostsComponent = props => {
      * iff column is present hit api
      */
     if (!user?.active) {
+      setModal(false)
       setNotApproved(true)
       return
     }
@@ -119,6 +141,18 @@ const ViewPostsComponent = props => {
         )
         // eslint-disable-next-line no-undef
         window.location.reload(false)
+      }
+    })
+  }
+
+  const handleChange = (id, e) => {
+    /**
+     * fetch record using id
+     * insert into record object; column
+     */
+    records.forEach(record => {
+      if (record.params.id === id) {
+        record.params.column = e.value
       }
     })
   }
@@ -157,6 +191,20 @@ const ViewPostsComponent = props => {
     return content.replace(reg, "<a href='$1$2' target='_blank' rel='noopener noreferrer'>$1$2</a>")
   }
 
+  const switchTabs = tab => {
+    if (tab === 1) {
+      setTabOne(true)
+      setTabTwo(false)
+    }
+    if (tab === 2) {
+      setTabOne(false)
+      setTabTwo(true)
+    }
+  }
+
+  if (!threadCountMap && !user) {
+    return <h2>Loading...</h2>
+  }
   return (
     <Layout>
       <Container>
@@ -168,6 +216,13 @@ const ViewPostsComponent = props => {
               user={user}
               conversationId={conversationId}
               baseUrl={props.action.custom.baseUrl}
+              replaceUrl={replaceUrl}
+              formatHtml={formatHtml}
+              deletePost={deletePost}
+              approved={tabTwo}
+              columns={columns}
+              handleChange={handleChange}
+              post={post}
             />
           ) : null}
           {notApproved ? (
@@ -180,42 +235,87 @@ const ViewPostsComponent = props => {
               <ApproveUser onClick={showNotApproved}>Approve User</ApproveUser>
             </>
           )}
-          {records &&
-            records.map((record, key) =>
-              record?.params.id === record?.params.conversationId ? (
-                <Card key={key}>
-                  {/* <CardImage src="https://picsum.photos/500/300/?image=10" /> */}
-                  <CardContent>
-                    <CardTitle>{record.params.username}</CardTitle>
-                    <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
-                    <ButtonBar>
-                      <Left>
-                        <Delete onClick={() => deleteUser(record?.params.id)}>Delete</Delete>
-                      </Left>
-                      <Right>
-                        <Select>
-                          <select defaultValue="default" onChange={e => changeSelect(record?.params.id, e)}>
-                            <option value="default" disabled={true}>
-                              Choose where to post
-                            </option>
-                            {columns &&
-                              columns?.map((column, i) => (
-                                <option key={i} value={column.params.slug}>
-                                  {column.params.name}
-                                </option>
-                              ))}
-                          </select>
-                        </Select>
-                        <Buttons>
-                          <Post onClick={() => post(record?.params.id)}> Post </Post>
-                          <Post onClick={() => showModal(record?.params.conversationId)}>Show threads</Post>
-                        </Buttons>
-                      </Right>
-                    </ButtonBar>
-                  </CardContent>
-                </Card>
-              ) : null
-            )}
+          <MainContainer>
+            <PostsContainer>
+              <TabBar>
+                <Tab disableTab={!tabOne} onClick={() => switchTabs(1)}>
+                  Unapproved Posts
+                </Tab>
+                <Tab disableTab={!tabTwo} onClick={() => switchTabs(2)}>
+                  Approved Posts
+                </Tab>
+              </TabBar>
+              <Posts>
+                {tabOne &&
+                  records &&
+                  records.map((record, key) =>
+                    record?.params.id === record?.params.conversationId && !record?.params.approvedPostId ? (
+                      <Card key={key}>
+                        {/* <CardImage src="https://picsum.photos/500/300/?image=10" /> */}
+                        <CardContent>
+                          <CardTitle>{record.params.username}</CardTitle>
+                          <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
+                          <ButtonBar>
+                            <Left>
+                              <Delete onClick={() => deletePost(record?.params.id)}>Delete</Delete>
+                            </Left>
+                            <Right>
+                              <SelectDiv>
+                                <Select
+                                  classNamePrefix="react-select"
+                                  placeholder="Select column"
+                                  options={columns}
+                                  menuPortalTarget={document.body}
+                                  styles={{ menuPortal: base => ({ ...base, zIndex: 9 }) }}
+                                  onChange={e => {
+                                    handleChange(record?.params.id, e)
+                                  }}
+                                />
+                              </SelectDiv>
+                              <Buttons>
+                                <Post onClick={() => post(record?.params.id)}> Post </Post>
+                                {threadCountMap[record?.params.conversationId.toString()] === 1 ? (
+                                  <Post thread={false} onClick={() => showModal(record?.params.conversationId)}>
+                                    Show Post
+                                  </Post>
+                                ) : (
+                                  <Post thread={true} onClick={() => showModal(record?.params.conversationId)}>
+                                    Show Thread
+                                  </Post>
+                                )}
+                              </Buttons>
+                            </Right>
+                          </ButtonBar>
+                        </CardContent>
+                      </Card>
+                    ) : null
+                  )}
+                {tabTwo &&
+                  records &&
+                  records.map((record, key) =>
+                    record?.params.id === record?.params.conversationId && record?.params.approvedPostId ? (
+                      <Card key={key}>
+                        <CardContent>
+                          <CardTitle>{record.params.username}</CardTitle>
+                          <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
+                          <ButtonBar>
+                            {threadCountMap[record?.params.conversationId.toString()] === 1 ? (
+                              <Post thread={false} onClick={() => showModal(record?.params.conversationId)}>
+                                Show Post
+                              </Post>
+                            ) : (
+                              <Post thread={true} onClick={() => showModal(record?.params.conversationId)}>
+                                Show Thread
+                              </Post>
+                            )}
+                          </ButtonBar>
+                        </CardContent>
+                      </Card>
+                    ) : null
+                  )}
+              </Posts>
+            </PostsContainer>
+          </MainContainer>
         </CardContainer>
       </Container>
     </Layout>

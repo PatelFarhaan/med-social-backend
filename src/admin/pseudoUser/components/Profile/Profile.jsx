@@ -3,8 +3,6 @@ import { Layout, Container, Image, Bio, Header, Content, Name } from './ProfileS
 const Profile = props => {
   const { bio, username, profileImageUrl } = props.record.params
 
-  console.log(props.record.params)
-
   return (
     <Layout>
       <Container>

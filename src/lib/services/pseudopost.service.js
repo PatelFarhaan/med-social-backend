@@ -3,7 +3,7 @@ const db = require('../../db/models')
 
 const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   const pseudoPosts = await db.PseudoPost.findAll({
-    where: { conversationId, retweet: false, reply_to: [] },
+    where: { conversationId, retweet: false, reply_to: null },
     order: [['created_at', 'ASC']],
     ...loaderOpts
   })
@@ -60,6 +60,20 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   return post
 }
 
+const getThreadCount = async (username, loaderOpts = {}) => {
+  const threadCountArray = await db.PseudoPost.count({
+    where: { username },
+    attributes: ['conversation_id'],
+    group: 'conversation_id',
+    ...loaderOpts
+  })
+  return threadCountArray.reduce((map, obj) => {
+    map[obj.conversation_id] = obj.count
+    return map
+  }, {})
+}
+
 module.exports = {
-  approvePost
+  approvePost,
+  getThreadCount
 }

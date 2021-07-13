@@ -77,14 +77,23 @@ export const Post = styled.button`
   border: none;
   background: #3d8f44;
   &:hover {
-    background-color: rgba(61, 143, 68, 0.9);
+    background-color: ${props => (props.thread ? 'rgba(255, 255, 255, 0.75)' : 'rgba(61, 143, 68, 0.9))')};
   }
+  ${props =>
+    props.thread &&
+    `
+    color: #3d8f44;
+    border: 1px solid #3d8f44;
+    background: none
+    
+  `}
 `
-export const Select = styled.div`
+export const SelectDiv = styled.div`
   margin-bottom: 10px;
   select {
     height: 20px;
   }
+  width: 240px;
 `
 export const Right = styled.div`
   width: 60%;
@@ -183,4 +192,55 @@ export const Layout = styled.div`
     letter-spacing: 0;
     padding: 1rem;
   }
+`
+
+export const MainContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`
+export const PostsContainer = styled.div``
+
+export const Posts = styled.div`
+  background-color: lightgray;
+  padding: 2%;
+  border: 2px solid rgba(61, 143, 68, 1);
+  width: 1075px;
+`
+export const TabBar = styled.div`
+  display: flex;
+  margin-bottom: 0;
+`
+
+export const Tab = styled.div`
+  color: #fff;
+  padding: 0.8rem;
+  font-size: 14px;
+  text-transform: uppercase;
+  /* border-radius: 4px; */
+  border-top: 4px;
+  font-weight: 400;
+  display: flex;
+  width: 40%;
+  cursor: pointer;
+  border: 1px solid rgba(61, 143, 68, 1);
+  background: #3d8f44;
+  &:hover {
+    background-color: rgba(61, 143, 68, 0.9);
+  }
+  justify-content: center;
+  align-items: center;
+  ${props =>
+    props.disableTab &&
+    `
+    cursor: pointer;
+    background: #fff;
+    color: rgba(61, 143, 68, 1);
+    cursor: pointer;
+    &:hover {
+      color: #fff;
+      background-color: rgba(61, 143, 68, 0.9);
+    }
+`}
 `
