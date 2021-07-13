@@ -12,7 +12,6 @@ import {
   Close,
   ThreadPost,
   TweetPosted,
-  TweetPostedEditable,
   Save,
   ButtonContainer,
   Buttons,
