@@ -1,4 +1,4 @@
-const { Op } = require('sequelize')
+const { Op, QueryTypes } = require('sequelize')
 const db = require('../../db/models')
 const logger = require('../utils/logger')
 const { isStringJSON } = require('../utils/isStringJSON')
@@ -254,25 +254,38 @@ const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Col
 }
 
 const getPopularcolumnists = async () =>
-  db.Column.findAll({
-    where: { state: columnStatuses.APPROVED },
-    limit: 10,
-    attributes: [
-      'slug',
-      'description',
-      'name',
-      'createdAt',
-      'price',
-      'visibility',
-      'state',
-      'type',
-      'authorId',
-      'ExpertiseId',
-      [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
-      [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
-    ],
-    order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
-  })
+  db.sequelize.query(
+    // eslint-disable-next-line max-len
+    `SELECT *, "User".* FROM (
+     SELECT DISTINCT ON (t."authorId") *  FROM (
+     SELECT  *,  (SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" =  "Column"."slug") AS "PostCount"
+     FROM "Column" 
+     WHERE "state" = 'APPROVED'
+     ORDER BY "PostCount" DESC
+     ) AS t ) AS t2 LEFT JOIN "User" ON t2."authorId" = "User"."id"
+     ORDER BY "PostCount" DESC  
+     LIMIT 10`,
+    { type: QueryTypes.SELECT }
+  )
+// db.Column.findAll({
+//   where: { state: columnStatuses.APPROVED },
+//   limit: 10,
+//   attributes: [
+//     'slug',
+//     'description',
+//     'name',
+//     'createdAt',
+//     'price',
+//     'visibility',
+//     'state',
+//     'type',
+//     'authorId',
+//     'ExpertiseId',
+//     [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
+//     [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
+//   ],
+//   order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
+// })
 
 const isUserSubscribedToColumn = async ({ column }, user, loaderOpts, Subscription = db.Subscription) => {
   const subscription = await Subscription.findOne({ where: { UserId: user.id, ColumnSlug: column }, ...loaderOpts })
