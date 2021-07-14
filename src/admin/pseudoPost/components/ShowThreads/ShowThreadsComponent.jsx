@@ -80,7 +80,7 @@ const ShowThreadsComponent = ({
         const response = await axios.get(
           `${baseUrl}/admin/api/resources/PseudoPost/actions/list?filters.username=${
             user.username
-          }&filters.conversationId=${conversationId}`
+          }&filters.conversationId=${conversationId}&direction=asc&sortBy=id`
         )
         setThreads(response.data.records)
       }
@@ -99,52 +99,54 @@ const ShowThreadsComponent = ({
         </ModalHeader>
         <ModalContent>
           {threads &&
-            threads.map((thread, key) => (
-              <ThreadPost key={key}>
-                <TweetPosted
-                  approved
-                  contentEditable={thread?.edit}
-                  maxLength={280}
-                  onBlur={e => {
-                    updateTweet(thread.params.id, e.currentTarget.textContent)
-                  }}
-                  type="text"
-                  dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(thread.params.tweet, thread.params)) }}
-                  focus={thread?.edit}
-                />
-                {!approved ? (
-                  <ButtonContainer>
-                    {key === 0 ? (
+            threads.map((thread, key) =>
+              thread.params.reply_to === null && !thread.params.retweet ? (
+                <ThreadPost key={key}>
+                  <TweetPosted
+                    approved
+                    contentEditable={thread?.edit}
+                    maxLength={280}
+                    onBlur={e => {
+                      updateTweet(thread.params.id, e.currentTarget.textContent)
+                    }}
+                    type="text"
+                    dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(thread.params.tweet, thread.params)) }}
+                    focus={thread?.edit}
+                  />
+                  {!approved ? (
+                    <ButtonContainer>
+                      {key === 0 ? (
+                        <Buttons>
+                          <SelectContainer>
+                            <Select
+                              classNamePrefix="react-select"
+                              placeholder="Select column"
+                              options={columns}
+                              menuPortalTarget={document.body}
+                              styles={{ menuPortal: base => ({ ...base, zIndex: 12 }) }}
+                              onChange={e => {
+                                handleChange(thread.params.id, e)
+                              }}
+                            />
+                          </SelectContainer>
+                          <Save width={'200px'} onClick={() => post(thread.params.id)}>
+                            Post
+                          </Save>
+                        </Buttons>
+                      ) : null}
                       <Buttons>
-                        <SelectContainer>
-                          <Select
-                            classNamePrefix="react-select"
-                            placeholder="Select column"
-                            options={columns}
-                            menuPortalTarget={document.body}
-                            styles={{ menuPortal: base => ({ ...base, zIndex: 12 }) }}
-                            onChange={e => {
-                              handleChange(thread.params.id, e)
-                            }}
-                          />
-                        </SelectContainer>
-                        <Save width={'200px'} onClick={() => post(thread.params.id)}>
-                          Post
-                        </Save>
+                        <Delete onClick={() => deletePost(thread.params.id)}>Delete</Delete>
+                        {thread?.edit ? (
+                          <Save onClick={() => save(thread.params.id)}>Save</Save>
+                        ) : (
+                          <Edit onClick={() => edit(thread.params.id)}>Edit</Edit>
+                        )}
                       </Buttons>
-                    ) : null}
-                    <Buttons>
-                      <Delete onClick={() => deletePost(thread.params.id)}>Delete</Delete>
-                      {thread?.edit ? (
-                        <Save onClick={() => save(thread.params.id)}>Save</Save>
-                      ) : (
-                        <Edit onClick={() => edit(thread.params.id)}>Edit</Edit>
-                      )}
-                    </Buttons>
-                  </ButtonContainer>
-                ) : null}
-              </ThreadPost>
-            ))}
+                    </ButtonContainer>
+                  ) : null}
+                </ThreadPost>
+              ) : null
+            )}
         </ModalContent>
       </Modal>
     </ModalContainer>

@@ -62,7 +62,7 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
 
 const getThreadCount = async (username, loaderOpts = {}) => {
   const threadCountArray = await db.PseudoPost.count({
-    where: { username },
+    where: { username, retweet: false, reply_to: null },
     attributes: ['conversation_id'],
     group: 'conversation_id',
     ...loaderOpts
