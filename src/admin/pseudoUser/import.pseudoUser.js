@@ -75,7 +75,7 @@ const options = {
         } = context
 
         return {
-          redirectUrl: `/admin/resources/PseudoPost?filters.username=${params.username}&direction=desc&sortBy=createdAt`,
+          redirectUrl: `/admin/resources/PseudoPost?filters.username=${params.username}`,
           records: [],
           record: context.record.toJSON(context.currentAdmin)
         }

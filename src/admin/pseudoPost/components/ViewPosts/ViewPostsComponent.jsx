@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Select from 'react-select'
 
-import styled from 'styled-components'
 import {
   ApproveUser,
   UserApproved,
@@ -177,9 +176,15 @@ const ViewPostsComponent = props => {
       const preIndex = refinedTweet.indexOf(preString)
       const searchIndex = preIndex + refinedTweet.substring(preIndex).indexOf(searchString)
       if (preIndex > searchIndex) {
-        refinedTweet = refinedTweet.replace(refinedTweet.substring(preIndex), params[`urls.${i}`])
+        refinedTweet = refinedTweet.replace(
+          refinedTweet.substring(preIndex),
+          !params[`urls.${i}`] ? `<_! COULD NOT RESOLVE URL: ${refinedTweet.substring(preIndex)}>` : params[`urls.${i}`]
+        )
       } else {
-        refinedTweet = refinedTweet.replace(refinedTweet.substring(preIndex, searchIndex), params[`urls.${i}`])
+        refinedTweet = refinedTweet.replace(
+          refinedTweet.substring(preIndex, searchIndex),
+          !params[`urls.${i}`] ? `<_! COULD NOT RESOLVE URL: ${refinedTweet.substring(preIndex, searchIndex)}>` : params[`urls.${i}`]
+        )
       }
       i += 1
     }
@@ -201,6 +206,9 @@ const ViewPostsComponent = props => {
       setTabTwo(true)
     }
   }
+
+  const isValid = record =>
+    record?.params.id === record?.params.conversationId && record?.params.reply_to === null && !record?.params.retweet
 
   if (!threadCountMap && !user) {
     return <h2>Loading...</h2>
@@ -248,8 +256,9 @@ const ViewPostsComponent = props => {
               <Posts>
                 {tabOne &&
                   records &&
+                  // thread.params.reply_to?.length === 0 && !thread.params.retweet
                   records.map((record, key) =>
-                    record?.params.id === record?.params.conversationId && !record?.params.approvedPostId ? (
+                    isValid(record) && !record?.params.approvedPostId ? (
                       <Card key={key}>
                         {/* <CardImage src="https://picsum.photos/500/300/?image=10" /> */}
                         <CardContent>
@@ -293,7 +302,7 @@ const ViewPostsComponent = props => {
                 {tabTwo &&
                   records &&
                   records.map((record, key) =>
-                    record?.params.id === record?.params.conversationId && record?.params.approvedPostId ? (
+                    isValid(record) && record?.params.approvedPostId ? (
                       <Card key={key}>
                         <CardContent>
                           <CardTitle>{record.params.username}</CardTitle>

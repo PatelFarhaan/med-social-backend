@@ -23,7 +23,7 @@ const options = {
       },
       handler: async (request, _, context) => {
         const { query } = request
-        const { filters = {} } = flat.unflatten(query || {})
+        const { sortBy, direction, filters = {} } = flat.unflatten(query || {})
         const { resource } = context
         let { page, perPage } = flat.unflatten(query || {})
         if (perPage) {
@@ -33,7 +33,7 @@ const options = {
         }
         page = Number(page) || 1
 
-        const sort = { direction: 'asc', sortBy: 'id' }
+        const sort = { direction: direction || 'desc', sortBy: sortBy || 'createdAt' }
 
         const filter = await new Filter(filters, resource).populate()
         const records = await resource.find(filter, {

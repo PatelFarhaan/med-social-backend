@@ -81,7 +81,7 @@ export const ThreadPost = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 20%;
+  height: 22%;
 `
 export const ButtonContainer = styled.div`
   display: flex;
@@ -113,6 +113,7 @@ export const TweetPosted = styled.div`
   text-align: left;
   width: ${props => (props.approved ? '100%' : '45%')};
   border: ${props => (props.focus ? '1px solid #3d8f44' : 'none')};
+  padding: 2%;
 `
 
 export const ModalContent = styled.div`
