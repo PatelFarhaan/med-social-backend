@@ -267,25 +267,28 @@ const getPopularcolumnists = async () =>
      LIMIT 10`,
     { type: QueryTypes.SELECT }
   )
-// db.Column.findAll({
-//   where: { state: columnStatuses.APPROVED },
-//   limit: 10,
-//   attributes: [
-//     'slug',
-//     'description',
-//     'name',
-//     'createdAt',
-//     'price',
-//     'visibility',
-//     'state',
-//     'type',
-//     'authorId',
-//     'ExpertiseId',
-//     [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
-//     [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
-//   ],
-//   order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
-// })
+
+const getTopColumns = async ({ page = 1, limit = 10 }) =>
+  db.Column.findAll({
+    where: { state: columnStatuses.APPROVED },
+    limit,
+    offset: limit * (page - 1),
+    attributes: [
+      'slug',
+      'description',
+      'name',
+      'createdAt',
+      'price',
+      'visibility',
+      'state',
+      'type',
+      'authorId',
+      'ExpertiseId',
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
+      [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
+    ],
+    order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
+  })
 
 const isUserSubscribedToColumn = async ({ column }, user, loaderOpts, Subscription = db.Subscription) => {
   const subscription = await Subscription.findOne({ where: { UserId: user.id, ColumnSlug: column }, ...loaderOpts })
@@ -302,5 +305,6 @@ module.exports = {
   banUser,
   getPopularColumns,
   isUserSubscribedToColumn,
-  getPopularcolumnists
+  getPopularcolumnists,
+  getTopColumns
 }
