@@ -176,14 +176,11 @@ const ViewPostsComponent = props => {
       const preIndex = refinedTweet.indexOf(preString)
       const searchIndex = preIndex + refinedTweet.substring(preIndex).indexOf(searchString)
       if (preIndex > searchIndex) {
-        refinedTweet = refinedTweet.replace(
-          refinedTweet.substring(preIndex),
-          !params[`urls.${i}`] ? `<_! COULD NOT RESOLVE URL: ${refinedTweet.substring(preIndex)}>` : params[`urls.${i}`]
-        )
+        refinedTweet = refinedTweet.replace(refinedTweet.substring(preIndex), !params[`urls.${i}`] ? params.thumbnail : params[`urls.${i}`])
       } else {
         refinedTweet = refinedTweet.replace(
           refinedTweet.substring(preIndex, searchIndex),
-          !params[`urls.${i}`] ? `<_! COULD NOT RESOLVE URL: ${refinedTweet.substring(preIndex, searchIndex)}>` : params[`urls.${i}`]
+          !params[`urls.${i}`] ? params.thumbnail : params[`urls.${i}`]
         )
       }
       i += 1
