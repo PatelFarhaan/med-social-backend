@@ -8,6 +8,7 @@ const columnSchema = gql`
     searchColumns(query: String!, page: Int, limit: Int): [Column]
     isUserSubscribedToColumn(column: String!): Boolean!
     popularColumnists: [Column]
+    topColumns(page: Int, limit: Int): [Column]
   }
 
   type Mutation {
