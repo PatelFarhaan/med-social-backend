@@ -46,7 +46,8 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
             author_id: author.id,
             ColumnSlug,
             order: index + 1,
-            stackParentId: post.id
+            stackParentId: post.id,
+            pseudoPost: true
           },
           { through: { order: index + 1 } }
         )
