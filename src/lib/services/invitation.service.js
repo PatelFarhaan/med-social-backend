@@ -104,7 +104,7 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
       invitation.state = states.APPROVED
       const token = await generateToken()
       invitation.token = token
-      await invitation.setApprovedBy(user.id)
+      invitation.approvedBy = user.id
       savedInvitation = await invitation.save()
       if (invitation.special) {
         await emailService.sendEmail(
