@@ -1,5 +1,4 @@
 const db = require('../../db/models')
-// const logger = require('../utils/logger')
 
 const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   const pseudoPosts = await db.PseudoPost.findAll({
@@ -74,7 +73,50 @@ const getThreadCount = async (username, loaderOpts = {}) => {
   }, {})
 }
 
+const getApprovedPosts = async username => {
+  const rawResult = await db.sequelize.query(
+    `select column1.name,ppjoin.* from
+  (select 
+  post."ColumnSlug",
+  pseudopost.id,
+  pseudopost.conversation_id,
+  pseudopost.created_at,
+  pseudopost.user_id,
+  pseudopost.username,
+  pseudopost.tweet,
+  pseudopost.urls, 
+  pseudopost.retweet,
+  pseudopost.thumbnail,
+  pseudopost.urls,
+  pseudopost.reply_to,
+  pseudopost.quote_url,
+  pseudopost.approved_post_id from "PseudoPost" as pseudopost
+  JOIN "Post" post
+  ON pseudopost.username='${username}' 
+  and pseudopost.conversation_id=pseudopost.id 
+  and pseudopost.retweet=FALSE 
+  and pseudopost.reply_to IS NULL 
+  and pseudopost.approved_post_id IS NOT NULL 
+  and pseudopost.approved_post_id = post.id
+  order by pseudopost.created_at desc
+  ) AS ppjoin JOIN "Column" as column1 
+  ON ppjoin."ColumnSlug" = column1.slug`
+  )
+  const approvedPosts = []
+  rawResult[0].forEach(params => {
+    params.conversationId = params.conversation_id
+    delete params.conversation_id
+    const post = { params }
+    approvedPosts.push(post)
+  })
+  if (approvedPosts.length) {
+    return approvedPosts
+  }
+  return null
+}
+
 module.exports = {
   approvePost,
-  getThreadCount
+  getThreadCount,
+  getApprovedPosts
 }

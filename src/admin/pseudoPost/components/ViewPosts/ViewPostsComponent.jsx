@@ -3,7 +3,9 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Select from 'react-select'
+import moment from 'moment'
 
+import styled from 'styled-components'
 import {
   ApproveUser,
   UserApproved,
@@ -26,7 +28,10 @@ import {
   PostsContainer,
   Posts,
   TabBar,
-  Tab
+  Tab,
+  TitleContainer,
+  CardColumn,
+  CreatedTime
 } from './ViewPostsComponentStyles'
 
 import ShowThreadsComponent from '../ShowThreads/ShowThreadsComponent'
@@ -42,6 +47,7 @@ const ViewPostsComponent = props => {
   const [tabOne, setTabOne] = useState(true)
   const [tabTwo, setTabTwo] = useState(false)
   const [threadCountMap, setThreadCountMap] = useState({})
+  const [approvedPosts, setApprovedPosts] = useState([])
   const location = useLocation()
 
   const deletePost = async id => {
@@ -116,6 +122,22 @@ const ViewPostsComponent = props => {
         setThreadCountMap(response.data.meta.threadCountMap)
       }
       getThreadCount(user.username)
+    },
+    [user, records, props.location]
+  )
+
+  useEffect(
+    () => {
+      const getApprovedPosts = async username => {
+        if (!username) {
+          return
+        }
+        const response = await axios.get(
+          `${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/actions/getApprovedPosts?username=${username}`
+        )
+        setApprovedPosts(response.data.meta.approvedPosts)
+      }
+      getApprovedPosts(user.username)
     },
     [user, records, props.location]
   )
@@ -260,6 +282,7 @@ const ViewPostsComponent = props => {
                         {/* <CardImage src="https://picsum.photos/500/300/?image=10" /> */}
                         <CardContent>
                           <CardTitle>{record.params.username}</CardTitle>
+                          <CreatedTime>{moment(record.params.createdAt).fromNow()}</CreatedTime>
                           <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
                           <ButtonBar>
                             <Left>
@@ -297,28 +320,30 @@ const ViewPostsComponent = props => {
                     ) : null
                   )}
                 {tabTwo &&
-                  records &&
-                  records.map((record, key) =>
-                    isValid(record) && record?.params.approvedPostId ? (
-                      <Card key={key}>
-                        <CardContent>
+                  approvedPosts &&
+                  approvedPosts.map((record, key) => (
+                    <Card key={key}>
+                      <CardContent>
+                        <TitleContainer>
                           <CardTitle>{record.params.username}</CardTitle>
-                          <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
-                          <ButtonBar>
-                            {threadCountMap[record?.params.conversationId.toString()] === 1 ? (
-                              <Post thread={false} onClick={() => showModal(record?.params.conversationId)}>
-                                Show Post
-                              </Post>
-                            ) : (
-                              <Post thread={true} onClick={() => showModal(record?.params.conversationId)}>
-                                Show Thread
-                              </Post>
-                            )}
-                          </ButtonBar>
-                        </CardContent>
-                      </Card>
-                    ) : null
-                  )}
+                          <CardColumn>Posted to: {record.params.name}</CardColumn>
+                        </TitleContainer>
+                        <CreatedTime>{moment(record.params.created_at).fromNow()}</CreatedTime>
+                        <CardText dangerouslySetInnerHTML={{ __html: formatHtml(replaceUrl(record.params.tweet, record.params)) }} />
+                        <ButtonBar>
+                          {threadCountMap[(record?.params.conversationId)] === 1 ? (
+                            <Post thread={false} onClick={() => showModal(record?.params.conversationId)}>
+                              Show Post
+                            </Post>
+                          ) : (
+                            <Post thread={true} onClick={() => showModal(record?.params.conversationId)}>
+                              Show Thread
+                            </Post>
+                          )}
+                        </ButtonBar>
+                      </CardContent>
+                    </Card>
+                  ))}
               </Posts>
             </PostsContainer>
           </MainContainer>

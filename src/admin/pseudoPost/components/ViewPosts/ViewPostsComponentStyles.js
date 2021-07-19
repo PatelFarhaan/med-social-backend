@@ -1,5 +1,18 @@
 import styled from 'styled-components'
 
+export const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`
+
+export const CardColumn = styled.div`
+  color: #3d8f44;
+  font-weight: 900;
+  font-size: 15px;
+`
+
 export const Buttons = styled.div`
   display: flex;
   flex-direction: row;
@@ -88,6 +101,14 @@ export const Post = styled.button`
     
   `}
 `
+
+export const CreatedTime = styled.p`
+  color: #3d8f44;
+  margin-top: 4px;
+  margin-bottom: 15px;
+  align-self: flex-start;
+`
+
 export const SelectDiv = styled.div`
   margin-bottom: 10px;
   select {
@@ -108,7 +129,6 @@ export const ButtonBar = styled.div`
 `
 
 export const CardText = styled.p`
-  color: #000;
   font-size: 0.875rem;
   line-height: 1.5;
   margin-bottom: 1.25rem;
@@ -119,7 +139,6 @@ export const CardText = styled.p`
 `
 
 export const CardTitle = styled.h2`
-  color: #000;
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 1px;
@@ -185,7 +204,6 @@ export const Layout = styled.div`
     background-color: #ecf9ff;
   }
   body {
-    color: #272727;
     font-family: 'Quicksand', serif;
     font-style: normal;
     font-weight: 400;

@@ -1,6 +1,6 @@
 const { default: AdminBro } = require('admin-bro')
 const { flat, Filter } = require('admin-bro')
-const { approvePost, getThreadCount } = require('../../lib/services/pseudopost.service')
+const { approvePost, getThreadCount, getApprovedPosts } = require('../../lib/services/pseudopost.service')
 
 const PER_PAGE_LIMIT = 500
 
@@ -91,6 +91,20 @@ const options = {
             message: 'Successfully Posted',
             type: 'success'
           }
+        }
+      }
+    },
+    getApprovedPosts: {
+      isVisible: false,
+      actionType: 'resource',
+      handler: async (request, _, __) => {
+        const { username } = request.query
+        const approvedPosts = await getApprovedPosts(username)
+        return {
+          meta: {
+            approvedPosts
+          },
+          records: null
         }
       }
     }
