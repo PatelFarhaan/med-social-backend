@@ -50,6 +50,14 @@ module.exports = {
       const columns = await db.Column.search(query, page, limit)
       return columns[0]
     },
+    popularColumnists: async _parent => {
+      const columns = await columnService.getPopularcolumnists()
+      return columns.map(column => exportSafeModel(column))
+    },
+    topColumns: async (_parent, args) => {
+      const columns = await columnService.getTopColumns(args)
+      return columns.map(column => exportSafeModel(column))
+    },
     isUserSubscribedToColumn: can(['standard', 'admin', 'superadmin']).createResolver(
       async (_parent, args, { context, EXPECTED_OPTIONS_KEY, req }) => {
         const { user } = req
