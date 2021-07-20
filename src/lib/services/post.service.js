@@ -663,12 +663,19 @@ const notifyMentionedUser = async (post, mentionedUsers) => {
 const getTopPostsForNewspaper = async (start, end) => {
   const startDate = new Date(start).toISOString()
   const endDate = new Date(end).toISOString()
+  const columnInclude = {
+    model: db.Column,
+    where: {
+      state: 'APPROVED'
+    }
+  }
   return db.Post.findAll({
     where: {
       createdAt: {
         [Op.between]: [startDate, endDate]
       }
     },
+    include: [columnInclude],
     order: [['votes', 'DESC']],
     limit: 15
   })
