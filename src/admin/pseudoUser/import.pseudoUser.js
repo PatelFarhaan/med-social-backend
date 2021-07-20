@@ -22,12 +22,13 @@ const options = {
         const { h, resource } = context
         const { file } = request.files
         const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
-        await pseudoUserService.addPseudoUser(_handle)
+        // await pseudoUserService.addPseudoUser(_handle)
         const { path } = file
         const buffer = fs.readFileSync(path)
         const type = await fileType.fromBuffer(buffer)
-        const filename = `${_handle}.${type.ext}`
+        const filename = `pseudouser-permissions/${_handle}.${type.ext}`
         const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
+        console.log(JSON.stringify(awsResponse))
         const notice = {}
         if (awsResponse.success) {
           notice.message = 'Successfully Imported'
