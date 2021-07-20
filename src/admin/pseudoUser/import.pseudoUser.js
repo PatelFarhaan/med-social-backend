@@ -26,7 +26,7 @@ const options = {
         const { path } = file
         const buffer = fs.readFileSync(path)
         const type = await fileType.fromBuffer(buffer)
-        const filename = `${_handle}.${type.ext}`
+        const filename = `pseudouser-permissions/${_handle}.${type.ext}`
         const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
         const notice = {}
         if (awsResponse.success) {
