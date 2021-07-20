@@ -100,26 +100,26 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
 
   let savedInvitation
   try {
-    if (invitation.state === states.PENDING) {
-      invitation.state = states.APPROVED
-      const token = await generateToken()
-      invitation.token = token
-      invitation.approved_by = user.id
-      savedInvitation = await invitation.save()
-      if (invitation.special) {
-        await emailService.sendEmail(
-          invitation.email,
-          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-          'nomDePlumeConfirmed'
-        )
-      } else {
-        await emailService.sendEmail(
-          invitation.email,
-          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-          'invitationConfirmed'
-        )
-      }
+    // if (invitation.state === states.PENDING) {
+    invitation.state = states.APPROVED
+    const token = await generateToken()
+    invitation.token = token
+    invitation.approved_by = user.id
+    savedInvitation = await invitation.save()
+    if (invitation.special) {
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+        'nomDePlumeConfirmed'
+      )
+    } else {
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+        'invitationConfirmed'
+      )
     }
+    // }
   } catch (e) {
     logger.warn(`savedInvitation ${e}`)
     throw e
