@@ -1,6 +1,9 @@
 const { default: AdminBro } = require('admin-bro')
 const { flat, Filter } = require('admin-bro')
+const fs = require('fs')
+const fileType = require('file-type')
 const { pseudoUserService } = require('../../lib/services')
+const { pUserUpload } = require('../../lib/services/upload.service')
 
 const PER_PAGE_LIMIT = 500
 
@@ -10,17 +13,33 @@ const options = {
   actions: {
     new: {
       isVisible: true,
+      custom: {
+        baseUrl: process.env.BASE_URL
+      },
+      component: AdminBro.bundle('./components/ImportUser/AddUserForm.jsx'),
       handler: async (request, _, context) => {
         const { url } = request.fields
         const { h, resource } = context
-        await pseudoUserService.addPseudoUser(url)
+        const { file } = request.files
+        const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
+        await pseudoUserService.addPseudoUser(_handle)
+        const { path } = file
+        const buffer = fs.readFileSync(path)
+        const type = await fileType.fromBuffer(buffer)
+        const filename = `${_handle}.${type.ext}`
+        const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
+        const notice = {}
+        if (awsResponse.success) {
+          notice.message = 'Successfully Imported'
+          notice.type = 'success'
+        } else {
+          notice.message = 'Error during import'
+          notice.type = 'failure'
+        }
         return {
           record: request.fields.url,
           redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
-          notice: {
-            message: 'Successfully Imported',
-            type: 'success'
-          }
+          notice
         }
       }
     },

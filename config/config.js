@@ -24,7 +24,8 @@ module.exports = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     postBucket: process.env.AWS_S3_POST_BUCKET,
-    userBucket: process.env.AWS_S3_USER_BUCKET
+    userBucket: process.env.AWS_S3_USER_BUCKET,
+    pUserBucket: process.env.AWS_S3_PUSER_BUCKET
   },
   googleLogin: {
     clientId: process.env.GOOGLE_CLIENT_ID,
