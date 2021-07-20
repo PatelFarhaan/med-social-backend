@@ -10,7 +10,9 @@ const publicFields = [
   'pseudoUser',
   'profileDescription',
   'createdAt',
-  'title'
+  'title',
+  'socialLink',
+  'customLink'
 ]
 
 const privateFields = [
@@ -21,9 +23,7 @@ const privateFields = [
   'roleId',
   'updatedAt',
   'deactivatedAt',
-  'notificationsSeenAt',
-  'socialLink',
-  'customLink'
+  'notificationsSeenAt'
 ]
 
 const systemPrivateFields = [
