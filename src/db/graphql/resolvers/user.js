@@ -8,9 +8,15 @@ const {
   signup,
   setPassword,
   resetPassword,
-  passwordChange
+  passwordChange,
+  updateNotificationSetting,
+  updateSocialLink,
+  addCustomLink,
+  updateCustomLink,
+  deleteCustomLink,
+  updateTitle
 } = require('../../../lib/users')
-const { tokenService, emailService, socialService, stripeService, uploadService } = require('../../../lib/services')
+const { tokenService, emailService, socialService, stripeService, uploadService, expertiseService } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
@@ -73,9 +79,11 @@ module.exports = {
         message: 'Email Sent'
       }
     },
-    getUser: async (_parent, { id }, { db, req }) => {
+    getUser: async (_parent, { id, username }, { db, req }) => {
+      if (!id && !username) throw new Error(JSON.stringify({ status: 400, message: 'id or username is required' }))
       const attributes = req.user && req.user.id === id ? privateFields : publicFields
-      const user = await db.User.findOne({ where: { id }, attributes })
+      const where = id ? { id } : { username }
+      const user = await db.User.findOne({ where, attributes })
       if (!user) throw new Error(JSON.stringify({ status: 404, message: 'Id provided is not valid' }))
       return user
     },
@@ -204,18 +212,26 @@ module.exports = {
       return savedUser
     }),
     // eslint-disable-next-line camelcase
-    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { email, profile_description }, { req, db }) => {
+    updateUser: can(['standard', 'admin', 'superadmin']).createResolver(
       // eslint-disable-next-line camelcase
-      if (!email && !profile_description)
-        throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
+      async (_parent, { email, title, profile_description, social_link, custom_link }, { req, db }) => {
+        // eslint-disable-next-line camelcase
+        if (!email && !profile_description)
+          throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
 
-      const updatePayload = {}
-      if (email) updatePayload.email = email
-      // eslint-disable-next-line camelcase
-      if (profile_description) updatePayload.profileDescription = profile_description
-      const updatedUser = await db.User.update(updatePayload, { where: { id: req.user.id }, returning: true, plain: true })
-      return updatedUser[1]
-    }),
+        const updatePayload = {}
+        if (email) updatePayload.email = email
+        if (title) updatePayload.title = title
+        // eslint-disable-next-line camelcase
+        if (profile_description) updatePayload.profileDescription = profile_description
+        // eslint-disable-next-line camelcase
+        if (social_link) updatePayload.socialLink = social_link
+        // eslint-disable-next-line camelcase
+        if (custom_link) updatePayload.customLink = custom_link
+        const updatedUser = await db.User.update(updatePayload, { where: { id: req.user.id }, returning: true, plain: true })
+        return updatedUser[1]
+      }
+    ),
     createUser: async (_parent, body) => {
       const user = await signup({ body, roleId: '3' })
       const tokens = await tokenService.generateAuthTokens(user)
@@ -256,6 +272,42 @@ module.exports = {
     },
     passwordChange: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { oldPassword, newPassword }, { req }) =>
       passwordChange(req.user, oldPassword, newPassword)
+    ),
+    updateUserNotificationSetting: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const notificationSettings = await updateNotificationSetting(user.id, args)
+      return notificationSettings
+    }),
+    updateUserSocialLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const upadatedUser = await updateSocialLink(user.id, args)
+      return upadatedUser
+    }),
+    addUserCustomLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await addCustomLink(user.id, args)
+      return updatedUser
+    }),
+    updateUserCustomLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await updateCustomLink(user.id, args)
+      return updatedUser
+    }),
+    deleteUserCustomLink: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await deleteCustomLink(user.id, args)
+      return updatedUser
+    }),
+    updateUserTitle: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const { user } = req
+      const updatedUser = await updateTitle(user.id, args)
+      return updatedUser
+    }),
+    setPrimaryExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { expertiseId }, { req }) =>
+      expertiseService.setExpertisePrimary(req.user, expertiseId)
+    ),
+    setSecondaryExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { expertiseId }, { req }) =>
+      expertiseService.setExpertiseSecondary(req.user, expertiseId)
     )
   },
   User: {
@@ -272,6 +324,10 @@ module.exports = {
     userExpertises: (user, _args, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })
+    },
+    notificationSetting: (user, _args, { db }) => {
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getNotificationSetting()
     }
   },
   UserExpertise: {

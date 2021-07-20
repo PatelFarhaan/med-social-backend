@@ -1,0 +1,46 @@
+.font_size{
+    font-size:46px;
+    line-height:56px;
+    max-height:257px;
+    }
+    .button_link{
+    padding: 14px 115px;
+    }
+    .left_buffer{
+    margin:auto;
+    }
+    .message_td{
+    padding-top:0px
+    }
+    @media only screen and (max-width: 768px){
+    .font_size{
+    font-size:32px;
+    line-height:40px;
+    max-height:257px;
+    }
+    .button_link{
+    padding: 14px 64px
+    }
+    .left_buffer{
+    margin-left:20px;
+    }
+    .message_td{
+    padding-top:0px
+    }
+    }
+    @media only screen and (max-width: 400px){
+    .font_size{
+    font-size:32px;
+    line-height:40px;
+    max-height:320px;
+    }
+    .button_link{
+    padding: 14px 64px
+    }
+    .left_buffer{
+    margin-left:20px;
+    }
+    .message_td{
+    padding-top:0px
+    }
+    }

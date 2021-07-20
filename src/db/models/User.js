@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.UUIDV4
       },
       lookupId: types.get('lookupId'),
-      email: { type: DataTypes.STRING, allowNull: false, validate: { min: 3 } },
+      email: { type: DataTypes.STRING, validate: { min: 3 } },
       firstName: { type: DataTypes.STRING, field: 'first_name' },
       lastName: { type: DataTypes.STRING, field: 'last_name' },
       fullName: { type: DataTypes.STRING },
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       isAnonymousUser: { type: DataTypes.BOOLEAN, field: 'is_anonymous_user', defaultValue: false },
       isMigrated: { type: DataTypes.BOOLEAN, field: 'is_migrated', defaultValue: false },
       invitationLimit: { type: DataTypes.INTEGER, field: 'invitation_limit', defaultValue: 5 },
-      profileDescription: { type: DataTypes.STRING(150), field: 'profile_description' },
+      profileDescription: { type: DataTypes.TEXT, field: 'profile_description' },
       notificationsSeenAt: { type: DataTypes.DATE, field: 'notifications_seen_at' },
       paymentMethod: { type: DataTypes.JSONB, field: 'payment_method' },
       stripeUserId: { type: DataTypes.STRING(150), field: 'stripe_user_id' },
@@ -36,10 +36,21 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         field: 'muted_notification_categories'
       },
+      pseudoUser: { type: DataTypes.BOOLEAN, field: 'pseudouser', defaultValue: false },
       settings: types.get('settings'),
+      vip: { type: DataTypes.BOOLEAN, defaultValue: false },
+      twitterUsername: { type: DataTypes.STRING },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt'),
-      deactivatedAt: types.get('deactivatedAt')
+      deactivatedAt: types.get('deactivatedAt'),
+      title: { type: DataTypes.STRING },
+      socialLink: {
+        type: DataTypes.JSONB,
+        field: 'social_link',
+        allowNull: false,
+        defaultValue: {}
+      },
+      customLink: { type: DataTypes.JSONB, field: 'custom_link', allowNull: false, defaultValue: [] }
     },
     {
       freezeTableName: true
@@ -47,6 +58,8 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   User.associate = models => {
+    User.hasOne(models.NotificationSetting)
+
     User.belongsTo(models.Role, {
       as: 'role',
       foreignKey: 'roleId'
@@ -96,6 +109,11 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     User.hasMany(models.Notification, { as: 'notificationAuthor' })
+
+    User.belongsToMany(models.Column, {
+      through: models.TopPeople,
+      as: 'topColumns'
+    })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {

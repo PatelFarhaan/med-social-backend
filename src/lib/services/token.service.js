@@ -67,7 +67,7 @@ const generateTypeToken = async (email, type = tokenTypes.MAGIC_LINK) => {
   if (existingToken) {
     try {
       const verifiedToken = jwt.verify(existingToken.token, config.jwt.secret)
-      return { token: verifiedToken, user }
+      return { token: verifiedToken.token, user }
     } catch (e) {
       await existingToken.destroy()
     }

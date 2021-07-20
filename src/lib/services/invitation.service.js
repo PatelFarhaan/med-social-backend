@@ -104,7 +104,7 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
       invitation.state = states.APPROVED
       const token = await generateToken()
       invitation.token = token
-      await invitation.setApprovedBy(user.id)
+      invitation.approved_by = user.id
       savedInvitation = await invitation.save()
       if (invitation.special) {
         await emailService.sendEmail(
@@ -142,7 +142,7 @@ const inviteUserToColumn = async (
   }
 
   const column = await Column.findByPk(columnSlug)
-  if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column already exists' }))
+  if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
 
   const existingUser = await User.findOne({ where: { email } })
 
@@ -176,8 +176,14 @@ const inviteUserToColumn = async (
 
   await emailService.sendEmail(
     invitation.email,
-    { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-    'invitationConfirmed'
+    {
+      fromFirstName: user.firstName.toUpperCase(),
+      firstName: invitation.firstName.toUpperCase(),
+      callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}`,
+      columnName: column.name,
+      columnSlug: column.slug
+    },
+    'sendInvitation'
   )
 
   return {

@@ -7,6 +7,7 @@ const publicFields = [
   'username',
   'profilePicture',
   'isAnonymousUser',
+  'pseudoUser',
   'profileDescription',
   'createdAt'
 ]

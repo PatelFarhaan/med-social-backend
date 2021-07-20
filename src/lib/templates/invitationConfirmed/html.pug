@@ -1,14 +1,27 @@
-extends ../basicEmail2
+extends ../newBasicEmailTwo
 
-block content
-  div(class="email")
-    p(class="email__name") Hi #{firstName},
-    p(class="email__title") We’ve reviewed your request and think you'd be a great addition to Column/.
-    p(class="email__text") You can finish signing up by clicking a button bellow.
-    a(class="email__button", href=`${callToActionUrl}`) FINISH SIGNING UP
-block ps
-  div(class="ps")
-    p(class="ps__text").
-      Column/ is a new social network dedicated to signal over noise. #[br]
-      If Twitter is a library crossed with a civil war, we’re a library crossed with a dinner party. #[br]#[br]
-      Can't wait to see you there!
+block large_content
+  .font_size(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Times,sans-serif;color:#000000;')
+    p(style='margin-top:0;letter-spacing:0.05em') WE’VE REVIEWED YOUR REQUEST AND THINK YOU'D BE A GREAT ADDITION TO COLUMN/. 
+
+
+block upper_text
+  div(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Arial,sans-serif;font-size:20px;;color:#666666;')
+    p(style='margin-top:0px;line-height:32px;')
+      | Sign up by clicking the green button below.
+
+block lower_text
+  div(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Arial,sans-serif;font-size:20px;line-height:32px;color:#666666;')
+    p(style='margin-top:0px')
+      | Column/ is a new social network dedicated to signal over noise. If Twitter is a library crossed with a civil war, we’re a library crossed with a dinner party.
+    p(style='margin-top:0px')
+      | Can't wait to see you there!
+
+block button_content
+  p(style='margin:0;text-align:center;')
+    a.button_link(href=`${callToActionUrl}` style='background: #3d8f44; text-decoration: none; ; color: #ffffff; border-radius: 8px; display:inline-block; mso-padding-alt:0;text-underline-color:none;font-size:Arial, sans-serif;letter-spacing:3.2px;font-size:12px;')
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%;mso-text-raise:20pt')  
+      span(style='mso-text-raise:10pt;font-weight:normal;') FINISH SIGNING UP
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%') 

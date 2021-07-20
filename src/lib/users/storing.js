@@ -10,10 +10,15 @@ const { tokenTypes } = require('../constants/token.constant')
 const logger = require('../utils/logger')
 const { calculatePoints } = require('../services/reputation.service')
 const { reputationSources } = require('../constants/reputation.constant')
+const { fileNames } = require('../constants/defaultProfileImages.constant')
 const previousAPIService = require('../services/previousAPI.service')
 const config = require('../../../config/config')
 
 const BCRYPT_SALT_ROUNDS = 10
+
+const getRandomInt = max => Math.ceil(Math.random() * max)
+
+const getS3URL = fileName => `https://column-static.s3.us-east-2.amazonaws.com/default_images/${fileName}`
 
 const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, Subscription = db.Subscription }) => {
   const { email, password, interests, expertises, passwordRepeat, roleId = 3, token, isSeed = false } = body
@@ -33,7 +38,18 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
   }
 
   // if (!roleId) throw new Error(JSON.stringify({ status: 422, message: 'Need role for user' }))
-  const user = await User.build({ ...body, roleId })
+  const user = await User.build({
+    ...body,
+    roleId,
+    title: '',
+    socialLink: { twitter: '', facebook: '', linkedin: '', instagram: '' },
+    customLink: []
+  })
+
+  // Set default Profile Picture
+  const randomInt = getRandomInt(129)
+  const fileName = fileNames[randomInt]
+  user.profilePicture = getS3URL(fileName)
 
   // Check if user email is unique
   if ((await User.count({ where: { email } })) > 0) {
@@ -50,6 +66,22 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
   try {
     // Save
     savedUser = await user.save()
+    const notificationSetting = await db.NotificationSetting.create({
+      UserId: savedUser.id,
+      pushNotifications: true,
+      upVote: true,
+      downVote: true,
+      repliesAndQuotes: true,
+      bookmarks: true,
+      columns: true,
+      invitations: true,
+      yourReputation: true,
+      reminders: true,
+      admin: true
+    })
+
+    savedUser.notificationSetting = notificationSetting
+    await savedUser.save()
 
     if (interests) {
       const dbInterests = await db.Interest.findAll({ where: { id: interests } })
@@ -259,6 +291,109 @@ const updatePrimaryUserRole = async (userId, roleId) => {
   })
 }
 
+const updateNotificationSetting = async (UserId, { settings }) => {
+  const {
+    pushNotifications,
+    upVote,
+    downVote,
+    repliesAndQuotes,
+    bookmarks,
+    columns,
+    invitations,
+    yourReputation,
+    reminders,
+    admin
+  } = settings
+  const notification = await db.NotificationSetting.findOne({ where: { UserId } })
+  try {
+    if (notification) {
+      notification.pushNotifications = pushNotifications
+      notification.upVote = upVote
+      notification.downVote = downVote
+      notification.repliesAndQuotes = repliesAndQuotes
+      notification.bookmarks = bookmarks
+      notification.columns = columns
+      notification.invitations = invitations
+      notification.yourReputation = yourReputation
+      notification.reminders = reminders
+      notification.admin = admin
+      await notification.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+  return notification
+}
+
+const updateSocialLink = async (userId, { socialLink }) => {
+  const user = db.User.findByPk(userId)
+  try {
+    if (user) {
+      user.socialLink = socialLink
+      await user.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+  return user
+}
+
+const addCustomLink = async (userId, { newLink }) => {
+  const user = db.User.findByPk(userId)
+  newLink.linkId = `${new Date()}`
+  try {
+    if (user) {
+      user.customLink = [...user.customLink, newLink]
+      await user.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+  return user
+}
+
+const updateCustomLink = async (userId, { link }) => {
+  const user = db.User.findByPk(userId)
+  try {
+    if (user) {
+      const linkIndex = user.customLink.findIndex(item => item.linkId === link.linkId)
+      if (linkIndex !== -1) {
+        user.customLink[linkIndex] = link
+        await user.save()
+      }
+    }
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+  return user
+}
+
+const deleteCustomLink = async (userId, { link }) => {
+  const user = db.User.findByPk(userId)
+  try {
+    if (user) {
+      const linkIndex = user.customLink.findIndex(item => item.linkId === link.linkId)
+      if (linkIndex !== -1) {
+        user.customLink.splice(linkIndex, 1)
+        await user.save()
+      }
+    }
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+  return user
+}
+
+const updateTitle = async (userId, { title }) => {
+  const user = db.User.findByPk(userId)
+  try {
+    user.title = title
+    await user.save()
+  } catch (e) {
+    logger.warn(`updatePrimaryUserRole ${e}`)
+  }
+}
+
 module.exports = {
   signup,
   authenticate,
@@ -269,5 +404,11 @@ module.exports = {
   updateUser,
   updatePrimaryUserRole,
   authenticateToken,
-  passwordChange
+  passwordChange,
+  updateNotificationSetting,
+  updateSocialLink,
+  addCustomLink,
+  updateCustomLink,
+  deleteCustomLink,
+  updateTitle
 }

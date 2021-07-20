@@ -53,7 +53,7 @@ describe('Column Service', () => {
       await db.Subscription.create({
         type: subscriptionTypes.COLUMN,
         email: user.email,
-        userId: user.id,
+        UserId: user.id,
         ColumnSlug: column.slug
       })
       const response = await columnService.unsubscribeToColumn({ body: { column } }, user)

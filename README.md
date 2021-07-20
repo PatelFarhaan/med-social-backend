@@ -14,9 +14,9 @@
 * Semi-docker env (recommended if you have node installed)
 
 1. `cp .env.example .env`
-2. `docker-compose up -d db` -> Launch DB only
+2. Build base docker image `docker build -t column/base -f docker/dev/Dockerfile.base .`
 3. `yarn install`
-4. `yarn dev`
+4. `yarn semiDocker && yarn dev`
 
 ## Dev process
 

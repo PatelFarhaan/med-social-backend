@@ -34,6 +34,7 @@
     ]
   },
   "dependencies": {
+    "@admin-bro/design-system": "^1.7.3",
     "@admin-bro/express": "^3.1.0",
     "@admin-bro/sequelize": "^1.2.1",
     "@aws-sdk/client-ses": "^3.7.0",
@@ -89,7 +90,9 @@
     "slugify": "^1.4.7",
     "socket.io": "^2.1.1",
     "stripe": "^8.137.0",
+    "styled-components": "^5.3.0",
     "supertest-session": "^3.3.0",
+    "url-safe-string": "^1.1.0",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
   },

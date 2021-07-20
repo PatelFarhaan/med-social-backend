@@ -1,13 +1,70 @@
-extends ../basicEmail3
+extends ../newBasicEmail
 
-block content
-  div(class="email")
-    p(class="email__title") SIGN IN
-    p(class="email__text").
-      Tap the button below to sign in your Column/ account on your mobile device. #[br]#[br]
-      This link will expire in 2 hours and can only be used once.
-    div(class="text_center")
-      a(class="email__button", href=`${callToActionUrl}`) SIGN IN TO COLUMN/
-    br
-    p(class="email__text").
-      If the button above doesn’t work, paste this link into your web browser: #{callToActionUrl}
+block header_template
+  p.top_buffer(style='\
+  font-family: Times, sans-serif;\
+  white-space: nowrap;\
+  letter-spacing: 4px;\
+  ')
+    | SIGN IN
+
+block upper_text_content
+  div(style='\
+  display: inline-block;\
+  width: 90%;\
+  max-width: 590px;\
+  vertical-align: top;\
+  font-family: Arial, sans-serif;\
+  font-size: 20px;\
+  color: #666666;\
+  ')
+    p(style='margin-top: 0px; line-height: 32px')
+      | Tap the button below to sign in your Column/ account on
+      | your mobile device.
+    p(style='margin-top: 0px; padding-top: 15px')
+      | This link will expire in 2 hours and can only be used
+      | once.
+
+block button_content
+  p(style='margin: 0; text-align: left')
+    a.button_link(href=`${callToActionUrl}` style='\
+    background: #3d8f44;\
+    text-decoration: none;\
+    color: #ffffff;\
+    border-radius: 8px;\
+    display: inline-block;\
+    mso-padding-alt: 0;\
+    text-underline-color: none;\
+    font-size: Arial, sans-serif;\
+    letter-spacing: 3.2px;\
+    font-size: 12px;\
+    ')
+      //if mso
+        i(style='\
+        letter-spacing: 25px;\
+        mso-font-width: -100%;\
+        mso-text-raise: 20pt;\
+        ')  
+        //
+          [endif]
+      span(style='mso-text-raise: 10pt; font-weight: normal') SIGN INTO COLUMN
+      //if mso
+        i(style='letter-spacing: 25px; mso-font-width: -100%')  
+        //
+          [endif]
+
+block bottom_text_content
+  div(style='\
+  display: inline-block;\
+  width: 90%;\
+  max-width: 590px;\
+  vertical-align: top;\
+  font-family: Arial, sans-serif;\
+  font-size: 20px;\
+  line-height: 32px;\
+  color: #666666;\
+  ')
+    p(style='margin-top: 0px')
+      | If the button above doesn’t work, paste this link into
+      | your web browser:
+      a(style='color: #3d8f44; cursor: pointer') #{callToActionUrl}

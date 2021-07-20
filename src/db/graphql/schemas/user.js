@@ -3,7 +3,7 @@ const { gql } = require('apollo-server-express')
 const userSchema = gql`
   type Query {
     login(email: String!, password: String, token: String): Session
-    getUser(id: String!): User
+    getUser(id: String, username: String): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
     getMagicLink(email: String!): DefaultPayload
     resetPasswordLink(email: String!): DefaultPayload
@@ -49,7 +49,7 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(email: String, profile_description: String): User
+    updateUser(email: String, profile_description: String, title: String, social_link: SocialLinkInput, custom_link: [LinkInput]): User
     createUser(
       email: String!
       firstName: String!
@@ -71,8 +71,51 @@ const userSchema = gql`
     setPassword(password: String!): User
     resetPassword(password: String!, token: String!): User
     passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
+    updateUserNotificationSetting(settings: SettingsInput!): NotificationSetting
+    updateUserSocialLink(socialLink: SocialLinkInput!): User
+    addUserCustomLink(newLink: CustomLinkInput!): User
+    updateUserCustomLink(link: LinkInput!): User
+    deleteUserCustomLink(link: LinkInput!): User
+    updateUserTitle(title: String!): User
+    setPrimaryExpertise(expertiseId: String!): UserExpertise
+    setSecondaryExpertise(expertiseId: String!): UserExpertise
   }
 
+  input LinkInput {
+    linkId: String!
+    type: String!
+    url: String!
+  }
+
+  input SettingsInput {
+    pushNotifications: Boolean!
+    upVote: Boolean!
+    downVote: Boolean!
+    repliesAndQuotes: Boolean!
+    bookmarks: Boolean!
+    columns: Boolean!
+    invitations: Boolean!
+    yourReputation: Boolean!
+    reminders: Boolean!
+    admin: Boolean!
+  }
+
+  type NotificationSetting {
+    id: ID!
+    pushNotifications: Boolean!
+    upVote: Boolean!
+    downVote: Boolean!
+    repliesAndQuotes: Boolean!
+    bookmarks: Boolean!
+    columns: Boolean!
+    invitations: Boolean!
+    yourReputation: Boolean!
+    reminders: Boolean!
+    admin: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    UserId: ID!
+  }
   type Users {
     list: [User]
     count: Int!
@@ -111,6 +154,31 @@ const userSchema = gql`
     expire_month: Int
   }
 
+  type SocialLink {
+    twitter: String
+    facebook: String
+    linkedin: String
+    instagram: String
+  }
+
+  input SocialLinkInput {
+    twitter: String!
+    facebook: String!
+    linkedin: String!
+    instagram: String!
+  }
+
+  type CustomLink {
+    linkId: String!
+    type: String!
+    url: String!
+  }
+
+  input CustomLinkInput {
+    type: String!
+    url: String!
+  }
+
   type User {
     id: String
     email: String!
@@ -122,6 +190,7 @@ const userSchema = gql`
     profilePicture: String
     profileDescription: String
     isAnonymousUser: Boolean
+    pseudoUser: Boolean
     notificationsSeenAt: DateTime
     settings: JSON
     expertises(limit: Int, page: Int): [Expertise]
@@ -129,6 +198,10 @@ const userSchema = gql`
     invitedBy: [User]
     userExpertises: [UserExpertise]
     paymentMethod: UserPaymentMethod
+    notificationSetting: NotificationSetting
+    title: String
+    socialLink: SocialLink
+    customLink: [CustomLink]
   }
 `
 

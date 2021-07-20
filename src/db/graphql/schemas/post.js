@@ -8,6 +8,7 @@ const postSchema = gql`
     listUserBookmarks(id: String!, page: Int, limit: Int, sortBy: String, sortDirection: String): Posts
     listUserPosts(page: Int, limit: Int, sortBy: String, sortDirection: String, hierarchy: Boolean): Posts
     searchPosts(query: String!, page: Int, limit: Int): [Post]
+    getTopPosts(start: String!, end: String!): [Post]
   }
 
   type Mutation {
@@ -23,7 +24,7 @@ const postSchema = gql`
     createComment(content: String!, id: Int!, files: [Upload]): Post
     createPostBookmark(id: Int!): Post
     deletePost(id: Int!): DefaultPayload
-    createPostVote(id: Int!, type: voteTypes): Post
+    createPostVote(id: Int!, type: voteTypes, points: Int!): Post
     editPost(id: Int!, content: String!): Post
     reportPost(id: Int!, reason: String!): DefaultPayload
     reviewPost(id: Int!, state: reportedContentStatuses!): DefaultPayload
