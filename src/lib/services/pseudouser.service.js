@@ -46,8 +46,7 @@ const approveUser = async (username, body, loaderOpts) => {
   return savedUser
 }
 
-const addPseudoUser = async url => {
-  const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
+const addPseudoUser = async _handle => {
   await axios.post(`${process.env.RESEARCH_APP}/pusers`, {
     handle: _handle
   })
