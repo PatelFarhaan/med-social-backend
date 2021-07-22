@@ -216,8 +216,8 @@ module.exports = {
       // eslint-disable-next-line camelcase
       async (_parent, { email, title, profile_description, social_link, custom_link }, { req, db }) => {
         // eslint-disable-next-line camelcase
-        if (!email && !profile_description)
-          throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
+        // if (!email && !profile_description)
+        //   throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
 
         const updatePayload = {}
         if (email) updatePayload.email = email
