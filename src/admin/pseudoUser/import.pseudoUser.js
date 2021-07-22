@@ -23,18 +23,21 @@ const options = {
         const { file } = request.files
         const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
         await pseudoUserService.addPseudoUser(_handle)
-        const { path } = file
-        const buffer = fs.readFileSync(path)
-        const type = await fileType.fromBuffer(buffer)
-        const filename = `pseudouser-permissions/${_handle}.${type.ext}`
-        const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
         const notice = {}
-        if (awsResponse.success) {
-          notice.message = 'Successfully Imported'
-          notice.type = 'success'
-        } else {
-          notice.message = 'Error during import'
-          notice.type = 'failure'
+        notice.message = 'Successfully Imported'
+        notice.type = 'success'
+        if (file) {
+          const { path } = file
+          const buffer = fs.readFileSync(path)
+          const type = await fileType.fromBuffer(buffer)
+          const filename = `pseudouser-permissions/${_handle}.${type.ext}`
+          const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
+          if (!awsResponse.success) {
+            notice.message = 'Error during import'
+            notice.type = 'failure'
+          } else {
+            await pseudoUserService.updatePermissionFileUrl(_handle, awsResponse.location)
+          }
         }
         return {
           record: request.fields.url,
@@ -203,6 +206,39 @@ const options = {
         }
       }),
       component: false
+    },
+    uploadPermissions: {
+      isVisible: false,
+      custom: {
+        baseUrl: process.env.BASE_URL
+      },
+      component: false,
+      handler: async (request, _, context) => {
+        const { handle } = request.fields
+        const { h, resource } = context
+        const { file } = request.files
+        const notice = {}
+        notice.message = 'Successfully Imported'
+        notice.type = 'success'
+        if (file) {
+          const { path } = file
+          const buffer = fs.readFileSync(path)
+          const type = await fileType.fromBuffer(buffer)
+          const filename = `pseudouser-permissions/${handle}.${type.ext}`
+          const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
+          if (!awsResponse.success) {
+            notice.message = 'Error during import'
+            notice.type = 'failure'
+          } else {
+            await pseudoUserService.updatePermissionFileUrl(handle, awsResponse.location)
+          }
+        }
+        return {
+          record: request.fields.url,
+          redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
+          notice
+        }
+      }
     }
   }
 }
