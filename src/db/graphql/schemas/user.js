@@ -162,10 +162,10 @@ const userSchema = gql`
   }
 
   input SocialLinkInput {
-    twitter: String!
-    facebook: String!
-    linkedin: String!
-    instagram: String!
+    twitter: String
+    facebook: String
+    linkedin: String
+    instagram: String
   }
 
   type CustomLink {
