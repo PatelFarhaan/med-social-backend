@@ -432,6 +432,10 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
       const uploadedFiles = (await Promise.all(files)).map(item => uploadService.processUploadS3(item, 'POST'))
       ;(await Promise.all(uploadedFiles)).map(async file => comment.createFile({ ...file, UserId: user.id, ColumnSlug: column.slug }))
     }
+    const mentionedUsers = await getMentionedUsers(DBpost)
+    if (mentionedUsers.length > 0) {
+      await notifyMentionedUser(DBpost, mentionedUsers)
+    }
     if (DBpost.author_id !== user.id) {
       const DBpostAuthor = await DBpost.getAuthor()
       await notify(
