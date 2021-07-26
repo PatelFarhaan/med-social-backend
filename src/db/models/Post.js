@@ -19,10 +19,11 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: types.get('updatedAt')
     },
     {
-      freezeTableName: true,
-      hierarchy: true
+      freezeTableName: true
     }
   )
+
+  Post.isHierarchy({ onDelete: 'CASCADE' })
 
   Post.associate = models => {
     Post.belongsToMany(models.Post, {

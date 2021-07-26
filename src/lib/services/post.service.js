@@ -300,6 +300,11 @@ const deletePost = async ({ body: { id } }, user, Post = db.Post) => {
   if (!DBpost) throw new Error({ status: 404, message: 'Post not found' })
   const author = await DBpost.getAuthor()
   if (author.id !== user.id) throw new Error({ status: 400, message: 'Post can only be deleted by the author' })
+  const postParent = await DBpost.getParent()
+  if (postParent) {
+    postParent.comments -= 1
+    await postParent.save()
+  }
   await DBpost.destroy()
   return {
     status: 204,
