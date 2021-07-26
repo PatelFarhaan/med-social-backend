@@ -38,13 +38,16 @@ module.exports = (sequelize, DataTypes) => {
       retweetDate: { type: DataTypes.TEXT, field: 'retweet_date' },
       translate: { type: DataTypes.TEXT },
       transSrc: { type: DataTypes.TEXT, field: 'trans_src' },
-      transDest: { type: DataTypes.TEXT, field: 'trans_dest' },
-      approvedPostId: { type: DataTypes.INTEGER, allowNull: true, field: 'approved_post_id' }
+      transDest: { type: DataTypes.TEXT, field: 'trans_dest' }
     },
     {
       freezeTableName: true
     }
   )
+
+  PseudoPost.associate = models => {
+    PseudoPost.belongsTo(models.Post)
+  }
 
   PseudoPost.addHook('beforeCreate', instance => {
     instance.tweet = sanitizeHtml(instance.tweet)
