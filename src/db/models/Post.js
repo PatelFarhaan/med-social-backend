@@ -73,6 +73,7 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     Post.hasMany(models.File, { as: 'files' })
+    Post.hasOne(models.PseudoPost)
   }
 
   Post.addHook('beforeCreate', instance => {
