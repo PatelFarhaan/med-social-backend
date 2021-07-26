@@ -209,7 +209,6 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
 
 const listUserAuthoredPosts = async ({ id, page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
   if (!user && !id) throw new Error(JSON.stringify({ status: 404, message: 'No id was supplied' }))
-  const userId = id || user.id
 
   let order = [['createdAt', 'ASC']]
 
@@ -225,18 +224,20 @@ const listUserAuthoredPosts = async ({ id, page = 1, limit = LIMIT, sortBy, sort
 
   return db.Post.findAndCountAll({
     where: {
-      author_id: userId
+      author_id: id
     },
     attributes: [
       ...publicFields,
       [
-        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${userId}')`),
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
       ],
       [
         db.sequelize.literal(
           // eslint-disable-next-line max-len
-          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${userId}')`
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
         ),
         'userBookmark'
       ]
