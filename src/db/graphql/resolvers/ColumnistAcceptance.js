@@ -1,17 +1,21 @@
 const { stripeService } = require('../../../lib/services')
 const { can } = require('./../auth')
-// const logger = require('../../../lib/utils/logger')
+const logger = require('../../../lib/utils/logger')
 
 module.exports = {
   Query: {
-    RetrieveStripeStatus: async (_parent, _, { req }) => {
+    RetrieveStripeStatus: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, _, { req }) => {
       const { user } = req
+      if (!user.stripeUserId)
+      {
+        return false
+      }
       const Account = await stripeService.RetrieveStripeAccount(user.stripeUserId)
       if (Account.details_submitted === true) {
         return true
       }
       return false
-    }
+    })
   },
   Mutation: {
     ConnectColumnistToStripe: can(['standard', 'admin', 'superadmin']).createResolver(
