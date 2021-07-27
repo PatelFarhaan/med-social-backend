@@ -49,7 +49,8 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     Post.belongsTo(models.Post, {
-      as: 'stackParent'
+      as: 'stackParent',
+      onDelete: 'CASCADE'
     })
 
     Post.belongsTo(models.Post, {
