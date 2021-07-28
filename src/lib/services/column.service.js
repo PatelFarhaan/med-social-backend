@@ -206,6 +206,35 @@ const unsubscribeToColumn = async ({ body: { column } }, user, Subscription = db
   }
 }
 
+const multiColumnUnsubscribe = async ({ columns = [] }, user, Subscription = db.Subscription) => {
+  const subscriptions = await Subscription.findAll({
+    where: {
+      type: subscriptionTypes.COLUMN,
+      ColumnSlug: columns.map(c => c.slug),
+      UserId: user.id
+    }
+  })
+  if (subscriptions.length === 0) throw new Error(JSON.stringify({ status: 404, message: 'Subscription not found' }))
+
+  const paidColumns = columns.filter(item => item.type === columnTypes.PAID)
+  const mappedPaidColumns = paidColumns.map(item => item.slug)
+  const mappedPaidColumnSubscriptions = subscriptions.filter(subscription => mappedPaidColumns.includes(subscription.ColumnSlug))
+
+  Promise.all(
+    mappedPaidColumnSubscriptions.map(async subscription => {
+      const resp = await stripeService.unsubscribe(subscription.subscriptionId)
+      if (resp.status !== 'canceled') throw new Error(JSON.stringify({ status: 400, message: 'Stripe subscription was not canceled' }))
+    })
+  )
+
+  await Subscription.destroy({ where: { id: subscriptions.map(subscription => subscription.id) } })
+
+  return {
+    status: 204,
+    message: 'Subscription successfully deleted'
+  }
+}
+
 const banUser = async ({ body: { column, bannedUser } }, user) => {
   const author = await column.getAuthor()
   if (author !== user.id) throw new Error(JSON.stringify({ status: 403, message: 'Only the owner of the column is allowed to ban a user' }))
@@ -306,5 +335,6 @@ module.exports = {
   getPopularColumns,
   isUserSubscribedToColumn,
   getPopularcolumnists,
-  getTopColumns
+  getTopColumns,
+  multiColumnUnsubscribe
 }
