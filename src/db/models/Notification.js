@@ -22,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
       as: 'author'
     })
 
+    Notification.belongsTo(models.Post)
+    Notification.belongsTo(models.Column)
+
     Notification.belongsToMany(models.User, {
       through: 'NotificationReceipient',
       as: 'receipients'

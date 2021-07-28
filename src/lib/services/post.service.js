@@ -489,12 +489,12 @@ const uploadFileToPost = async ({ body: { id, files = [] } }, Post = db.Post) =>
   return DBpost
 }
 
-const updateVoteValue = async (voteType, points, post) => {
+const updateVoteValue = async (voteType, points, post, oldPoints = 0) => {
   if (voteType === 'UP') {
-    await post.increment('votes', { by: points })
+    await post.increment('votes', { by: oldPoints + points })
     return points
   }
-  await post.decrement('votes', { by: points })
+  await post.decrement('votes', { by: oldPoints + points })
   return -1 * points
 }
 
@@ -510,7 +510,7 @@ const votePost = async (
   let post
   try {
     let voteValue = 0
-    if (points > maxVotePoints) throw new Error({ status: 400, message: 'Max points to be given is only up to 50' })
+    if (points > maxVotePoints) throw new Error(`Max points to be given is only up to ${maxVotePoints}`)
     post = await Post.findByPk(id)
     if (!post) throw new Error({ status: 404, message: 'Post not found' })
     const existingVote = await Vote.findOne({ where: { PostId: post.id, UserId: user.id } })
@@ -528,22 +528,26 @@ const votePost = async (
           source: reputationSources.VOTED
         }
       })
-      await Notification.destroy({
-        where: {
-          PostId: post.id,
-          authorId: user.id
-        }
-      })
       if (existingVote.type === type) {
-        await updateVoteValue(type, -1 * points, post)
-        await existingVote.destroy()
-      } else {
-        existingVote.type = type
+        if (existingVote.points + points > maxVotePoints) throw new Error(`Max points to be given is only up to ${maxVotePoints}`)
+        const newPoints = existingVote.points + points <= maxVotePoints ? points : maxVotePoints
+        const newVoteValue = await updateVoteValue(type, newPoints, post)
+        await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, newVoteValue)
+        existingVote.points += newPoints
         await existingVote.save()
-        voteValue = await updateVoteValue(type, points, post)
-        // TODO: Refactor this after the 0.5 release to adhere with DRY
+      } else {
+        voteValue = await updateVoteValue(type, points, post, existingVote.points)
+        existingVote.type = type
+        existingVote.points = points
+        await existingVote.save()
         await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
         if (voteValue > 0 && postAuthor.id !== user.id) {
+          await Notification.destroy({
+            where: {
+              PostId: post.id,
+              authorId: user.id
+            }
+          })
           await notify(
             notificationTypes.UPVOTED,
             notificationCategories.VOTES,
@@ -581,8 +585,7 @@ const votePost = async (
     }
   } catch (e) {
     logger.warn(`votePost: ${e}`)
-    const parsedError = isStringJSON(e.message) ? JSON.parse(e.message) : e
-    throw new Error(JSON.stringify({ status: parsedError.status ? parsedError.status : 400, message: parsedError.message }))
+    throw e
   }
   return post
 }
