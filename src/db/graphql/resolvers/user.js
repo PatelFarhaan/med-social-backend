@@ -245,10 +245,10 @@ module.exports = {
         const { token } = await changeRequestService.createChangeRequest('User', 'email', email, user.id)
 
         await emailService.sendEmail(
-          user.email,
+          email,
           {
             firstName: user.firstName,
-            callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/verify-email?token=${token}&email=${user.email}`
+            callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/verify-email?token=${token}&email=${email}`
           },
           'userChangeEmail'
         )
