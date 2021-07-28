@@ -49,7 +49,9 @@ const userSchema = gql`
   }
 
   type Mutation {
-    updateUser(email: String, profile_description: String, title: String, social_link: SocialLinkInput, custom_link: [LinkInput]): User
+    updateUser(profile_description: String, title: String, social_link: SocialLinkInput, custom_link: [LinkInput]): User
+    updateEmail(email: String!): DefaultPayload
+    verifyUpdateEmail(email: String!, token: String!): DefaultPayload
     createUser(
       email: String!
       firstName: String!

@@ -114,6 +114,10 @@ module.exports = (sequelize, DataTypes) => {
       through: models.TopPeople,
       as: 'topColumns'
     })
+
+    User.hasMany(models.ChangeRequest)
+
+    User.hasMany(models.ChangeRequest, { as: 'approvedChangeRequests' })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {
