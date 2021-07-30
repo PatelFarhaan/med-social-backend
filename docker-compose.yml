@@ -49,7 +49,7 @@ services:
     - mock_server
 
   db:
-    image: postgres:12.7-alpine
+    image: postgres
     ports:
     - 5432:5432
     environment:

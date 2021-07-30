@@ -2,7 +2,7 @@ const { gql } = require('apollo-server-express')
 
 const ColumnistAcceptance = gql`
   type Query {
-    RetrieveStripeStatus: Boolean
+    RetrieveStripeStatus: StripeStatus
   }
   type Mutation {
     ConnectColumnistToStripe(return_url: String!, refresh_url: String!): StripeUrl
@@ -10,6 +10,11 @@ const ColumnistAcceptance = gql`
 
   type StripeUrl {
     ConnectUrl: String
+  }
+
+  type StripeStatus {
+    Status: Boolean
+    Errors: String
   }
 `
 
