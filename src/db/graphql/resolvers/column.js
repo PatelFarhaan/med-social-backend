@@ -87,6 +87,13 @@ module.exports = {
         return columnService.unsubscribeToColumn({ body: { column } }, req.user)
       }
     ),
+    multiColumnUnsubscribe: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, { columns }, { db, req, context, EXPECTED_OPTIONS_KEY }) => {
+        const dbColumns = await db.Column.findAll({ where: { slug: columns } }, { [EXPECTED_OPTIONS_KEY]: context })
+        if (dbColumns.length === 0) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
+        return columnService.multiColumnUnsubscribe({ columns: dbColumns }, req.user)
+      }
+    ),
     banUser: can(['standard', 'admin', 'superadmin']).createResolver(
       async (_parent, { slug, bannedUserId }, { db, req, context, EXPECTED_OPTIONS_KEY }) => {
         const column = await db.Column.findByPk(slug, { [EXPECTED_OPTIONS_KEY]: context })
