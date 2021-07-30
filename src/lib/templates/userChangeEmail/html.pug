@@ -1,12 +1,67 @@
-extends ../basicEmail3
+extends ../newBasicEmail
 
-block content
-  div(class="email")
-    p(class="email__title") CHANGE EMAIL
-    p(class="email__text").
-      Hi #{firstName},#[br]#[br]
-      You requested to change your email on Column/. Click this button to change it:
-    div(class="text_center")
-      a(class="email__button", href=`${callToActionUrl}`) CHANGE EMAIL
+block header_template
+  p.top_buffer_reset(style='\
+  font-family: Times, sans-serif;\
+  white-space: nowrap;\
+  letter-spacing: 4px;\
+  line-height:38px;\
+  ')
+    | CHANGE
     br
-    p(class="email__text") If you did not request this, please ignore this email or reply to let us know. This change email is valid for the next 30 minutes.
+    | EMAIL
+
+block upper_text_content
+  div(style='\
+  display: inline-block;\
+  width: 90%;\
+  max-width: 590px;\
+  vertical-align: top;\
+  font-family: Arial, sans-serif;\
+  font-size: 20px;\
+  color: #666666;\
+  ')
+    p(style='margin-top: 0px; line-height: 32px')
+      | You requested to change your email on Column/. Click this button to reset it:
+
+block button_content
+  p(style='margin: 0; text-align: left')
+    a.button_link(href=`${callToActionUrl}` style='\
+    background: #3d8f44;\
+    text-decoration: none;\
+    color: #ffffff;\
+    border-radius: 8px;\
+    display: inline-block;\
+    mso-padding-alt: 0;\
+    text-underline-color: none;\
+    font-size: Arial, sans-serif;\
+    letter-spacing: 3.2px;\
+    font-size: 12px;\
+    ')
+      //if mso
+        i(style='\
+        letter-spacing: 25px;\
+        mso-font-width: -100%;\
+        mso-text-raise: 20pt;\
+        ')  
+        //
+          [endif]
+      span(style='mso-text-raise: 10pt; font-weight: normal') CHANGE EMAIL
+      //if mso
+        i(style='letter-spacing: 25px; mso-font-width: -100%')  
+        //
+          [endif]
+
+block bottom_text_content
+  div(style='\
+  display: inline-block;\
+  width: 90%;\
+  max-width: 590px;\
+  vertical-align: top;\
+  font-family: Arial, sans-serif;\
+  font-size: 20px;\
+  line-height: 32px;\
+  color: #666666;\
+  ')
+    p(style='margin-top: 0px')
+      | If you did not request this, please ignore this email or reply to let us know. This change email request is valid for 1 day.
