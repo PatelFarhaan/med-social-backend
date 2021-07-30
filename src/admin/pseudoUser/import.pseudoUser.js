@@ -159,7 +159,7 @@ const options = {
         params.lastName = params.name.substr(params.name.indexOf(' ') + 1)
         if (!params.firstName) {
           params.firstName = params.name
-          params.lastName = null
+          params.lastName = ''
         }
         params.fullName = params.name
         params.profilePicture = params.profileImageUrl.replace('_normal', '')
