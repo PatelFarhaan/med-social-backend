@@ -55,7 +55,8 @@ const setDefaultPaymentMethod = async ({ id, user }) => {
     await stripeService.setDefaultPaymentMethod(stripeCustomerId, id)
     const paymentMethod = await db.PaymentMethod.findOne({ where: { UserId: user.id, id } })
     user.paymentMethod = paymentMethod
-    return user.save()
+    await user.save()
+    return { status: 204, message: 'Successfully updated' }
   } catch (e) {
     logger.warn(`setDefaultPaymentMethod:`, e)
     return e
