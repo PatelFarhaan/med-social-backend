@@ -1,8 +1,24 @@
-extends ../basicEmail2
+extends ../newBasicEmailFive
 
-block content
-  div(class="email")
-    p(class="email__name") Hi #{firstName},
-    p(class="email__title") Sadly, you don't meet our requirements to obtain a Nom de Plume.
-    p(class="email__text") Still want to participate in the conversation? We'd love for you to be a member under your real name! Please follow the link below to finish signing up.
-    a(class="email__button", href=`${callToActionUrl}`) FINISH SIGNING UP
+block large_content
+  div.font_size(style='display:inline-block;width:90%;max-width:590px;max-height:165px;vertical-align:top;font-family:Times,sans-serif;color:#000000;')
+    p(style='margin-top:0;')
+      | SADLY, YOU DON'T  MEET OUR REQUIREMENTS TO OBTAIN A 
+      br
+      | NOM DE PLUME. 
+
+block text_content
+  div(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Arial,sans-serif;font-size:20px;line-height:32px;color:#666666;')
+    p(style='margin-top:0px')
+      | Still want to participate in the conversation? We'd love for you to be a member under your real name!
+    p(style='margin-top:0px')
+      | Please follow the link below to finish signing up.
+
+block button_content
+  p(style='margin:0;text-align:center;')
+    a.button_link(href=`${callToActionUrl}` style='background: #3d8f44; text-decoration: none; ; color: #ffffff; border-radius: 8px; display:inline-block; mso-padding-alt:0;text-underline-color:none;font-size:Arial, sans-serif;letter-spacing:3.2px;font-size:12px;')
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%;mso-text-raise:20pt')  
+      span(style='mso-text-raise:10pt;font-weight:normal;') FINISH SIGNING UP
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%')  
