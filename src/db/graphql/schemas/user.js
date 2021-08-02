@@ -12,40 +12,7 @@ const userSchema = gql`
     searchByUsername(query: String!, page: Int, limit: Int): [User]
     isUsernameTaken(query: String!): Boolean
     getUserColumns(page: Int, limit: Int): [Column]
-  }
-
-  type socialGoogleOnboarding {
-    id: String
-    attributes: socialGoogleAttributes
-  }
-
-  type socialGoogleAttributes {
-    envelope: String
-    payload: socialGooglePayload
-  }
-
-  type socialGooglePayload {
-    iss: String
-    at_has: String
-    email_verified: Boolean
-    sub: String
-    azp: String
-    email: String
-    profile: String
-    picture: String
-    name: String
-    given_name: String
-    family_name: String
-    aud: String
-    hd: String
-    nonce: String
-    iat: Int
-    exp: Int
-    locale: String
-  }
-
-  enum socialProviders {
-    google
+    listPaymentMethods(page: Int, limit: Int): UserPaymentMethods
   }
 
   type Mutation {
@@ -81,6 +48,41 @@ const userSchema = gql`
     updateUserTitle(title: String!): User
     setPrimaryExpertise(expertiseId: String!): UserExpertise
     setSecondaryExpertise(expertiseId: String!): UserExpertise
+    deletePaymentMethod(id: String!, force: Boolean): DefaultPayload
+  }
+
+  type socialGoogleOnboarding {
+    id: String
+    attributes: socialGoogleAttributes
+  }
+
+  type socialGoogleAttributes {
+    envelope: String
+    payload: socialGooglePayload
+  }
+
+  type socialGooglePayload {
+    iss: String
+    at_has: String
+    email_verified: Boolean
+    sub: String
+    azp: String
+    email: String
+    profile: String
+    picture: String
+    name: String
+    given_name: String
+    family_name: String
+    aud: String
+    hd: String
+    nonce: String
+    iat: Int
+    exp: Int
+    locale: String
+  }
+
+  enum socialProviders {
+    google
   }
 
   input LinkInput {
@@ -147,10 +149,16 @@ const userSchema = gql`
     expertise: Expertise
   }
 
+  type UserPaymentMethods {
+    list: [UserPaymentMethod]
+    count: Int!
+  }
+
   type UserPaymentMethod {
     id: String
     name: String
     brend: String
+    brand: String
     expire_year: Int
     last_digits: String
     expire_month: Int

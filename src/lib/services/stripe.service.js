@@ -102,16 +102,13 @@ const deleteStripeConnectedAccount = async user => {
   return {}
 }
 
-const deletePaymentMethod = async user => {
-  if (user.paymentMethod && user.paymentMethod.id) {
-    try {
-      return stripe.paymentMethods.detach(user.paymentMethod.id)
-    } catch (e) {
-      logger.warn(`deletePaymentMethod ${e}`)
-      throw e
-    }
+const deletePaymentMethod = async paymentMethod => {
+  try {
+    return stripe.paymentMethods.detach(paymentMethod.id)
+  } catch (e) {
+    logger.warn(`deletePaymentMethod ${e}`)
+    throw e
   }
-  return {}
 }
 
 const updatePaymentMethod = async (user, paymentData) => {
