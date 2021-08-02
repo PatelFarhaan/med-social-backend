@@ -215,6 +215,36 @@ const unsubscribe = async stripeSubscriptionId => {
   }
 }
 
+const getStripeUserID = async () => {
+  try {
+    return await stripe.accounts.create({
+      type: 'express'
+    })
+  } catch (e) {
+    logger.warn(`getStripeUserID ${e}`)
+    throw e
+  }
+}
+
+const getExpressAccountLink = async (AccountId, Refresh_Url, Return_Url) => {
+  try {
+    return await stripe.accountLinks.create({
+      account: AccountId,
+      refresh_url: Refresh_Url,
+      return_url: Return_Url,
+      type: 'account_onboarding'
+    })
+  } catch (error) {
+    logger.warn(`getExpressAccountLink ${error}`)
+  }
+}
+const RetrieveStripeAccount = async AccountId => {
+  try {
+    return await stripe.accounts.retrieve(AccountId)
+  } catch (error) {
+    logger.warn(`RetrieveStripeAccount ${error}`)
+  }
+}
 const createEvent = async (body, headers) => stripe.webhooks.constructEvent(body, headers, endpointSecret)
 
 module.exports = {
@@ -232,5 +262,8 @@ module.exports = {
   createSubscription,
   listPaymentMethods,
   createEvent,
-  createTaxPrice
+  createTaxPrice,
+  getStripeUserID,
+  getExpressAccountLink,
+  RetrieveStripeAccount
 }
