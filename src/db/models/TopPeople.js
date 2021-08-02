@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   TopPeople.associate = models => {
-    TopPeople.belongsTo(models.User)
+    TopPeople.belongsTo(models.User, { onDelete: 'CASCADE' })
     TopPeople.belongsTo(models.Column)
   }
 

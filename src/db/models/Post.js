@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       through: models.PostBookmark,
       as: 'userBookmarks',
       foreignKey: 'postId',
-      onDelete: 'RESTRICT',
+      onDelete: 'CASCADE',
       hooks: true
     })
 
@@ -62,19 +62,20 @@ module.exports = (sequelize, DataTypes) => {
 
     Post.belongsTo(models.User, {
       as: 'author',
-      foreignKey: 'author_id'
+      foreignKey: 'author_id',
+      onDelete: 'CASCADE'
     })
 
     Post.belongsToMany(models.User, {
       through: models.Vote,
       as: 'userVotes',
       foreignKey: 'PostId',
-      onDelete: 'RESTRICT',
+      onDelete: 'CASCADE',
       hooks: true
     })
 
     Post.hasMany(models.File, { as: 'files' })
-    Post.hasOne(models.PseudoPost)
+    Post.hasOne(models.PseudoPost, { onDelete: 'CASCADE' })
   }
 
   Post.addHook('beforeCreate', instance => {

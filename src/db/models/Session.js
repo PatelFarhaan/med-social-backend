@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
   Session.associate = models => {
     Session.belongsTo(models.User, {
       as: 'user',
-      foreignKey: 'userId'
+      foreignKey: 'userId',
+      onDelete: 'CASCADE'
     })
   }
 

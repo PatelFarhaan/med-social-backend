@@ -15,8 +15,8 @@ module.exports = (sequelize, _DataTypes) => {
   )
 
   PostBookmark.associate = models => {
-    PostBookmark.belongsTo(models.User, { foreignKey: 'userId' })
-    PostBookmark.belongsTo(models.Post, { foreignKey: 'postId' })
+    PostBookmark.belongsTo(models.User, { foreignKey: 'userId', onDelete: 'CASCADE' })
+    PostBookmark.belongsTo(models.Post, { foreignKey: 'postId', onDelete: 'CASCADE' })
   }
 
   return PostBookmark
