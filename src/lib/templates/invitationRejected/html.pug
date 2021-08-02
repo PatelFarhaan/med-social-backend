@@ -1,7 +1,10 @@
-extends ../basicEmail2
+extends ../newBasicEmailOne
 
-block content
-  div(class="email")
-    p(class="email__name") Hi #{firstName},
-    p(class="email__title") Thanks for applying to join Column/.
-    p(class="email__text") We’re still building the network, and will be in contact when we’ve created the right section where your contributions will be most appreciated.
+block large_content
+
+block text_content
+  div(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Arial,sans-serif;font-size:20px;line-height:32px;color:#666666;')
+    p(style='margin-top:0px')
+      | We’re still building the network, and will be in contact when we’ve created the right section where your contributions will be most appreciated.
+
+block button_content
