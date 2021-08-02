@@ -223,6 +223,9 @@ module.exports = {
     deletePaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { id, force = false }, { req }) =>
       paymentMethodService.deletePaymentMethod({ id, user: req.user, force })
     ),
+    setDefaultPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { id }, { req }) =>
+      paymentMethodService.setDefaultPaymentMethod({ id, user: req.user })
+    ),
     connectSocial: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { provider, token }, { req }) => {
       // TODO: Add other socials
       if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))

@@ -49,6 +49,7 @@ const userSchema = gql`
     setPrimaryExpertise(expertiseId: String!): UserExpertise
     setSecondaryExpertise(expertiseId: String!): UserExpertise
     deletePaymentMethod(id: String!, force: Boolean): DefaultPayload
+    setDefaultPaymentMethod(id: String!): DefaultPayload
   }
 
   type socialGoogleOnboarding {

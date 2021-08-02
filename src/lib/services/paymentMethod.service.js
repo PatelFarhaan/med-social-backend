@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const db = require('../../db/models')
-// const logger = require('../utils/logger')
+const logger = require('../utils/logger')
 const stripeService = require('./stripe.service')
 
 const LIMIT = 10
@@ -47,8 +47,24 @@ const deletePaymentMethod = async ({ id, user, force = false }) => {
   }
 }
 
+const setDefaultPaymentMethod = async ({ id, user }) => {
+  if (!user.stripeCustomerId || !user.paymentMethod)
+    throw new Error(JSON.stringify({ status: 400, message: 'User needs to connect a payment method first' }))
+  const { stripeCustomerId } = user
+  try {
+    await stripeService.setDefaultPaymentMethod(stripeCustomerId, id)
+    const paymentMethod = await db.PaymentMethod.findOne({ where: { UserId: user.id, id } })
+    user.paymentMethod = paymentMethod
+    return user.save()
+  } catch (e) {
+    logger.warn(`setDefaultPaymentMethod:`, e)
+    return e
+  }
+}
+
 module.exports = {
   getPaymentMethod,
   getUserPaymentMethods,
-  deletePaymentMethod
+  deletePaymentMethod,
+  setDefaultPaymentMethod
 }
