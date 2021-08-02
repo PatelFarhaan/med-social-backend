@@ -102,16 +102,13 @@ const deleteStripeConnectedAccount = async user => {
   return {}
 }
 
-const deletePaymentMethod = async user => {
-  if (user.paymentMethod && user.paymentMethod.id) {
-    try {
-      return stripe.paymentMethods.detach(user.paymentMethod.id)
-    } catch (e) {
-      logger.warn(`deletePaymentMethod ${e}`)
-      throw e
-    }
+const deletePaymentMethod = async paymentMethod => {
+  try {
+    return stripe.paymentMethods.detach(paymentMethod.id)
+  } catch (e) {
+    logger.warn(`deletePaymentMethod ${e}`)
+    throw e
   }
-  return {}
 }
 
 const updatePaymentMethod = async (user, paymentData) => {
@@ -181,6 +178,19 @@ const createSubscription = async (stripeCustomerId, priceId, taxPriceId) => {
     })
   } catch (e) {
     logger.warn(`subscribe ${e}`)
+    throw e
+  }
+}
+
+const setDefaultPaymentMethod = async (stripeCustomerId, paymentMethodId) => {
+  try {
+    return stripe.customers.update(stripeCustomerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId
+      }
+    })
+  } catch (e) {
+    logger.warn(`setDefaultPaymentMethod ${e}`)
     throw e
   }
 }
@@ -263,6 +273,7 @@ module.exports = {
   listPaymentMethods,
   createEvent,
   createTaxPrice,
+  setDefaultPaymentMethod,
   getStripeUserID,
   getExpressAccountLink,
   RetrieveStripeAccount
