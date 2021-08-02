@@ -35,7 +35,7 @@ const userSchema = gql`
     refreshAuth(refreshToken: String!): Session
     connectSocial(token: String!, provider: socialProviders!): User
     disconnectSocial(token: String!, provider: socialProviders!): User
-    connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
+    connectPaymentMethod(paymentMethod: StripePaymentMethod!, setDefault: Boolean): User
     uploadProfilePicture(file: Upload!): User
     setPassword(password: String!): User
     resetPassword(password: String!, token: String!): User
