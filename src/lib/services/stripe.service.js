@@ -182,6 +182,19 @@ const createSubscription = async (stripeCustomerId, priceId, taxPriceId) => {
   }
 }
 
+const setDefaultPaymentMethod = async (stripeCustomerId, paymentMethodId) => {
+  try {
+    return stripe.customers.update(stripeCustomerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId
+      }
+    })
+  } catch (e) {
+    logger.warn(`setDefaultPaymentMethod ${e}`)
+    throw e
+  }
+}
+
 const subscribe = async (stripeCustomerId, priceId, stripeUserId) => {
   try {
     return stripe.subscriptions.create({
@@ -229,5 +242,6 @@ module.exports = {
   createSubscription,
   listPaymentMethods,
   createEvent,
-  createTaxPrice
+  createTaxPrice,
+  setDefaultPaymentMethod
 }

@@ -215,6 +215,7 @@ module.exports = {
         await user.createPaymentMethod(DBPaymentMethod)
         if (setDefault) {
           user.paymentMethod = DBPaymentMethod
+          await stripeService.setDefaultPaymentMethod(paymentMethod.id)
         }
         return user.save()
       }
