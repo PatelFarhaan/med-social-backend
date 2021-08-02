@@ -64,6 +64,54 @@ describe('Column Service', () => {
     })
   })
 
+  describe('Column Multiple Unsubscribe', () => {
+    let column
+    let column2
+    beforeEach(async () => {
+      column = await db.Column.create(defaultValue)
+      column2 = await db.Column.create({
+        name: 'Calculys',
+        description: 'This is a column about calculus',
+        state: columnStatuses.APPROVED,
+        type: columnTypes.FREE
+      })
+      await column.setExpertise(expertise)
+      await column.setAuthor(user)
+      await column.addInterest(interest)
+      await column2.setExpertise(expertise)
+      await column2.setAuthor(user)
+      await column2.addInterest(interest)
+    })
+
+    afterEach(async () => {
+      await db.Column.destroy({ where: { slug: ['algebra', 'calculus'] } })
+    })
+
+    test('It should unsubscribe to multiple columns when valid parameters are passed', async () => {
+      // First subscription
+      await db.Subscription.create({
+        type: subscriptionTypes.COLUMN,
+        email: user.email,
+        UserId: user.id,
+        ColumnSlug: column.slug
+      })
+
+      // Second subscription
+      await db.Subscription.create({
+        type: subscriptionTypes.COLUMN,
+        email: user.email,
+        UserId: user.id,
+        ColumnSlug: column2.slug
+      })
+
+      const response = await columnService.multiColumnUnsubscribe({ columns: [column, column2] }, user)
+      expect(response.status).toBe(204)
+      expect(response.message).toBe('Subscription successfully deleted')
+      const dbSubscriptionsCount = await db.Subscription.count()
+      expect(dbSubscriptionsCount).toBe(0)
+    })
+  })
+
   describe('List Columns', () => {
     beforeAll(async () => {
       await db.Subscription.destroy({ where: {} })

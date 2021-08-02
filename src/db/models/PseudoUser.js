@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt'),
       deactivatedAt: types.get('deactivatedAt'),
-      expertises: { type: DataTypes.JSONB, defaultValue: [] }
+      expertises: { type: DataTypes.JSONB, defaultValue: [] },
+      permissionFileUrl: { type: DataTypes.TEXT, field: 'permission_file_url' }
     },
     {
       freezeTableName: true

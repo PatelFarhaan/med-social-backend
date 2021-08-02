@@ -9,7 +9,10 @@ const publicFields = [
   'isAnonymousUser',
   'pseudoUser',
   'profileDescription',
-  'createdAt'
+  'createdAt',
+  'title',
+  'socialLink',
+  'customLink'
 ]
 
 const privateFields = [

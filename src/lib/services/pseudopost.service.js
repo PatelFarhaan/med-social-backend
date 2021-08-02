@@ -31,7 +31,7 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
     pseudoPost: true
   })
 
-  parentPost.approvedPostId = post.id
+  parentPost.PostId = post.id
   await parentPost.save()
 
   if (postsArray.length > 0) {
@@ -50,7 +50,7 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
           },
           { through: { order: index + 1 } }
         )
-        stackedPost.approvedPostId = stackedChild.id
+        stackedPost.PostId = stackedChild.id
         await stackedPost.save()
         return stackedChild
       })
@@ -58,6 +58,21 @@ const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   }
 
   return post
+}
+
+const deletePost = async conversationId => {
+  try {
+    await db.PseudoPost.destroy({
+      where: { conversationId }
+    })
+  } catch (e) {
+    throw e
+  }
+
+  return {
+    status: 200,
+    message: 'PseudoPost successfully deleted'
+  }
 }
 
 const getThreadCount = async (username, loaderOpts = {}) => {
@@ -90,14 +105,14 @@ const getApprovedPosts = async username => {
   pseudopost.urls,
   pseudopost.reply_to,
   pseudopost.quote_url,
-  pseudopost.approved_post_id from "PseudoPost" as pseudopost
+  pseudopost."PostId" from "PseudoPost" as pseudopost
   JOIN "Post" post
   ON pseudopost.username='${username}' 
   and pseudopost.conversation_id=pseudopost.id 
   and pseudopost.retweet=FALSE 
   and pseudopost.reply_to IS NULL 
-  and pseudopost.approved_post_id IS NOT NULL 
-  and pseudopost.approved_post_id = post.id
+  and pseudopost."PostId" IS NOT NULL 
+  and pseudopost."PostId" = post.id
   order by pseudopost.created_at desc
   ) AS ppjoin JOIN "Column" as column1 
   ON ppjoin."ColumnSlug" = column1.slug`
@@ -118,5 +133,6 @@ const getApprovedPosts = async username => {
 module.exports = {
   approvePost,
   getThreadCount,
-  getApprovedPosts
+  getApprovedPosts,
+  deletePost
 }

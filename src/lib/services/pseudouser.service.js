@@ -46,8 +46,7 @@ const approveUser = async (username, body, loaderOpts) => {
   return savedUser
 }
 
-const addPseudoUser = async url => {
-  const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
+const addPseudoUser = async _handle => {
   await axios.post(`${process.env.RESEARCH_APP}/pusers`, {
     handle: _handle
   })
@@ -121,6 +120,23 @@ const removePUserExpertise = async ({ username, expertises }) => {
   }
   return db.Expertise.findAll({ where: { id: pseudoUser.expertises } })
 }
+
+const updatePermissionFileUrl = async (username, url) => {
+  const pseudoUser = await db.PseudoUser.findOne({
+    where: { username }
+  })
+  try {
+    if (pseudoUser) {
+      pseudoUser.permissionFileUrl = url
+      await pseudoUser.save()
+    }
+  } catch (e) {
+    logger.warn(`updatePUserExpertise ${e}`)
+    return null
+  }
+  return 'success'
+}
+
 module.exports = {
   approveUser,
   addPseudoUser,
@@ -128,5 +144,6 @@ module.exports = {
   fetchPostCountByUserName,
   updatePUserExpertise,
   addPUserExpertise,
-  removePUserExpertise
+  removePUserExpertise,
+  updatePermissionFileUrl
 }

@@ -19,12 +19,17 @@ module.exports = (sequelize, DataTypes) => {
 
   Notification.associate = models => {
     Notification.belongsTo(models.User, {
-      as: 'author'
+      as: 'author',
+      onDelete: 'CASCADE'
     })
+
+    Notification.belongsTo(models.Post)
+    Notification.belongsTo(models.Column)
 
     Notification.belongsToMany(models.User, {
       through: 'NotificationReceipient',
-      as: 'receipients'
+      as: 'receipients',
+      onDelete: 'CASCADE'
     })
   }
 

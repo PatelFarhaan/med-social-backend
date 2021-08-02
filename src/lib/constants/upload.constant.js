@@ -1,5 +1,5 @@
 const {
-  aws: { postBucket, userBucket }
+  aws: { postBucket, userBucket, pUserBucket }
 } = require('../../../config/config')
 
 const uploadTypes = {
@@ -9,7 +9,8 @@ const uploadTypes = {
 
 const uploadTypeBucket = {
   POST: postBucket,
-  USER: userBucket
+  USER: userBucket,
+  PUSER: pUserBucket
 }
 
 module.exports = {

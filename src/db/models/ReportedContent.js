@@ -23,8 +23,8 @@ module.exports = (sequelize, DataTypes) => {
   ReportedContent.associate = models => {
     ReportedContent.belongsTo(models.Post)
     ReportedContent.belongsTo(models.Column)
-    ReportedContent.belongsTo(models.User, { as: 'reporter' })
-    ReportedContent.belongsTo(models.User, { as: 'approvedBy' })
+    ReportedContent.belongsTo(models.User, { as: 'reporter', onDelete: 'CASCADE' })
+    ReportedContent.belongsTo(models.User, { as: 'approvedBy', onDelete: 'CASCADE' })
   }
 
   return ReportedContent

@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   Subscription.associate = models => {
-    Subscription.belongsTo(models.User)
+    Subscription.belongsTo(models.User, { onDelete: 'CASCADE' })
 
     Subscription.belongsTo(models.Column)
   }

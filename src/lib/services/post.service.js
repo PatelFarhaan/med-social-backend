@@ -209,7 +209,6 @@ const listUserPosts = async ({ page = 1, limit = LIMIT, sortBy, sortDirection },
 
 const listUserAuthoredPosts = async ({ id, page = 1, limit = LIMIT, sortBy, sortDirection }, user, loaderOpts) => {
   if (!user && !id) throw new Error(JSON.stringify({ status: 404, message: 'No id was supplied' }))
-  const userId = id || user.id
 
   let order = [['createdAt', 'ASC']]
 
@@ -225,18 +224,20 @@ const listUserAuthoredPosts = async ({ id, page = 1, limit = LIMIT, sortBy, sort
 
   return db.Post.findAndCountAll({
     where: {
-      author_id: userId
+      author_id: id
     },
     attributes: [
       ...publicFields,
       [
-        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${userId}')`),
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
       ],
       [
         db.sequelize.literal(
           // eslint-disable-next-line max-len
-          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${userId}')`
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
         ),
         'userBookmark'
       ]
@@ -250,7 +251,6 @@ const listUserAuthoredPosts = async ({ id, page = 1, limit = LIMIT, sortBy, sort
 
 const listUserBookmarks = async ({ id, page = 1, limit = LIMIT, sortBy, sortDirection }, user, _loaderOpts) => {
   if (!user && !id) throw new Error(JSON.stringify({ status: 404, message: 'No id was supplied' }))
-  const userId = id || user.id
 
   let order = [['createdAt', 'ASC']]
 
@@ -265,7 +265,7 @@ const listUserBookmarks = async ({ id, page = 1, limit = LIMIT, sortBy, sortDire
   }
 
   const userBookmarks = await db.PostBookmark.findAll({
-    where: { userId },
+    where: { userId: id },
     limit,
     offset: limit * (page - 1),
     order
@@ -280,13 +280,15 @@ const listUserBookmarks = async ({ id, page = 1, limit = LIMIT, sortBy, sortDire
     attributes: [
       ...publicFields,
       [
-        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${userId}')`),
+        db.sequelize.literal(`(SELECT type FROM "Vote" AS votes WHERE "votes"."PostId" = "Post"."id" AND "votes"."UserId" = '${user.id}')`),
         'userVote'
       ],
       [
         db.sequelize.literal(
           // eslint-disable-next-line max-len
-          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${userId}')`
+          `(SELECT COUNT(*) FROM "PostBookmark" AS bookmarks WHERE "bookmarks"."postId" = "Post"."id" AND "bookmarks"."userId" = '${
+            user.id
+          }')`
         ),
         'userBookmark'
       ]
@@ -300,6 +302,11 @@ const deletePost = async ({ body: { id } }, user, Post = db.Post) => {
   if (!DBpost) throw new Error({ status: 404, message: 'Post not found' })
   const author = await DBpost.getAuthor()
   if (author.id !== user.id) throw new Error({ status: 400, message: 'Post can only be deleted by the author' })
+  const postParent = await DBpost.getParent()
+  if (postParent) {
+    postParent.comments -= 1
+    await postParent.save()
+  }
   await DBpost.destroy()
   return {
     status: 204,
@@ -432,6 +439,10 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
       const uploadedFiles = (await Promise.all(files)).map(item => uploadService.processUploadS3(item, 'POST'))
       ;(await Promise.all(uploadedFiles)).map(async file => comment.createFile({ ...file, UserId: user.id, ColumnSlug: column.slug }))
     }
+    const mentionedUsers = await getMentionedUsers(DBpost)
+    if (mentionedUsers.length > 0) {
+      await notifyMentionedUser(DBpost, mentionedUsers)
+    }
     if (DBpost.author_id !== user.id) {
       const DBpostAuthor = await DBpost.getAuthor()
       await notify(
@@ -478,12 +489,12 @@ const uploadFileToPost = async ({ body: { id, files = [] } }, Post = db.Post) =>
   return DBpost
 }
 
-const updateVoteValue = async (voteType, points, post) => {
+const updateVoteValue = async (voteType, points, post, oldPoints = 0) => {
   if (voteType === 'UP') {
-    await post.increment('votes', { by: points })
+    await post.increment('votes', { by: oldPoints + points })
     return points
   }
-  await post.decrement('votes', { by: points })
+  await post.decrement('votes', { by: oldPoints + points })
   return -1 * points
 }
 
@@ -499,7 +510,7 @@ const votePost = async (
   let post
   try {
     let voteValue = 0
-    if (points > maxVotePoints) throw new Error({ status: 400, message: 'Max points to be given is only up to 50' })
+    if (points > maxVotePoints) throw new Error(`Max points to be given is only up to ${maxVotePoints}`)
     post = await Post.findByPk(id)
     if (!post) throw new Error({ status: 404, message: 'Post not found' })
     const existingVote = await Vote.findOne({ where: { PostId: post.id, UserId: user.id } })
@@ -517,22 +528,26 @@ const votePost = async (
           source: reputationSources.VOTED
         }
       })
-      await Notification.destroy({
-        where: {
-          PostId: post.id,
-          authorId: user.id
-        }
-      })
       if (existingVote.type === type) {
-        await updateVoteValue(type, -1 * points, post)
-        await existingVote.destroy()
-      } else {
-        existingVote.type = type
+        if (existingVote.points + points > maxVotePoints) throw new Error(`Max points to be given is only up to ${maxVotePoints}`)
+        const newPoints = existingVote.points + points <= maxVotePoints ? points : maxVotePoints
+        const newVoteValue = await updateVoteValue(type, newPoints, post)
+        await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, newVoteValue)
+        existingVote.points += newPoints
         await existingVote.save()
-        voteValue = await updateVoteValue(type, points, post)
-        // TODO: Refactor this after the 0.5 release to adhere with DRY
+      } else {
+        voteValue = await updateVoteValue(type, points, post, existingVote.points)
+        existingVote.type = type
+        existingVote.points = points
+        await existingVote.save()
         await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
         if (voteValue > 0 && postAuthor.id !== user.id) {
+          await Notification.destroy({
+            where: {
+              PostId: post.id,
+              authorId: user.id
+            }
+          })
           await notify(
             notificationTypes.UPVOTED,
             notificationCategories.VOTES,
@@ -570,8 +585,7 @@ const votePost = async (
     }
   } catch (e) {
     logger.warn(`votePost: ${e}`)
-    const parsedError = isStringJSON(e.message) ? JSON.parse(e.message) : e
-    throw new Error(JSON.stringify({ status: parsedError.status ? parsedError.status : 400, message: parsedError.message }))
+    throw e
   }
   return post
 }
@@ -663,12 +677,19 @@ const notifyMentionedUser = async (post, mentionedUsers) => {
 const getTopPostsForNewspaper = async (start, end) => {
   const startDate = new Date(start).toISOString()
   const endDate = new Date(end).toISOString()
+  const columnInclude = {
+    model: db.Column,
+    where: {
+      state: 'APPROVED'
+    }
+  }
   return db.Post.findAll({
     where: {
       createdAt: {
         [Op.between]: [startDate, endDate]
       }
     },
+    include: [columnInclude],
     order: [['votes', 'DESC']],
     limit: 15
   })

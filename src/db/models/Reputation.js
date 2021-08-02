@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     Reputation.belongsTo(models.Post, { constraints: false })
     Reputation.belongsTo(models.UserExpertise)
     Reputation.belongsTo(models.Column)
-    Reputation.belongsTo(models.User, { as: 'author' })
+    Reputation.belongsTo(models.User, { as: 'author', onDelete: 'CASCADE' })
   }
 
   return Reputation

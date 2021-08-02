@@ -277,7 +277,7 @@ const ViewPostsComponent = props => {
                   records &&
                   // thread.params.reply_to?.length === 0 && !thread.params.retweet
                   records.map((record, key) =>
-                    isValid(record) && !record?.params.approvedPostId ? (
+                    isValid(record) && !record?.params.PostId ? (
                       <Card key={key}>
                         {/* <CardImage src="https://picsum.photos/500/300/?image=10" /> */}
                         <CardContent>

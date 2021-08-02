@@ -19,10 +19,11 @@ module.exports = (sequelize, DataTypes) => {
       updatedAt: types.get('updatedAt')
     },
     {
-      freezeTableName: true,
-      hierarchy: true
+      freezeTableName: true
     }
   )
+
+  Post.isHierarchy({ onDelete: 'CASCADE' })
 
   Post.associate = models => {
     Post.belongsToMany(models.Post, {
@@ -43,12 +44,13 @@ module.exports = (sequelize, DataTypes) => {
       through: models.PostBookmark,
       as: 'userBookmarks',
       foreignKey: 'postId',
-      onDelete: 'RESTRICT',
+      onDelete: 'CASCADE',
       hooks: true
     })
 
     Post.belongsTo(models.Post, {
-      as: 'stackParent'
+      as: 'stackParent',
+      onDelete: 'CASCADE'
     })
 
     Post.belongsTo(models.Post, {
@@ -60,18 +62,20 @@ module.exports = (sequelize, DataTypes) => {
 
     Post.belongsTo(models.User, {
       as: 'author',
-      foreignKey: 'author_id'
+      foreignKey: 'author_id',
+      onDelete: 'CASCADE'
     })
 
     Post.belongsToMany(models.User, {
       through: models.Vote,
       as: 'userVotes',
       foreignKey: 'PostId',
-      onDelete: 'RESTRICT',
+      onDelete: 'CASCADE',
       hooks: true
     })
 
     Post.hasMany(models.File, { as: 'files' })
+    Post.hasOne(models.PseudoPost, { onDelete: 'CASCADE' })
   }
 
   Post.addHook('beforeCreate', instance => {

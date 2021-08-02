@@ -16,7 +16,15 @@ const {
   deleteCustomLink,
   updateTitle
 } = require('../../../lib/users')
-const { tokenService, emailService, socialService, stripeService, uploadService, expertiseService } = require('../../../lib/services')
+const {
+  tokenService,
+  emailService,
+  socialService,
+  stripeService,
+  uploadService,
+  expertiseService,
+  changeRequestService
+} = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
 const { tokenTypes } = require('../../../lib/constants/token.constant')
@@ -214,13 +222,8 @@ module.exports = {
     // eslint-disable-next-line camelcase
     updateUser: can(['standard', 'admin', 'superadmin']).createResolver(
       // eslint-disable-next-line camelcase
-      async (_parent, { email, title, profile_description, social_link, custom_link }, { req, db }) => {
-        // eslint-disable-next-line camelcase
-        if (!email && !profile_description)
-          throw new Error(JSON.stringify({ status: 400, message: 'Email or profile_description is needed' }))
-
+      async (_parent, { title, profile_description, social_link, custom_link }, { req, db }) => {
         const updatePayload = {}
-        if (email) updatePayload.email = email
         if (title) updatePayload.title = title
         // eslint-disable-next-line camelcase
         if (profile_description) updatePayload.profileDescription = profile_description
@@ -232,6 +235,50 @@ module.exports = {
         return updatedUser[1]
       }
     ),
+    updateEmail: can(['standard', 'admin', 'superadmin']).createResolver(
+      // eslint-disable-next-line camelcase
+      async (_parent, { email }, { req, db }) => {
+        const { user } = req
+        const dbUser = await db.User.findOne({ where: { email } })
+        if (dbUser) throw new Error(JSON.stringify({ status: 400, message: `User with email ${email} already exists` }))
+
+        const { token } = await changeRequestService.createChangeRequest('User', 'email', email, user.id)
+
+        await emailService.sendEmail(
+          email,
+          {
+            firstName: user.firstName,
+            callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/verify-email?token=${token}&email=${email}`
+          },
+          'userChangeEmail'
+        )
+        return {
+          status: 200,
+          message: 'Please check your email to verify the change'
+        }
+      }
+    ),
+    verifyUpdateEmail: async (_parent, { token, email }, { db }) => {
+      const changeRequest = await db.ChangeRequest.findOne({
+        where: {
+          token,
+          change: email
+        }
+      })
+      if (!changeRequest)
+        throw new Error(JSON.stringify({ status: 404, message: `Change request for this ${email} and token ${token} does not exist` }))
+      const user = await changeRequest.getUser()
+      if (user.email === email)
+        throw new Error(JSON.stringify({ status: 404, message: `Change request for this user has already been made` }))
+      user.email = changeRequest.change
+      changeRequest.approvedById = user.id
+      await changeRequest.save()
+      await user.save()
+      return {
+        status: 200,
+        message: 'Email has successfully been set'
+      }
+    },
     createUser: async (_parent, body) => {
       const user = await signup({ body, roleId: '3' })
       const tokens = await tokenService.generateAuthTokens(user)

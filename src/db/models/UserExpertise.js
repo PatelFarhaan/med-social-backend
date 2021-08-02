@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   UserExpertise.associate = models => {
-    UserExpertise.belongsTo(models.User)
+    UserExpertise.belongsTo(models.User, { onDelete: 'CASCADE' })
     UserExpertise.belongsTo(models.Expertise)
   }
 

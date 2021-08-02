@@ -1,6 +1,9 @@
 const { default: AdminBro } = require('admin-bro')
 const { flat, Filter } = require('admin-bro')
+const fs = require('fs')
+const fileType = require('file-type')
 const { pseudoUserService } = require('../../lib/services')
+const { pUserUpload } = require('../../lib/services/upload.service')
 
 const PER_PAGE_LIMIT = 500
 
@@ -10,17 +13,36 @@ const options = {
   actions: {
     new: {
       isVisible: true,
+      custom: {
+        baseUrl: process.env.BASE_URL
+      },
+      component: AdminBro.bundle('./components/ImportUser/AddUserForm.jsx'),
       handler: async (request, _, context) => {
         const { url } = request.fields
         const { h, resource } = context
-        await pseudoUserService.addPseudoUser(url)
+        const { file } = request.files
+        const _handle = url.substr(url.lastIndexOf('/') + 1, url.length)
+        await pseudoUserService.addPseudoUser(_handle)
+        const notice = {}
+        notice.message = 'Successfully Imported'
+        notice.type = 'success'
+        if (file) {
+          const { path } = file
+          const buffer = fs.readFileSync(path)
+          const type = await fileType.fromBuffer(buffer)
+          const filename = `pseudouser-permissions/${_handle}.${type.ext}`
+          const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
+          if (!awsResponse.success) {
+            notice.message = 'Error during import'
+            notice.type = 'failure'
+          } else {
+            await pseudoUserService.updatePermissionFileUrl(_handle, awsResponse.location)
+          }
+        }
         return {
           record: request.fields.url,
           redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
-          notice: {
-            message: 'Successfully Imported',
-            type: 'success'
-          }
+          notice
         }
       }
     },
@@ -137,7 +159,7 @@ const options = {
         params.lastName = params.name.substr(params.name.indexOf(' ') + 1)
         if (!params.firstName) {
           params.firstName = params.name
-          params.lastName = null
+          params.lastName = ''
         }
         params.fullName = params.name
         params.profilePicture = params.profileImageUrl.replace('_normal', '')
@@ -184,6 +206,39 @@ const options = {
         }
       }),
       component: false
+    },
+    uploadPermissions: {
+      isVisible: false,
+      custom: {
+        baseUrl: process.env.BASE_URL
+      },
+      component: false,
+      handler: async (request, _, context) => {
+        const { handle } = request.fields
+        const { h, resource } = context
+        const { file } = request.files
+        const notice = {}
+        notice.message = 'Successfully Imported'
+        notice.type = 'success'
+        if (file) {
+          const { path } = file
+          const buffer = fs.readFileSync(path)
+          const type = await fileType.fromBuffer(buffer)
+          const filename = `pseudouser-permissions/${handle}.${type.ext}`
+          const awsResponse = await pUserUpload(filename, file, buffer, 'PUSER')
+          if (!awsResponse.success) {
+            notice.message = 'Error during import'
+            notice.type = 'failure'
+          } else {
+            await pseudoUserService.updatePermissionFileUrl(handle, awsResponse.location)
+          }
+        }
+        return {
+          record: request.fields.url,
+          redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
+          notice
+        }
+      }
     }
   }
 }

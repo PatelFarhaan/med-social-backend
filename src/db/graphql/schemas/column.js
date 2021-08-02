@@ -23,6 +23,7 @@ const columnSchema = gql`
     ): Column
     subscribeToColumn(slug: String!): Subscription
     unsubscribeToColumn(slug: String!): DefaultPayload
+    multiColumnUnsubscribe(columns: [String!]!): DefaultPayload
     banUser(slug: String!, bannedUserId: String!): DefaultPayload
   }
 
