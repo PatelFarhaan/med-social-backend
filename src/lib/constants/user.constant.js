@@ -18,7 +18,6 @@ const publicFields = [
 const privateFields = [
   ...publicFields,
   'paymentMethod',
-  'paymentMethods',
   'muted_notification_categories',
   'settings',
   'roleId',
