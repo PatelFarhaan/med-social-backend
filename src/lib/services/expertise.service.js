@@ -1,4 +1,5 @@
 const db = require('../../db/models')
+const UserExpertise = require('../../db/models/UserExpertise')
 const logger = require('../utils/logger')
 
 const LIMIT = 50
@@ -48,38 +49,70 @@ const createExpertise = async ({ body: { name, interests }, Expertise = db.Exper
 
 const setExpertisePrimary = async (user, expertiseId) => {
   const userExpertises = await user.getUserExpertises()
-  const expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === expertiseId)
+  const expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === parseInt(expertiseId, 10))
+  let primaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isPrimary)
+  let secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
+  if (!expertise) {
+    return null
+  }
+
+  // Check if expertise same as already primary
+  if (primaryUserExpertise && expertise.ExpertiseId == primaryUserExpertise.ExpertiseId) {
+    return expertise
+  }
+  // Check if expertise is Secondary
+  if (secondaryUserExpertise && expertise.ExpertiseId == secondaryUserExpertise.ExpertiseId) {
+    secondaryUserExpertise.isPrimary = true
+    secondaryUserExpertise.isSecondary = false
+    secondaryUserExpertise = await secondaryUserExpertise.save()
+    if (primaryUserExpertise) {
+      primaryUserExpertise.isPrimary = false
+      primaryUserExpertise.isSecondary = false
+      primaryUserExpertise.save()
+    }
+    return secondaryUserExpertise
+  }
+
+  // if expertise is neither primary or secondary
   expertise.isPrimary = true
-  const primaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isPrimary)
-  const secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
-
-  if (primaryUserExpertise) {
-    primaryUserExpertise.isPrimary = false
-    primaryUserExpertise.isSecondary = true
-    await primaryUserExpertise.save()
-  }
-
-  if (secondaryUserExpertise) {
-    secondaryUserExpertise.isPrimary = false
-    secondaryUserExpertise.isSecondary = true
-    await secondaryUserExpertise.save()
-  }
+  expertise.isSecondary = false
 
   return expertise.save()
 }
 
 const setExpertiseSecondary = async (user, expertiseId) => {
   const userExpertises = await user.getUserExpertises()
-  const expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === expertiseId)
+  let expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === parseInt(expertiseId, 10))
+  let primaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isPrimary)
+  let secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
+
+  //Check if already secondary
+  if (secondaryUserExpertise && expertise.ExpertiseId == secondaryUserExpertise.ExpertiseId) {
+    return expertise
+  }
+  // only 1
+  if (userExpertises.length == 1) {
+    return null
+  }
+
+  // Primary is set to secondary
+  if (primaryUserExpertise && expertise.ExpertiseId == primaryUserExpertise.ExpertiseId) {
+    expertise.isSecondary = true
+    expertise.isPrimary = false
+    expertise.save()
+    if (secondaryUserExpertise) {
+      secondaryUserExpertise.isSecondary = false
+      secondaryUserExpertise.save()
+    }
+    return expertise
+  }
   expertise.isSecondary = true
-  const secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
 
   if (secondaryUserExpertise) {
     secondaryUserExpertise.isPrimary = false
-    secondaryUserExpertise.isSecondary = true
+    secondaryUserExpertise.isSecondary = false
     await secondaryUserExpertise.save()
   }
-
   return expertise.save()
 }
 
