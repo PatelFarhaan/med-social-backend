@@ -155,7 +155,6 @@ const ViewPostsComponent = props => {
     }
     records.forEach(async record => {
       if (record.params.id === id && record.params.column) {
-        console.warn('Record', record)
         await axios.get(
           `${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/records/${id}/approvePost?slug=${
             record.params.column

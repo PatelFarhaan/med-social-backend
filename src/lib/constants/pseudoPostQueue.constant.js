@@ -7,7 +7,7 @@ const queueStatuses = {
 
 const QUEUE_POST_LIMIT = 10
 
-const QUEUE_RUN_FREQUENCY = 5
+const QUEUE_RUN_FREQUENCY = 1
 
 module.exports = {
   queueStatuses,

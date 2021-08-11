@@ -14,12 +14,10 @@ const approveQueuedPosts = async () => {
     await Promise.all(
       queue.map(async item => {
         item.state = queueStatuses.ACTIVE
-        return item.save().then(async result =>
-          approvePost(result.conversationId, result.ColumnSlug).then(async _result2 => {
-            item.state = queueStatuses.COMPLETED
-            return item.save()
-          })
-        )
+        const result = await item.save()
+        await approvePost(result.conversationId, result.ColumnSlug)
+        item.state = queueStatuses.COMPLETED
+        return item.save()
       })
     )
   }
