@@ -14,7 +14,9 @@ const {
   addCustomLink,
   updateCustomLink,
   deleteCustomLink,
-  updateTitle
+  updateTitle,
+  followUser,
+  unfollowUser
 } = require('../../../lib/users')
 const {
   tokenService,
@@ -379,6 +381,12 @@ module.exports = {
     ),
     setSecondaryExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { expertiseId }, { req }) =>
       expertiseService.setExpertiseSecondary(req.user, expertiseId)
+    ),
+    followUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      followUser(req.user, userId)
+    ),
+    unfollowUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      unfollowUser(req.user, userId)
     )
   },
   User: {
@@ -399,6 +407,12 @@ module.exports = {
     notificationSetting: (user, _args, { db }) => {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getNotificationSetting()
+    },
+    following: async (user, _args, { db, req }) => {
+      if (!req.user) return false
+      const dbUser = db.User.build(exportSafeModel(user))
+      const follower = await dbUser.getFollowing({ where: { id: req.user.id } })
+      return follower.length > 0
     }
   },
   UserExpertise: {

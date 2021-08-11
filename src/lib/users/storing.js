@@ -394,6 +394,23 @@ const updateTitle = async (userId, { title }) => {
   }
 }
 
+const followUser = async (follower, followingId) => {
+  const dbFollow = await db.Follow.findOne({ where: { FollowerId: follower.id, FollowingId: followingId } })
+  if (dbFollow) throw new Error(JSON.stringify({ status: 409, message: 'User already following' }))
+  await db.Follow.create({
+    FollowerId: follower.id,
+    FollowingId: followingId
+  })
+  return { status: 204, message: 'Successfully followed user' }
+}
+
+const unfollowUser = async (follower, followingId) => {
+  const dbFollow = await db.Follow.findOne({ where: { FollowerId: follower.id, FollowingId: followingId } })
+  if (!dbFollow) throw new Error(JSON.stringify({ status: 409, message: 'You do not follow this user' }))
+  await dbFollow.destroy()
+  return { status: 204, message: 'Successfully unfollowed user' }
+}
+
 module.exports = {
   signup,
   authenticate,
@@ -410,5 +427,7 @@ module.exports = {
   addCustomLink,
   updateCustomLink,
   deleteCustomLink,
-  updateTitle
+  updateTitle,
+  followUser,
+  unfollowUser
 }

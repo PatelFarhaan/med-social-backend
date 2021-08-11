@@ -120,6 +120,22 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.ChangeRequest, { as: 'approvedChangeRequests' })
 
     User.hasMany(models.PaymentMethod)
+
+    User.belongsToMany(models.User, {
+      through: models.Follow,
+      as: 'Follower',
+      otherKey: 'FollowingId',
+      foreignKey: 'FollowerId',
+      onDelete: 'CASCADE'
+    })
+
+    User.belongsToMany(models.User, {
+      through: models.Follow,
+      as: 'Following',
+      otherKey: 'FollowerId',
+      foreignKey: 'FollowingId',
+      onDelete: 'CASCADE'
+    })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {

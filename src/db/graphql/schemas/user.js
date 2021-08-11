@@ -50,6 +50,8 @@ const userSchema = gql`
     setSecondaryExpertise(expertiseId: String!): UserExpertise
     deletePaymentMethod(id: String!, force: Boolean): DefaultPayload
     setDefaultPaymentMethod(id: String!): DefaultPayload
+    followUser(userId: String!): DefaultPayload
+    unfollowUser(userId: String!): DefaultPayload
   }
 
   type socialGoogleOnboarding {
@@ -213,6 +215,7 @@ const userSchema = gql`
     title: String
     socialLink: SocialLink
     customLink: [CustomLink]
+    following: Boolean
   }
 `
 
