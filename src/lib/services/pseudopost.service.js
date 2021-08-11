@@ -1,4 +1,29 @@
 const db = require('../../db/models')
+const { queueStatuses, QUEUE_POST_LIMIT } = require('../constants/pseudoPostQueue.constant')
+
+const schedulePost = async (conversationId, ColumnSlug, username) =>
+  db.PseudoPostQueue.create({
+    conversationId,
+    ColumnSlug,
+    username
+  })
+
+const approveQueuedPosts = async () => {
+  const queue = await db.PseudoPostQueue.findAll({ limit: QUEUE_POST_LIMIT })
+  if (queue.length > 0) {
+    await Promise.all(
+      queue.map(async item => {
+        item.state = queueStatuses.ACTIVE
+        return item.save().then(async result =>
+          approvePost(result.conversationId, result.ColumnSlug).then(async _result2 => {
+            item.state = queueStatuses.COMPLETED
+            return item.save()
+          })
+        )
+      })
+    )
+  }
+}
 
 const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   const pseudoPosts = await db.PseudoPost.findAll({
@@ -131,6 +156,8 @@ const getApprovedPosts = async username => {
 }
 
 module.exports = {
+  schedulePost,
+  approveQueuedPosts,
   approvePost,
   getThreadCount,
   getApprovedPosts,
