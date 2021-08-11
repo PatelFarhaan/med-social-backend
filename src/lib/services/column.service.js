@@ -145,12 +145,13 @@ const subscribeToColumn = async ({ body }, user, Subscription = db.Subscription)
       subscription = await Subscription.create({
         paymentMethod: user.paymentMethod,
         paymentGateway: paymentGateways.STRIPE,
-        type: subscriptionTypes.Column,
+        type: subscriptionTypes.COLUMN,
         customerId: user.stripeCustomerId,
         subscriptionId: stripeSubscription.id,
         email: user.email,
         UserId: user.id,
-        ColumnSlug: column.slug
+        ColumnSlug: column.slug,
+        paid: true
       })
       await notificationService.notify(
         notificationTypes.NEW_COLUMN_SUBSCRIPTION,

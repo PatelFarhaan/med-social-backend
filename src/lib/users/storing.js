@@ -5,13 +5,14 @@ const { env } = require('../../../config/config')
 const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
 const { states, invitationTypes } = require('../constants/invitation.constant')
-const { subscriptionStatuses } = require('../constants/subscription.constant')
+const { subscriptionTypes, paymentGateways, subscriptionStatuses } = require('../constants/subscription.constant')
 const { tokenTypes } = require('../constants/token.constant')
 const logger = require('../utils/logger')
 const { calculatePoints } = require('../services/reputation.service')
 const { reputationSources } = require('../constants/reputation.constant')
 const { fileNames } = require('../constants/defaultProfileImages.constant')
 const previousAPIService = require('../services/previousAPI.service')
+const stripeService = require('../services/stripe.service')
 const config = require('../../../config/config')
 
 const BCRYPT_SALT_ROUNDS = 10
@@ -81,6 +82,7 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
     })
 
     savedUser.notificationSetting = notificationSetting
+
     await savedUser.save()
 
     if (interests) {
@@ -95,6 +97,16 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
     }
 
     if (!isSeed && env !== 'test') {
+      const stripePriceId = await stripeService.createPrice({
+        name: `${user.username} Subscription`,
+        metadata: `${user.username}_subscription`,
+        slug: user.username,
+        price: 1
+      })
+
+      user.stripePriceId = stripePriceId.id
+      await user.save()
+
       invitation.state = states.COMPLETED
       await invitation.save()
 
@@ -411,6 +423,75 @@ const unfollowUser = async (follower, followingId) => {
   return { status: 204, message: 'Successfully unfollowed user' }
 }
 
+const subscribeToUser = async (follower, followingId) => {
+  if (!follower.stripeCustomerId) throw new Error(JSON.stringify({ status: 404, message: 'User has no payment method yet' }))
+  const following = await db.User.findOne({ where: { id: followingId } })
+  if (!following) throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
+
+  const existingSubscription = await db.Subscription.findOne({
+    where: {
+      type: subscriptionTypes.USER,
+      email: follower.email,
+      UserId: follower.id,
+      SubscriptionUserId: followingId,
+      state: subscriptionStatuses.ACTIVE
+    }
+  })
+
+  if (existingSubscription) throw new Error(JSON.stringify({ status: 400, message: 'Already subscribed to user' }))
+  let { stripePriceId } = following
+  if (!following.stripePriceId) {
+    const stripePrice = await stripeService.createPrice({
+      name: `${following.username} Subscription`,
+      metadata: `${following.username}_subscription`,
+      slug: following.username,
+      price: 1
+    })
+    stripePriceId = stripePrice.id
+    following.stripePriceId = stripePrice.id
+    await following.save()
+  }
+
+  const stripeSubscription = await stripeService.createSubscription(follower.stripeCustomerId, stripePriceId)
+  if (stripeSubscription.latest_invoice.payment_intent.status !== 'cancelled') {
+    await db.Subscription.create({
+      paymentMethod: follower.paymentMethod,
+      paymentGateway: paymentGateways.STRIPE,
+      type: subscriptionTypes.USER,
+      customerId: follower.stripeCustomerId,
+      subscriptionId: stripeSubscription.id,
+      email: follower.email,
+      UserId: follower.id,
+      SubscriptionUserId: followingId,
+      paid: true
+    })
+  } else {
+    throw new Error(JSON.stringify({ status: 400, message: 'Stripe Subscription creation was cancelled' }))
+  }
+
+  return { status: 204, message: 'Successfully subscribed to user' }
+}
+
+const unsubscribeToUser = async (follower, followingId) => {
+  const following = await db.User.findOne({ where: { id: followingId } })
+  if (!following) throw new Error(JSON.stringify({ status: 404, message: 'User not found' }))
+
+  const subscription = await db.Subscription.findOne({
+    where: {
+      type: subscriptionTypes.USER,
+      SubscriptionUserId: followingId,
+      UserId: follower.id
+    }
+  })
+
+  if (!subscription) throw new Error(JSON.stringify({ status: 404, message: 'Subscription not found' }))
+  const resp = await stripeService.unsubscribe(subscription.subscriptionId)
+  if (resp.status !== 'canceled') throw new Error(JSON.stringify({ status: 400, message: 'Stripe subscription was not canceled' }))
+  await subscription.destroy()
+
+  return { status: 204, message: 'Successfully unsubscribed to user' }
+}
+
 module.exports = {
   signup,
   authenticate,
@@ -429,5 +510,7 @@ module.exports = {
   deleteCustomLink,
   updateTitle,
   followUser,
-  unfollowUser
+  unfollowUser,
+  subscribeToUser,
+  unsubscribeToUser
 }

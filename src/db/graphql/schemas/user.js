@@ -52,6 +52,8 @@ const userSchema = gql`
     setDefaultPaymentMethod(id: String!): DefaultPayload
     followUser(userId: String!): DefaultPayload
     unfollowUser(userId: String!): DefaultPayload
+    subscribeToUser(userId: String!): DefaultPayload
+    unsubscribeToUser(userId: String!): DefaultPayload
   }
 
   type socialGoogleOnboarding {
@@ -216,6 +218,7 @@ const userSchema = gql`
     socialLink: SocialLink
     customLink: [CustomLink]
     following: Boolean
+    subscribed: Boolean
   }
 `
 

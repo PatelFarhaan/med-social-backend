@@ -16,7 +16,9 @@ const {
   deleteCustomLink,
   updateTitle,
   followUser,
-  unfollowUser
+  unfollowUser,
+  subscribeToUser,
+  unsubscribeToUser
 } = require('../../../lib/users')
 const {
   tokenService,
@@ -387,6 +389,12 @@ module.exports = {
     ),
     unfollowUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
       unfollowUser(req.user, userId)
+    ),
+    subscribeToUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      subscribeToUser(req.user, userId)
+    ),
+    unsubscribeToUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      unsubscribeToUser(req.user, userId)
     )
   },
   User: {
@@ -412,7 +420,13 @@ module.exports = {
       if (!req.user) return false
       const dbUser = db.User.build(exportSafeModel(user))
       const follower = await dbUser.getFollowing({ where: { id: req.user.id } })
-      return follower.length > 0
+      return follower.length === 1
+    },
+    subscribed: async (user, _args, { db, req }) => {
+      if (!req.user) return false
+      const dbUser = db.User.build(exportSafeModel(user))
+      const subscriber = await dbUser.getSubscribers({ where: { id: req.user.id } })
+      return subscriber.length === 1
     }
   },
   UserExpertise: {

@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       linkedinUserId: { type: DataTypes.STRING(150), field: 'linkedin_user_id' },
       twitterUserId: { type: DataTypes.STRING(150), field: 'twitter_user_id' },
       stripeCustomerId: { type: DataTypes.STRING(150), field: 'stripe_customer_id' },
+      stripePriceId: { type: DataTypes.STRING(150), field: 'stripe_price_id' },
       muted_notification_categories: {
         type: DataTypes.ARRAY(DataTypes.STRING(64)),
         allowNull: true,
@@ -136,6 +137,8 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'FollowingId',
       onDelete: 'CASCADE'
     })
+
+    User.hasMany(models.Subscription, { as: 'Subscribers', foreignKey: 'SubscriptionUserId' })
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {
