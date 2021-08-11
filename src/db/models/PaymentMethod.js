@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     'PaymentMethod',
     {
       id: { type: DataTypes.STRING, primaryKey: true },
+      name: { type: DataTypes.STRING },
       brend: { type: DataTypes.STRING },
       brand: { type: DataTypes.STRING },
       expireYear: { type: DataTypes.INTEGER, field: 'expire_year' },
