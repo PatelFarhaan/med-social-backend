@@ -1,0 +1,161 @@
+doctype html
+html(lang='en' xmlns='https://www.w3.org/1999/xhtml' xmlns:o='urn:schemas-microsoft-com:office:office')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width,initial-scale=1')
+    meta(name='x-apple-disable-message-reformatting')
+    title
+    //if mso
+      style.
+        table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        border: none;
+        margin: 0;
+        }
+        div,
+        td {
+        padding: 0;
+        }
+        div {
+        margin: 0 !important;
+        }
+      noscript
+        xml
+          o:officedocumentsettings
+            o:pixelsperinch 96
+    style
+      include newBasicEmail.css
+
+  body(style='\
+  margin: 0;\
+  padding: 0;\
+  word-spacing: normal;\
+  background-color: #f5f4f0;\
+  ')
+    div(role='article' aria-roledescription='email' lang='en' style='\
+    text-size-adjust: 100%;\
+    -webkit-text-size-adjust: 100%;\
+    -ms-text-size-adjust: 100%;\
+    ')
+      table(role='presentation' style='width: 100%; border: none; border-spacing: 0')
+        tbody
+          tr
+            td(align='center' style='padding: 0')
+              //if mso
+                table(role='presentation' align='center' style='width:750px;')
+                  tbody
+                    tr
+                      td
+              table(role='presentation' style='\
+              width: 100%;\
+              border: none;\
+              border-spacing: 0;\
+              text-align: left;\
+              font-family: Arial, sans-serif;\
+              line-height: 22px;\
+              ')
+                tbody
+                  tr
+                    td.left_offset(style='\
+                    padding-top: 0px;\
+                    padding-bottom: 20px;\
+                    text-align: left;\
+                    font-size: 32px;\
+                    font-family: Times, sans-serif;\
+                    letter-spacing: 1.8px;\
+                    ')
+                      table(role='presentation' style='\
+                      width: 100%;\
+                      border: none;\
+                      border-spacing: 0;\
+                      text-align: left;\
+                      font-family: Arial, sans-serif;\
+                      line-height: 22px;\
+                      ')
+                        tbody
+                          tr
+                            td(style='padding-top: 0px; padding-right: 0px')
+                              a(href='https://www.joincolumn.com/' style='text-decoration: none')
+                                img.logo_top_buffer(style='\
+                                width: 80%;\
+                                max-width: 36px;\
+                                height: auto;\
+                                border: none;\
+                                text-decoration: none;\
+                                color: #ffffff;\
+                                ' src='https://column-static.s3.us-east-2.amazonaws.com/LogoTransparent.png' alt='Logo')
+                              block header_template
+                            td(style='text-align: right; vertical-align: top')
+                              a.other_disp(href='https://www.joincolumn.com/' style='text-decoration: none')
+                                img(style='\
+                                width: 100%;\
+                                max-width: 420px;\
+                                height: auto;\
+                                border: none;\
+                                text-decoration: none;\
+                                color: #ffffff;\
+                                ' src='https://column-static.s3.us-east-2.amazonaws.com/ColumnsDesk.png' alt='Columns')
+                              a.resp_disp(href='https://www.joincolumn.com/' style='text-decoration: none')
+                                img(style='\
+                                width: 100%;\
+                                max-width: 250px;\
+                                min-height: 320px;\
+                                height: auto;\
+                                border: none;\
+                                text-decoration: none;\
+                                color: #ffffff;\
+                                ' src='https://column-static.s3.us-east-2.amazonaws.com/ColumnsMob.png' alt='Columns')
+                  tr
+                    td.left_offset(style='text-align: left; padding-top: 25px')
+                      block upper_text_content
+                 tr
+                    td.left_offset(style='text-align:left;padding-top:25px;')
+                      block img_content
+                  tr
+                    td.left_offset(style='text-align: left; padding-top: 25px')
+                      block button_content
+              table(role='presentation' style='\
+              width: 100%;\
+              max-border: none;\
+              border-spacing: 0;\
+              text-align: left;\
+              font-family: Arial, sans-serif;\
+              line-height: 22px;\
+              margin-top: 42px;\
+              margin-bottom: 32px;\
+              ')
+                tbody
+                  tr
+                    td.left_offset(style='text-align: left')
+                      .left_buffer(style='text-align: left; width: 180px')
+                        p(style='\
+                        color: #999999;\
+                        font-family: Arial, sans-serif;\
+                        font-size: 20px;\
+                        ')
+                          | Yours Sincerely,
+                        img(style='\
+                        max-width: 150px;\
+                        height: auto;\
+                        border: none;\
+                        text-decoration: none;\
+                        color: #ffffff;\
+                        ' src='https://column-static.s3.us-east-2.amazonaws.com/Signature.png')
+                        p(style='\
+                        color: #999999;\
+                        font-family: Arial, sans-serif;\
+                        font-size: 16px;\
+                        ')
+                          | Social Secretary & Editor
+                          br
+                          |                       in Chief Column/
+                    td(style='text-align: center')
+                      img(style='\
+                      max-width: 150px;\
+                      height: auto;\
+                      border: none;\
+                      text-decoration: none;\
+                      color: #ffffff;\
+                      ' src='https://column-static.s3.us-east-2.amazonaws.com/Circle+Stamp.png')
+              //if mso

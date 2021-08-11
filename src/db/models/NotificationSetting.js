@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
   )
 
   NotificationSetting.associate = models => {
-    NotificationSetting.belongsTo(models.User)
+    NotificationSetting.belongsTo(models.User, { onDelete: 'CASCADE' })
   }
 
   return NotificationSetting

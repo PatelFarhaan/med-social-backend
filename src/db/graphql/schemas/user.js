@@ -12,6 +12,44 @@ const userSchema = gql`
     searchByUsername(query: String!, page: Int, limit: Int): [User]
     isUsernameTaken(query: String!): Boolean
     getUserColumns(page: Int, limit: Int): [Column]
+    listPaymentMethods(page: Int, limit: Int): UserPaymentMethods
+  }
+
+  type Mutation {
+    updateUser(profile_description: String, title: String, social_link: SocialLinkInput, custom_link: [LinkInput]): User
+    updateEmail(email: String!): DefaultPayload
+    verifyUpdateEmail(email: String!, token: String!): DefaultPayload
+    createUser(
+      email: String!
+      firstName: String!
+      lastName: String
+      username: String!
+      password: String
+      passwordRepeat: String
+      expertises: [Int]
+      interests: [Int]
+      token: String!
+      twitterUserId: String
+      googleUserId: String
+    ): Session
+    refreshAuth(refreshToken: String!): Session
+    connectSocial(token: String!, provider: socialProviders!): User
+    disconnectSocial(token: String!, provider: socialProviders!): User
+    connectPaymentMethod(paymentMethod: StripePaymentMethod!, setDefault: Boolean): User
+    uploadProfilePicture(file: Upload!): User
+    setPassword(password: String!): User
+    resetPassword(password: String!, token: String!): User
+    passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
+    updateUserNotificationSetting(settings: SettingsInput!): NotificationSetting
+    updateUserSocialLink(socialLink: SocialLinkInput!): User
+    addUserCustomLink(newLink: CustomLinkInput!): User
+    updateUserCustomLink(link: LinkInput!): User
+    deleteUserCustomLink(link: LinkInput!): User
+    updateUserTitle(title: String!): User
+    setPrimaryExpertise(expertiseId: String!): UserExpertise
+    setSecondaryExpertise(expertiseId: String!): UserExpertise
+    deletePaymentMethod(id: String!, force: Boolean): DefaultPayload
+    setDefaultPaymentMethod(id: String!): DefaultPayload
   }
 
   type socialGoogleOnboarding {
@@ -46,41 +84,6 @@ const userSchema = gql`
 
   enum socialProviders {
     google
-  }
-
-  type Mutation {
-    updateUser(profile_description: String, title: String, social_link: SocialLinkInput, custom_link: [LinkInput]): User
-    updateEmail(email: String!): DefaultPayload
-    verifyUpdateEmail(email: String!, token: String!): DefaultPayload
-    createUser(
-      email: String!
-      firstName: String!
-      lastName: String
-      username: String!
-      password: String
-      passwordRepeat: String
-      expertises: [Int]
-      interests: [Int]
-      token: String!
-      twitterUserId: String
-      googleUserId: String
-    ): Session
-    refreshAuth(refreshToken: String!): Session
-    connectSocial(token: String!, provider: socialProviders!): User
-    disconnectSocial(token: String!, provider: socialProviders!): User
-    connectPaymentMethod(paymentMethod: StripePaymentMethod!): User
-    uploadProfilePicture(file: Upload!): User
-    setPassword(password: String!): User
-    resetPassword(password: String!, token: String!): User
-    passwordChange(oldPassword: String!, newPassword: String!): DefaultPayload
-    updateUserNotificationSetting(settings: SettingsInput!): NotificationSetting
-    updateUserSocialLink(socialLink: SocialLinkInput!): User
-    addUserCustomLink(newLink: CustomLinkInput!): User
-    updateUserCustomLink(link: LinkInput!): User
-    deleteUserCustomLink(link: LinkInput!): User
-    updateUserTitle(title: String!): User
-    setPrimaryExpertise(expertiseId: String!): UserExpertise
-    setSecondaryExpertise(expertiseId: String!): UserExpertise
   }
 
   input LinkInput {
@@ -147,10 +150,16 @@ const userSchema = gql`
     expertise: Expertise
   }
 
+  type UserPaymentMethods {
+    list: [UserPaymentMethod]
+    count: Int!
+  }
+
   type UserPaymentMethod {
     id: String
     name: String
     brend: String
+    brand: String
     expire_year: Int
     last_digits: String
     expire_month: Int

@@ -1,0 +1,55 @@
+extends ../newBasicEmail
+
+block header_template
+  p.top_buffer(style='\
+  font-family: Times, sans-serif;\
+  white-space: nowrap;\
+  letter-spacing: 4px;\
+  ')
+    | WELCOME
+    br
+    | COLMUNIST!
+
+block upper_text_content
+  div(style='\
+  display: inline-block;\
+  width: 90%;\
+  max-width: 590px;\
+  vertical-align: top;\
+  font-family: Arial, sans-serif;\
+  font-size: 20px;\
+  color: #666666;\
+  ')
+    p(style='margin-top: 0px; line-height: 32px')
+      | Congratulations! 
+      | The editors of Column/ loved your concept for a Column and you are now able to set it up.
+
+block button_content
+  p(style='margin: 0; text-align: left')
+    a.button_link(href=`${callToActionUrl}` style='\
+    background: #3d8f44;\
+    text-decoration: none;\
+    color: #ffffff;\
+    border-radius: 8px;\
+    display: inline-block;\
+    mso-padding-alt: 0;\
+    text-underline-color: none;\
+    font-size: Arial, sans-serif;\
+    letter-spacing: 3.2px;\
+    font-size: 12px;\
+    ')
+      //if mso
+        i(style='\
+        letter-spacing: 25px;\
+        mso-font-width: -100%;\
+        mso-text-raise: 20pt;\
+        ')  
+        //
+          [endif]
+      span(style='mso-text-raise: 10pt; font-weight: normal') SETUP MY COLUMN
+      //if mso
+        i(style='letter-spacing: 25px; mso-font-width: -100%')  
+        //
+          [endif]
+
+block bottom_text_content

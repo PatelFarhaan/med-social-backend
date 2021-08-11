@@ -118,6 +118,8 @@ module.exports = (sequelize, DataTypes) => {
     User.hasMany(models.ChangeRequest)
 
     User.hasMany(models.ChangeRequest, { as: 'approvedChangeRequests' })
+
+    User.hasMany(models.PaymentMethod)
   }
   /* eslint-disable no-param-reassign */
   User.addHook('beforeCreate', instance => {

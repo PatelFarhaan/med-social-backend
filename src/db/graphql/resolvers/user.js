@@ -23,7 +23,8 @@ const {
   stripeService,
   uploadService,
   expertiseService,
-  changeRequestService
+  changeRequestService,
+  paymentMethodService
 } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
@@ -182,26 +183,49 @@ module.exports = {
     isUsernameTaken: async (_parent, { query }, { db }) => {
       const rawUser = await db.User.findOne({ where: { username: query } })
       return !!rawUser
-    }
+    },
+    listPaymentMethods: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const rawPaymentMethods = await paymentMethodService.getUserPaymentMethods({ ...args, user: req.user })
+      const paymentMethods = rawPaymentMethods.rows.map(paymentMethod => exportSafeUser(paymentMethod))
+      return {
+        list: paymentMethods,
+        count: paymentMethods.count
+      }
+    })
   },
   Mutation: {
-    connectPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { paymentMethod }, { req }) => {
-      const { user } = req
-      const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
-      await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
-      user.stripeCustomerId = stripeCustomer.id
-      user.paymentMethod = {
-        id: paymentMethod.id,
-        name: `${user.firstName} ${user.lastName}`,
-        brend: paymentMethod.card.brand,
-        expire_year: paymentMethod.card.exp_year,
-        expire_month: paymentMethod.card.exp_month,
-        last_digits: paymentMethod.card.last4,
-        stripe: paymentMethod
+    connectPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, { paymentMethod, setDefault }, { req }) => {
+        const { user } = req
+        if (!user.stripeCustomerId) {
+          const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
+          user.stripeCustomerId = stripeCustomer.id
+        }
+        await stripeService.attachPaymentMethod(user.stripeCustomerId, paymentMethod)
+        const DBPaymentMethod = {
+          id: paymentMethod.id,
+          name: `${user.firstName} ${user.lastName}`,
+          brend: paymentMethod.card.brand,
+          brand: paymentMethod.card.brand,
+          expire_year: paymentMethod.card.exp_year,
+          expire_month: paymentMethod.card.exp_month,
+          last_digits: paymentMethod.card.last4,
+          stripe: paymentMethod
+        }
+        await user.createPaymentMethod(DBPaymentMethod)
+        if (setDefault) {
+          user.paymentMethod = DBPaymentMethod
+          await stripeService.setDefaultPaymentMethod(user.stripeCustomerId, paymentMethod.id)
+        }
+        return user.save()
       }
-      const savedUser = await user.save()
-      return savedUser
-    }),
+    ),
+    deletePaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { id, force = false }, { req }) =>
+      paymentMethodService.deletePaymentMethod({ id, user: req.user, force })
+    ),
+    setDefaultPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { id }, { req }) =>
+      paymentMethodService.setDefaultPaymentMethod({ id, user: req.user })
+    ),
     connectSocial: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { provider, token }, { req }) => {
       // TODO: Add other socials
       if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
