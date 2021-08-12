@@ -425,7 +425,7 @@ module.exports = {
     subscribed: async (user, _args, { db, req }) => {
       if (!req.user) return false
       const dbUser = db.User.build(exportSafeModel(user))
-      const subscriber = await dbUser.getSubscribers({ where: { id: req.user.id } })
+      const subscriber = await dbUser.getSubscribers({ where: { UserId: req.user.id } })
       return subscriber.length === 1
     }
   },
