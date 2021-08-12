@@ -52,6 +52,7 @@ const setExpertisePrimary = async (user, expertiseId) => {
   const expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === parseInt(expertiseId, 10))
   let primaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isPrimary)
   let secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
+  console.log(expertise)
   if (!expertise) {
     return null
   }
