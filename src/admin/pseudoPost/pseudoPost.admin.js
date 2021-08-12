@@ -61,18 +61,14 @@ const options = {
       actionType: 'record',
       handler: async (request, _, context) => {
         const { h, resource } = context
-        const { slug, conversationId, immediate, username } = request.query
-        // if (immediate) {
-        // await approvePost(conversationId, slug)
-        // } else {
+        const { slug, conversationId, username } = request.query
         await schedulePost(conversationId, slug, username)
-        // }
 
         return {
           record: context.record.toJSON(context.currentAdmin),
           redirectUrl: h.resourceUrl({ resourceId: resource._decorated ? resource._decorated.id() : resource.id() }),
           notice: {
-            message: immediate ? 'Successfully Posted' : 'Successfully Scheduled',
+            message: 'Successfully Scheduled',
             type: 'success'
           }
         }
