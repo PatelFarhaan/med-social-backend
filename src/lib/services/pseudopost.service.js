@@ -9,10 +9,15 @@ const schedulePost = async (conversationId, ColumnSlug, username) =>
   })
 
 const approveQueuedPosts = async () => {
-  const queue = await db.PseudoPostQueue.findAll({ limit: QUEUE_POST_LIMIT })
-  if (queue.length > 0) {
+  const queue = await db.sequelize.query(
+    `SELECT DISTINCT ("username"), *
+    FROM "PseudoPostQueue"
+    LIMIT ${QUEUE_POST_LIMIT};
+    `
+  )
+  if (queue[0].length > 0) {
     await Promise.all(
-      queue.map(async item => {
+      queue[0].map(async item => {
         item.state = queueStatuses.ACTIVE
         const result = await item.save()
         await approvePost(result.conversationId, result.ColumnSlug)
