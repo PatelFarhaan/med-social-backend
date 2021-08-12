@@ -163,18 +163,13 @@ const listPaymentMethods = async customerId => {
 }
 
 const createSubscription = async (stripeCustomerId, priceId, taxPriceId) => {
+  const items = [{ price: priceId }]
+  if (taxPriceId) items.push({ price: taxPriceId })
   try {
     return stripe.subscriptions.create({
       customer: stripeCustomerId,
       expand: ['latest_invoice.payment_intent'],
-      items: [
-        {
-          price: priceId
-        },
-        {
-          price: taxPriceId
-        }
-      ]
+      items
     })
   } catch (e) {
     logger.warn(`subscribe ${e}`)

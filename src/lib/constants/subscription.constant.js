@@ -1,6 +1,7 @@
 const subscriptionTypes = {
   PAID_INVITATION: 'PAID_INVITATION',
-  COLUMN: 'COLUMN'
+  COLUMN: 'COLUMN',
+  USER: 'USER'
 }
 
 const paymentGateways = {

@@ -271,7 +271,8 @@ const payForApproval = async ({ paymentMethod, email }, Invitation = db.Invitati
         type: 'PAID_INVITATION',
         customerId: stripeCustomer.id,
         subscriptionId: stripeSubscription.id,
-        email
+        email,
+        paid: true
       })
 
       await approvedInvitation.setSubscription(subscription)
