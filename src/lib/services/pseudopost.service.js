@@ -12,6 +12,7 @@ const approveQueuedPosts = async () => {
   const queue = await db.sequelize.query(
     `SELECT DISTINCT ("username"), *
     FROM "PseudoPostQueue"
+    WHERE "state"='PENDING'
     LIMIT ${QUEUE_POST_LIMIT};
     `
   )
