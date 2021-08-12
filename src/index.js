@@ -18,12 +18,15 @@ const AdminBro = require('admin-bro')
 const AdminBroSequelize = require('@admin-bro/sequelize')
 const { createContext, EXPECTED_OPTIONS_KEY } = require('dataloader-sequelize')
 const bcrypt = require('bcrypt')
+const cron = require('node-cron')
 
 AdminBro.registerAdapter(AdminBroSequelize)
 const AdminBroExpress = require('@admin-bro/express')
 const invitationAdmin = require('./admin/invitation/invitation.admin')
 const pseudoUserAdmin = require('./admin/pseudoUser/import.pseudoUser')
 const pseudoPostAdmin = require('./admin/pseudoPost/pseudoPost.admin')
+
+const { QUEUE_RUN_FREQUENCY } = require('./lib/constants/pseudoPostQueue.constant')
 
 const { jwtStrategy } = require('./middleware/passport')
 const logger = require('./lib/utils/logger')
@@ -193,6 +196,12 @@ const initApp = async () => {
 }
 
 const bindApp = async appToBind => {
+  // eslint-disable-next-line global-require
+  const pseudoPostService = require('./lib/services/pseudopost.service')
+  cron.schedule(`*/${QUEUE_RUN_FREQUENCY} * * * *`, async () => {
+    await pseudoPostService.approveQueuedPosts()
+  })
+
   appToBind.server.listen(process.env.MOCK_SERVER_PORT, process.env.MOCK_SERVER_HOST, () => {
     logger.info('🚀 Server ready at http://localhost:3005')
     logger.info(`🚀 GraphQL Server ready at http://localhost:3005${apolloServer.graphqlPath}`)

@@ -1,4 +1,32 @@
 const db = require('../../db/models')
+const { queueStatuses, QUEUE_POST_LIMIT } = require('../constants/pseudoPostQueue.constant')
+
+const schedulePost = async (conversationId, ColumnSlug, username) =>
+  db.PseudoPostQueue.create({
+    conversationId,
+    ColumnSlug,
+    username
+  })
+
+const approveQueuedPosts = async () => {
+  const queue = await db.sequelize.query(
+    `SELECT DISTINCT ("username"), *
+    FROM "PseudoPostQueue"
+    LIMIT ${QUEUE_POST_LIMIT};
+    `
+  )
+  if (queue[0].length > 0) {
+    await Promise.all(
+      queue[0].map(async item => {
+        item.state = queueStatuses.ACTIVE
+        const result = await item.save()
+        await approvePost(result.conversationId, result.ColumnSlug)
+        item.state = queueStatuses.COMPLETED
+        return item.save()
+      })
+    )
+  }
+}
 
 const approvePost = async (conversationId, ColumnSlug, loaderOpts = {}) => {
   const pseudoPosts = await db.PseudoPost.findAll({
@@ -131,6 +159,8 @@ const getApprovedPosts = async username => {
 }
 
 module.exports = {
+  schedulePost,
+  approveQueuedPosts,
   approvePost,
   getThreadCount,
   getApprovedPosts,
