@@ -17,18 +17,19 @@ const getUserPaymentMethods = async ({ user, page = 1, limit = LIMIT }, loaderOp
 
 const deletePaymentMethod = async ({ id, user, force = false }) => {
   const paymentMethods = await db.PaymentMethod.findAll({ where: { UserId: user.id } })
-  if (paymentMethods.length === 0) throw new Error(JSON.stringify({ status: 404, message: 'Payment method not found' }))
+  if (paymentMethods.length === 0) throw new Error(JSON.stringify({ status: 404, message: 'User has no payment method' }))
   const paymentMethod = paymentMethods.find(pm => pm.id === id)
-  if (paymentMethods.length === 1 && paymentMethod && !force)
-    throw new Error(
-      JSON.stringify({
-        status: 400,
-        message:
-          // eslint-disable-next-line max-len
-          "Payment method that would be deleted is the user's last payment method. Please add force = true parameter if the user really wants to delete it"
-      })
-    )
-  if (force) {
+  if (!paymentMethod) throw new Error(JSON.stringify({ status: 404, message: 'Payment method not found' }))
+  if (paymentMethods.length === 1) {
+    if (!force)
+      throw new Error(
+        JSON.stringify({
+          status: 400,
+          message:
+            // eslint-disable-next-line max-len
+            "Payment method that would be deleted is the user's last payment method. Please add force = true parameter if the user really wants to delete it"
+        })
+      )
     const paidUserSubscriptions = await user.getUserSubscriptions({ where: { paymentMethod: { [Op.ne]: null } } })
     await Promise.all(
       paidUserSubscriptions.map(async subscription => {
@@ -37,17 +38,19 @@ const deletePaymentMethod = async ({ id, user, force = false }) => {
         return subscription.destroy()
       })
     )
+    user.paymentMethod = null
+    await user.save()
   }
 
-  await stripeService.deletePaymentMethod(paymentMethod)
-  await paymentMethod.destroy()
-
-  if (paymentMethods.length > 1) {
+  if (paymentMethods.length > 1 && user.paymentMethod.id === id) {
     const newDefaultPaymentMethod = paymentMethods.find(pm => pm.id !== id)
     await stripeService.setDefaultPaymentMethod(user.stripeCustomerId, newDefaultPaymentMethod.id)
     user.paymentMethod = newDefaultPaymentMethod
     await user.save()
   }
+
+  await stripeService.deletePaymentMethod(paymentMethod)
+  await paymentMethod.destroy()
 
   return {
     status: 204,
