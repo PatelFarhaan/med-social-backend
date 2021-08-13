@@ -17,9 +17,9 @@ const getUserPaymentMethods = async ({ user, page = 1, limit = LIMIT }, loaderOp
 
 const deletePaymentMethod = async ({ id, user, force = false }) => {
   const paymentMethods = await db.PaymentMethod.findAll({ where: { UserId: user.id } })
-  if (!paymentMethods.length === 0) throw new Error(JSON.stringify({ status: 404, message: 'Payment method not found' }))
-  const paymentMethod = paymentMethods.find({ id })
-  if (!paymentMethods.length === 1 && paymentMethod && !force)
+  if (paymentMethods.length === 0) throw new Error(JSON.stringify({ status: 404, message: 'Payment method not found' }))
+  const paymentMethod = paymentMethods.find(pm => pm.id === id)
+  if (paymentMethods.length === 1 && paymentMethod && !force)
     throw new Error(
       JSON.stringify({
         status: 400,
@@ -41,6 +41,14 @@ const deletePaymentMethod = async ({ id, user, force = false }) => {
 
   await stripeService.deletePaymentMethod(paymentMethod)
   await paymentMethod.destroy()
+
+  if (paymentMethods.length > 1) {
+    const newDefaultPaymentMethod = paymentMethods.find(pm => pm.id !== id)
+    await stripeService.setDefaultPaymentMethod(user.stripeCustomerId, newDefaultPaymentMethod.id)
+    user.paymentMethod = newDefaultPaymentMethod
+    await user.save()
+  }
+
   return {
     status: 204,
     message: 'Successfully Deleted'
