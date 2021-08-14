@@ -14,7 +14,11 @@ const {
   addCustomLink,
   updateCustomLink,
   deleteCustomLink,
-  updateTitle
+  updateTitle,
+  followUser,
+  unfollowUser,
+  subscribeToUser,
+  unsubscribeToUser
 } = require('../../../lib/users')
 const {
   tokenService,
@@ -23,7 +27,8 @@ const {
   stripeService,
   uploadService,
   expertiseService,
-  changeRequestService
+  changeRequestService,
+  paymentMethodService
 } = require('../../../lib/services')
 const { getTenantSettings } = require('../../../lib/settings')
 const { can } = require('./../auth')
@@ -182,26 +187,49 @@ module.exports = {
     isUsernameTaken: async (_parent, { query }, { db }) => {
       const rawUser = await db.User.findOne({ where: { username: query } })
       return !!rawUser
-    }
+    },
+    listPaymentMethods: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
+      const rawPaymentMethods = await paymentMethodService.getUserPaymentMethods({ ...args, user: req.user })
+      const paymentMethods = rawPaymentMethods.rows.map(paymentMethod => exportSafeUser(paymentMethod))
+      return {
+        list: paymentMethods,
+        count: paymentMethods.count
+      }
+    })
   },
   Mutation: {
-    connectPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { paymentMethod }, { req }) => {
-      const { user } = req
-      const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
-      await stripeService.attachPaymentMethod(stripeCustomer.id, paymentMethod)
-      user.stripeCustomerId = stripeCustomer.id
-      user.paymentMethod = {
-        id: paymentMethod.id,
-        name: `${user.firstName} ${user.lastName}`,
-        brend: paymentMethod.card.brand,
-        expire_year: paymentMethod.card.exp_year,
-        expire_month: paymentMethod.card.exp_month,
-        last_digits: paymentMethod.card.last4,
-        stripe: paymentMethod
+    connectPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(
+      async (_parent, { paymentMethod, setDefault }, { req }) => {
+        const { user } = req
+        if (!user.stripeCustomerId) {
+          const stripeCustomer = await stripeService.createCustomer({ email: user.email }, paymentMethod)
+          user.stripeCustomerId = stripeCustomer.id
+        }
+        await stripeService.attachPaymentMethod(user.stripeCustomerId, paymentMethod)
+        const DBPaymentMethod = {
+          id: paymentMethod.id,
+          name: paymentMethod.billing_details.name,
+          brend: paymentMethod.card.brand,
+          brand: paymentMethod.card.brand,
+          expire_year: paymentMethod.card.exp_year,
+          expire_month: paymentMethod.card.exp_month,
+          last_digits: paymentMethod.card.last4,
+          stripe: paymentMethod
+        }
+        await user.createPaymentMethod(DBPaymentMethod)
+        if (setDefault) {
+          user.paymentMethod = DBPaymentMethod
+          await stripeService.setDefaultPaymentMethod(user.stripeCustomerId, paymentMethod.id)
+        }
+        return user.save()
       }
-      const savedUser = await user.save()
-      return savedUser
-    }),
+    ),
+    deletePaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { id, force = false }, { req }) =>
+      paymentMethodService.deletePaymentMethod({ id, user: req.user, force })
+    ),
+    setDefaultPaymentMethod: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { id }, { req }) =>
+      paymentMethodService.setDefaultPaymentMethod({ id, user: req.user })
+    ),
     connectSocial: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { provider, token }, { req }) => {
       // TODO: Add other socials
       if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
@@ -355,6 +383,18 @@ module.exports = {
     ),
     setSecondaryExpertise: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { expertiseId }, { req }) =>
       expertiseService.setExpertiseSecondary(req.user, expertiseId)
+    ),
+    followUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      followUser(req.user, userId)
+    ),
+    unfollowUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      unfollowUser(req.user, userId)
+    ),
+    subscribeToUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      subscribeToUser(req.user, userId)
+    ),
+    unsubscribeToUser: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { userId }, { req }) =>
+      unsubscribeToUser(req.user, userId)
     )
   },
   User: {
@@ -375,6 +415,18 @@ module.exports = {
     notificationSetting: (user, _args, { db }) => {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getNotificationSetting()
+    },
+    following: async (user, _args, { db, req }) => {
+      if (!req.user) return false
+      const dbUser = db.User.build(exportSafeModel(user))
+      const follower = await dbUser.getFollowing({ where: { id: req.user.id } })
+      return follower.length === 1
+    },
+    subscribed: async (user, _args, { db, req }) => {
+      if (!req.user) return false
+      const dbUser = db.User.build(exportSafeModel(user))
+      const subscriber = await dbUser.getSubscribers({ where: { UserId: req.user.id } })
+      return subscriber.length === 1
     }
   },
   UserExpertise: {

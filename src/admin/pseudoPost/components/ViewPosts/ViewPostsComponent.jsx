@@ -158,7 +158,7 @@ const ViewPostsComponent = props => {
         await axios.get(
           `${props.action.custom.baseUrl}/admin/api/resources/PseudoPost/records/${id}/approvePost?slug=${
             record.params.column
-          }&conversationId=${record.params.conversationId}`
+          }&conversationId=${record.params.conversationId}&username=${record.params.username}`
         )
         // eslint-disable-next-line no-undef
         window.location.reload(false)

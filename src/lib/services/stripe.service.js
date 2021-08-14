@@ -102,16 +102,13 @@ const deleteStripeConnectedAccount = async user => {
   return {}
 }
 
-const deletePaymentMethod = async user => {
-  if (user.paymentMethod && user.paymentMethod.id) {
-    try {
-      return stripe.paymentMethods.detach(user.paymentMethod.id)
-    } catch (e) {
-      logger.warn(`deletePaymentMethod ${e}`)
-      throw e
-    }
+const deletePaymentMethod = async paymentMethod => {
+  try {
+    return stripe.paymentMethods.detach(paymentMethod.id)
+  } catch (e) {
+    logger.warn(`deletePaymentMethod ${e}`)
+    throw e
   }
-  return {}
 }
 
 const updatePaymentMethod = async (user, paymentData) => {
@@ -166,21 +163,29 @@ const listPaymentMethods = async customerId => {
 }
 
 const createSubscription = async (stripeCustomerId, priceId, taxPriceId) => {
+  const items = [{ price: priceId }]
+  if (taxPriceId) items.push({ price: taxPriceId })
   try {
     return stripe.subscriptions.create({
       customer: stripeCustomerId,
       expand: ['latest_invoice.payment_intent'],
-      items: [
-        {
-          price: priceId
-        },
-        {
-          price: taxPriceId
-        }
-      ]
+      items
     })
   } catch (e) {
     logger.warn(`subscribe ${e}`)
+    throw e
+  }
+}
+
+const setDefaultPaymentMethod = async (stripeCustomerId, paymentMethodId) => {
+  try {
+    return stripe.customers.update(stripeCustomerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId
+      }
+    })
+  } catch (e) {
+    logger.warn(`setDefaultPaymentMethod ${e}`)
     throw e
   }
 }
@@ -215,6 +220,36 @@ const unsubscribe = async stripeSubscriptionId => {
   }
 }
 
+const getStripeUserID = async () => {
+  try {
+    return await stripe.accounts.create({
+      type: 'express'
+    })
+  } catch (e) {
+    logger.warn(`getStripeUserID ${e}`)
+    throw e
+  }
+}
+
+const getExpressAccountLink = async (AccountId, Refresh_Url, Return_Url) => {
+  try {
+    return await stripe.accountLinks.create({
+      account: AccountId,
+      refresh_url: Refresh_Url,
+      return_url: Return_Url,
+      type: 'account_onboarding'
+    })
+  } catch (error) {
+    logger.warn(`getExpressAccountLink ${error}`)
+  }
+}
+const RetrieveStripeAccount = async AccountId => {
+  try {
+    return await stripe.accounts.retrieve(AccountId)
+  } catch (error) {
+    logger.warn(`RetrieveStripeAccount ${error}`)
+  }
+}
 const createEvent = async (body, headers) => stripe.webhooks.constructEvent(body, headers, endpointSecret)
 
 module.exports = {
@@ -232,5 +267,9 @@ module.exports = {
   createSubscription,
   listPaymentMethods,
   createEvent,
-  createTaxPrice
+  createTaxPrice,
+  setDefaultPaymentMethod,
+  getStripeUserID,
+  getExpressAccountLink,
+  RetrieveStripeAccount
 }

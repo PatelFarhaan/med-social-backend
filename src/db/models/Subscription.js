@@ -33,6 +33,8 @@ module.exports = (sequelize, DataTypes) => {
     Subscription.belongsTo(models.User, { onDelete: 'CASCADE' })
 
     Subscription.belongsTo(models.Column)
+
+    Subscription.belongsTo(models.User, { as: 'SubscriptionUser', onDelete: 'CASCADE' })
   }
 
   // eslint-disable-next-line func-names
