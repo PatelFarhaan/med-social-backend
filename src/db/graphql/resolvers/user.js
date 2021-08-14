@@ -412,7 +412,8 @@ module.exports = {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    notificationSetting: (user, _args, { db }) => {
+    notificationSetting: (user, _args, { db, req }) => {
+      if (!req.user) return null
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getNotificationSetting()
     },
@@ -427,6 +428,11 @@ module.exports = {
       const dbUser = db.User.build(exportSafeModel(user))
       const subscriber = await dbUser.getSubscribers({ where: { UserId: req.user.id } })
       return subscriber.length === 1
+    },
+    columnSubscriptions: async (user, { limit = 10, page = 1 }, { db, req, EXPECTED_OPTIONS_KEY, context }) => {
+      if (!req.user) return null
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getSubscriptions({ where: { type: 'COLUMN' }, limit, page, [EXPECTED_OPTIONS_KEY]: context })
     }
   },
   UserExpertise: {
