@@ -30,7 +30,7 @@ const deletePaymentMethod = async ({ id, user, force = false }) => {
             "Payment method that would be deleted is the user's last payment method. Please add force = true parameter if the user really wants to delete it"
         })
       )
-    const paidUserSubscriptions = await user.getUserSubscriptions({ where: { paymentMethod: { [Op.ne]: null } } })
+    const paidUserSubscriptions = await user.getSubscriptions({ where: { paymentMethod: { [Op.ne]: null } } })
     await Promise.all(
       paidUserSubscriptions.map(async subscription => {
         const resp = await stripeService.unsubscribe(subscription.subscriptionId)
