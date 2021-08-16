@@ -49,11 +49,9 @@ const createExpertise = async ({ body: { name, interests }, Expertise = db.Exper
 
 const setExpertisePrimary = async (user, expertiseId) => {
   const userExpertises = await user.getUserExpertises()
-  console.log(userExpertises)
   const expertise = userExpertises.find(userExpertise => userExpertise.ExpertiseId === parseInt(expertiseId, 10))
   let primaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isPrimary)
   let secondaryUserExpertise = userExpertises.find(userExpertise => userExpertise.isSecondary)
-  console.log(expertise)
   if (!expertise) {
     return null
   }
@@ -78,6 +76,12 @@ const setExpertisePrimary = async (user, expertiseId) => {
   // if expertise is neither primary or secondary
   expertise.isPrimary = true
   expertise.isSecondary = false
+
+  if (primaryUserExpertise && expertise.ExpertiseId !== primaryUserExpertise.ExpertiseId){
+    primaryUserExpertise.isPrimary = false
+    primaryUserExpertise.isSecondary = false
+    primaryUserExpertise.save()
+  }
 
   return expertise.save()
 }
