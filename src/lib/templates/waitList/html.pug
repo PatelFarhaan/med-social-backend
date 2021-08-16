@@ -1,0 +1,24 @@
+extends ../newBasicEmailOne
+
+block large_content
+  div.font_size(style='display:inline-block;width:90%;max-width:590px;max-height:165px;vertical-align:top;font-family:Times,sans-serif;color:#000000;')
+    p(style='margin-top:0;')
+      | THANK YOU SO
+      br
+      |  MUCH FOR APPLYING TO JOIN COLUMN
+
+block text_content
+  div(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Arial,sans-serif;font-size:20px;line-height:32px;color:#666666;')
+    p(style='margin-top:0px')
+      | Please be patient with us as we review applications. There’s a long waiting list, and we will get to you!
+    p(style='margin-top:0px')
+      | In meantime, you can read the public conversations in Column/.
+
+block button_content
+  p(style='margin:0;text-align:center;')
+    a.button_link(href='https://joincolumn.com/newspaper' style='background: #3d8f44; text-decoration: none; ; color: #ffffff; border-radius: 8px; display:inline-block; mso-padding-alt:0;text-underline-color:none;font-size:Arial, sans-serif;letter-spacing:3.2px;font-size:12px;')
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%;mso-text-raise:20pt')  
+      span(style='mso-text-raise:10pt;font-weight:normal;') READ NEWSPAPER
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%')  
