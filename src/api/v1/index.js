@@ -2,7 +2,7 @@ const { Router } = require('express')
 const bodyParser = require('body-parser')
 const logger = require('../../lib/utils/logger')
 const db = require('../../db/models')
-const { stripeService, subscriptionService, emailService } = require('../../lib/services')
+const { stripeService, subscriptionService } = require('../../lib/services')
 const { version } = require('./../../../package.json')
 const SocialAuthRoutes = require('./socialAuth.route')
 
