@@ -2,12 +2,17 @@ const { Router } = require('express')
 const bodyParser = require('body-parser')
 const logger = require('../../lib/utils/logger')
 const db = require('../../db/models')
-const { stripeService, subscriptionService } = require('../../lib/services')
+const { stripeService, subscriptionService, emailService } = require('../../lib/services')
 const { version } = require('./../../../package.json')
 const SocialAuthRoutes = require('./socialAuth.route')
 
 module.exports = () => {
   const api = Router()
+
+  api.get('/test-email', async (_req, res) => {
+    await emailService.sendEmail('harzkr142@gmail.com', { firstName: 'Harsha', callToActionUrl: `https://joincolumn.com` }, 'waitList')
+    res.json({ status: 200 })
+  })
 
   api.use('/auth', SocialAuthRoutes)
 
