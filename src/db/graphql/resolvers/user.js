@@ -190,10 +190,10 @@ module.exports = {
     },
     listPaymentMethods: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
       const rawPaymentMethods = await paymentMethodService.getUserPaymentMethods({ ...args, user: req.user })
-      const paymentMethods = rawPaymentMethods.rows.map(paymentMethod => exportSafeUser(paymentMethod))
+      const paymentMethods = rawPaymentMethods.map(paymentMethod => exportSafeUser(paymentMethod))
       return {
         list: paymentMethods,
-        count: paymentMethods.count
+        count: paymentMethods.length
       }
     })
   },

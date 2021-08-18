@@ -8,12 +8,7 @@ const LIMIT = 10
 const getPaymentMethod = async ({ id }, loaderOpts) => db.PaymentMethod.findByPk(id, loaderOpts)
 
 const getUserPaymentMethods = async ({ user, page = 1, limit = LIMIT }, loaderOpts) =>
-  db.PaymentMethod.findAndCountAll({
-    query: { where: { UserId: user.id } },
-    limit,
-    offset: limit * (page - 1),
-    ...loaderOpts
-  })
+  user.getPaymentMethods({ limit, offset: limit * (page - 1), ...loaderOpts })
 
 const deletePaymentMethod = async ({ id, user, force = false }) => {
   const paymentMethods = await db.PaymentMethod.findAll({ where: { UserId: user.id } })
