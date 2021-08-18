@@ -134,6 +134,14 @@ module.exports = {
     user: (subscription, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
       const sub = db.Subscription.build(exportSafeModel(subscription))
       return sub.getUser({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
+    },
+    column: (subscription, { limit = 10, page = 1 }, { db, EXPECTED_OPTIONS_KEY, context }) => {
+      const sub = db.Subscription.build(exportSafeModel(subscription))
+      return sub.getColumn({ limit, page, [EXPECTED_OPTIONS_KEY]: context })
+    },
+    ColumnSlug: (subscription, _args, { db }) => {
+      const sub = db.Subscription.build(exportSafeModel(subscription))
+      return sub.ColumnSlug
     }
   }
 }

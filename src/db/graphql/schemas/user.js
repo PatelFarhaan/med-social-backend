@@ -219,6 +219,7 @@ const userSchema = gql`
     customLink: [CustomLink]
     following: Boolean
     subscribed: Boolean
+    columnSubscriptions(limit: Int, page: Int): [Subscription]
   }
 `
 

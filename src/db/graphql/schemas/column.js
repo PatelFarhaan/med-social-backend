@@ -80,6 +80,8 @@ const columnSchema = gql`
     cycle: String
     cycleLength: Int
     user: User
+    column: Column
+    ColumnSlug: String
   }
 `
 
