@@ -41,6 +41,7 @@ const invitationSchema = gql`
       type: invitationTypes
     ): Invitation
     approveInvitation(email: String!): Invitation
+    acceptInvitation(token: String!): DefaultPayload
     payForApproval(paymentMethod: StripePaymentMethod!, email: String!): Approval
     applyForFellowship(email: String!, fellow: fellowApplicationInput!, additionalExpertise: String): DefaultPayload
     inviteUserToColumn(firstName: String!, lastName: String!, email: String!, expertise: String!, columnSlug: String!): DefaultPayload

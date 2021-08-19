@@ -4,18 +4,23 @@ const { Op } = require('sequelize')
 const { env } = require('../../../config/config')
 const db = require('../../db/models/')
 const { getTenantSetting } = require('../settings')
-const { states, invitationTypes } = require('../constants/invitation.constant')
-const { subscriptionTypes, paymentGateways, subscriptionStatuses } = require('../constants/subscription.constant')
-const { tokenTypes } = require('../constants/token.constant')
 const logger = require('../utils/logger')
-const { calculatePoints } = require('../services/reputation.service')
-const { reputationSources } = require('../constants/reputation.constant')
-const { fileNames } = require('../constants/defaultProfileImages.constant')
-const previousAPIService = require('../services/previousAPI.service')
-const stripeService = require('../services/stripe.service')
 const config = require('../../../config/config')
 
+const { states, invitationTypes } = require('../constants/invitation.constant')
+const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
+const { subscriptionTypes, paymentGateways, subscriptionStatuses } = require('../constants/subscription.constant')
+const { tokenTypes } = require('../constants/token.constant')
+const { reputationSources } = require('../constants/reputation.constant')
+const { fileNames } = require('../constants/defaultProfileImages.constant')
+
+const { calculatePoints } = require('../services/reputation.service')
+const previousAPIService = require('../services/previousAPI.service')
+const stripeService = require('../services/stripe.service')
+const notificationService = require('../services/notification.service')
+
 const BCRYPT_SALT_ROUNDS = 10
+const COLUMN_SINGLE_PAGE = slug => `/columns/${slug}`
 
 const getRandomInt = max => Math.ceil(Math.random() * max)
 
@@ -116,6 +121,33 @@ const signup = async ({ body = {}, User = db.User, Invitation = db.Invitation, S
         await savedUser.save()
         await subscription.addUser(savedUser)
         await subscription.save()
+      }
+
+      const column = await invitation.getColumn()
+
+      if (column) {
+        const columnAuthor = await column.getAuthor()
+        await Subscription.create({
+          type: subscriptionTypes.COLUMN,
+          email: savedUser.email,
+          UserId: savedUser.id,
+          ColumnSlug: column.slug
+        })
+        await notificationService.notify(
+          notificationTypes.NEW_COLUMN_SUBSCRIPTION,
+          notificationCategories.SUBSCRIPTION,
+          {
+            from_name: savedUser.firstName,
+            to_first_name: columnAuthor.firstName,
+            column_name: column.name,
+            column_slug: column.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${COLUMN_SINGLE_PAGE(column.slug)}`
+          },
+          savedUser,
+          [columnAuthor.id],
+          {},
+          column
+        )
       }
     }
   } catch (e) {
