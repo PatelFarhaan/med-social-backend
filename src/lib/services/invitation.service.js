@@ -54,7 +54,7 @@ const createInvitation = async (
   if (type === undefined) {
     type = 'REGULAR'
   }
-  const existingInvitation = await Invitation.findOne({ where: { email, type, state: states.PENDING } })
+  const existingInvitation = await Invitation.findOne({ where: { email, type } })
   if (existingInvitation) {
     throw new Error(JSON.stringify({ status: 400, message: 'Invitation already exists' }))
   }
