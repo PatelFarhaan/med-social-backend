@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
+const moment = require('moment')
 const base64url = require('base64url')
 const db = require('../../db/models')
 
@@ -109,22 +110,23 @@ const approveInvitation = async (email, user, Invitation = db.Invitation, Subscr
     const token = await generateToken()
     invitation.token = token
     invitation.approved_by = user.id
+
+    let waitlistFlag = moment(invitation.createdAt).isBefore(moment('31/07/2020', 'DD/MM/YYYY'))
+
     savedInvitation = await invitation.save()
     const columnUser = await User.findOne({ where: { email } })
     if (!columnUser) {
-      if (invitation.special) {
-        await emailService.sendEmail(
-          invitation.email,
-          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-          'nomDePlumeConfirmed'
-        )
-      } else {
-        await emailService.sendEmail(
-          invitation.email,
-          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-          'invitationConfirmed'
-        )
+      let emailTemplate = invitation.special ? 'nomDePlumeConfirmed' : 'invitationConfirmed'
+
+      if (waitlistFlag) {
+        emailTemplate = 'waitList'
       }
+
+      await emailService.sendEmail(
+        invitation.email,
+        { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+        emailTemplate
+      )
     } else {
       const column = await invitation.getColumn()
 
