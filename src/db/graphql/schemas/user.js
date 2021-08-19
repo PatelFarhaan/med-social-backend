@@ -5,6 +5,7 @@ const userSchema = gql`
     login(email: String!, password: String, token: String): Session
     getUser(id: String, username: String): User
     getUsers(page: Int, limit: Int, sortBy: String, sortDirection: String): Users
+    getAdminUsers: [User]
     getMagicLink(email: String!): DefaultPayload
     resetPasswordLink(email: String!): DefaultPayload
     socialLogin(token: String!, provider: socialProviders!): Session

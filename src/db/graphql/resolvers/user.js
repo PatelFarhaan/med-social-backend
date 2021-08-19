@@ -136,6 +136,24 @@ module.exports = {
         count: rawUsers.count
       }
     }),
+    getAdminUsers: async (_parent, _args, { db }) =>
+      db.User.findAll({
+        distinct: true,
+        attributes: publicFields,
+        include: [
+          {
+            model: db.Role,
+            as: 'role',
+            attributes: ['id', 'type'],
+            required: false
+          }
+        ],
+        where: {
+          roleId: {
+            [Op.or]: [1, 2]
+          }
+        }
+      }),
     socialLogin: async (_parent, { provider, token }, { db }) => {
       if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
       const ticket = await socialService.googleTokenVerify(token)
