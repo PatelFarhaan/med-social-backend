@@ -19,7 +19,6 @@ const {
   unfollowUser,
   subscribeToUser,
   unsubscribeToUser
-  // getAdminUsers
 } = require('../../../lib/users')
 const {
   tokenService,
