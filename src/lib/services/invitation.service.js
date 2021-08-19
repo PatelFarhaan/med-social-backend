@@ -5,14 +5,18 @@ const db = require('../../db/models')
 const {
   stripe: { paidSubscriptionPriceId }
 } = require('../../../config/config')
-const { invitationTypes, states } = require('../constants/invitation.constant')
 const logger = require('../utils/logger')
-const columnService = require('./column.service')
+
+const { invitationTypes, states } = require('../constants/invitation.constant')
+const { subscriptionTypes } = require('../constants/subscription.constant')
+const { notificationCategories, notificationTypes } = require('../constants/notification.constant')
+
 const stripeService = require('./stripe.service')
 const emailService = require('./email.service')
-const { columnTypes } = require('../constants/column.constant')
+const notificationService = require('./notification.service')
 
 const LIMIT = 50
+const COLUMN_SINGLE_PAGE = slug => `/columns/${slug}`
 
 const getInvitation = async ({ token }, loaderOpts) => db.Invitation.findOne({ where: { token, state: states.APPROVED } }, loaderOpts)
 
@@ -92,7 +96,7 @@ const createInvitation = async (
   return invitation
 }
 
-const approveInvitation = async (email, user, Invitation = db.Invitation) => {
+const approveInvitation = async (email, user, Invitation = db.Invitation, Subscription = db.Subscription, User = db.User) => {
   const invitation = await Invitation.findOne({ where: { email } })
   if (!invitation) {
     throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
@@ -106,26 +110,97 @@ const approveInvitation = async (email, user, Invitation = db.Invitation) => {
     invitation.token = token
     invitation.approved_by = user.id
     savedInvitation = await invitation.save()
-    if (invitation.special) {
-      await emailService.sendEmail(
-        invitation.email,
-        { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-        'nomDePlumeConfirmed'
-      )
+    const columnUser = await User.findOne({ where: { email } })
+    if (!columnUser) {
+      if (invitation.special) {
+        await emailService.sendEmail(
+          invitation.email,
+          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          'nomDePlumeConfirmed'
+        )
+      } else {
+        await emailService.sendEmail(
+          invitation.email,
+          { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
+          'invitationConfirmed'
+        )
+      }
     } else {
-      await emailService.sendEmail(
-        invitation.email,
-        { firstName: invitation.firstName, callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}` },
-        'invitationConfirmed'
-      )
+      const column = await invitation.getColumn()
+
+      if (column) {
+        const columnAuthor = await column.getAuthor()
+        await Subscription.create({
+          type: subscriptionTypes.COLUMN,
+          email: columnUser.email,
+          UserId: columnUser.id,
+          ColumnSlug: column.slug
+        })
+        await notificationService.notify(
+          notificationTypes.NEW_COLUMN_SUBSCRIPTION,
+          notificationCategories.SUBSCRIPTION,
+          {
+            from_name: columnUser.firstName,
+            to_first_name: columnAuthor.firstName,
+            column_name: column.name,
+            column_slug: column.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${COLUMN_SINGLE_PAGE(column.slug)}`
+          },
+          columnUser,
+          [columnAuthor.id],
+          {},
+          column
+        )
+      }
     }
     // }
   } catch (e) {
-    logger.warn(`savedInvitation ${e}`)
+    logger.warn(`approveInvitation ${e}`)
     throw e
   }
 
   return savedInvitation
+}
+
+const acceptInvitation = async (token, user, Invitation = db.Invitation, Subscription = db.Subscription) => {
+  const invitation = await Invitation.findOne({ where: { token, state: states.REQUESTED, email: user.email } })
+  if (!invitation) {
+    throw new Error(JSON.stringify({ status: 404, message: 'Invitation not found' }))
+  }
+
+  try {
+    invitation.state = states.APPROVED
+    invitation.approved_by = user.id
+    await invitation.save()
+    const column = await invitation.getColumn()
+    if (!column) throw new Error(JSON.stringify({ status: 400, message: 'Column does not exist' }))
+    const columnAuthor = await column.getAuthor()
+    await Subscription.create({
+      type: subscriptionTypes.COLUMN,
+      email: user.email,
+      UserId: user.id,
+      ColumnSlug: column.slug
+    })
+    await notificationService.notify(
+      notificationTypes.NEW_COLUMN_SUBSCRIPTION,
+      notificationCategories.SUBSCRIPTION,
+      {
+        from_name: user.firstName,
+        to_first_name: columnAuthor.firstName,
+        column_name: column.name,
+        column_slug: column.slug,
+        actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${COLUMN_SINGLE_PAGE(column.slug)}`
+      },
+      user,
+      [columnAuthor.id],
+      {},
+      column
+    )
+    return { status: 204, message: 'Successfully accepted the invitation' }
+  } catch (e) {
+    logger.warn(`acceptInvitation ${e}`)
+    throw e
+  }
 }
 
 const inviteUserToColumn = async (
@@ -144,19 +219,17 @@ const inviteUserToColumn = async (
   const column = await Column.findByPk(columnSlug)
   if (!column) throw new Error(JSON.stringify({ status: 404, message: 'Column does not exist' }))
 
-  const existingUser = await User.findOne({ where: { email } })
-
-  if (existingUser) {
-    const columnAuthor = await column.getAuthor()
-    if (column.type === columnTypes.PAID && columnAuthor.id !== user.id)
-      throw new Error(JSON.stringify({ status: 403, message: 'Only Column owners in paid columns can invite users' }))
-
-    await columnService.subscribeToColumn({ body: { column } }, existingUser)
-    return {
-      status: 204,
-      message: 'Successfully Subscribed User to Column'
-    }
-  }
+  // This would be used in a future implementation
+  // if (existingUser) {
+  // const columnAuthor = await column.getAuthor()
+  // if (column.type === columnTypes.PAID && columnAuthor.id !== user.id)
+  //   throw new Error(JSON.stringify({ status: 403, message: 'Only Column owners in paid columns can invite users' }))
+  // await columnService.subscribeToColumn({ body: { column } }, existingUser)
+  // return {
+  //   status: 204,
+  //   message: 'Successfully Subscribed User to Column'
+  // }
+  // }
 
   const existingExpertise = await Expertise.findOne({ where: { name: expertise } })
   const invitationExpertise = existingExpertise || (await Expertise.create({ name: expertise }))
@@ -166,22 +239,27 @@ const inviteUserToColumn = async (
     lastName,
     email,
     type: invitationTypes.REGULAR,
-    state: states.APPROVED,
-    token
+    state: states.REQUESTED,
+    token,
+    ColumnSlug: column.slug
   })
 
   const columnExpertise = await column.getExpertise()
 
   await invitation.addExpertises([invitationExpertise, columnExpertise])
-
+  const existingUser = await User.findOne({ where: { email } })
+  const CTAUrl = existingUser
+    ? `${process.env.MOCK_WEBCLIENT_HOST}/accept-invitation?token=${token}`
+    : `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}`
   await emailService.sendEmail(
     invitation.email,
     {
       fromFirstName: user.firstName.toUpperCase(),
       firstName: invitation.firstName.toUpperCase(),
-      callToActionUrl: `${process.env.MOCK_WEBCLIENT_HOST}/onboarding?token=${token}`,
+      callToActionUrl: CTAUrl,
       columnName: column.name,
-      columnSlug: column.slug
+      columnSlug: column.slug,
+      existingUser: !!existingUser
     },
     'sendInvitation'
   )
@@ -333,6 +411,7 @@ const generateToken = async () => base64url(uuidv4())
 module.exports = {
   createInvitation,
   approveInvitation,
+  acceptInvitation,
   getInvitations,
   getInvitation,
   payForApproval,

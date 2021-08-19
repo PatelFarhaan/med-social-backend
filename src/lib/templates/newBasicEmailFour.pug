@@ -46,9 +46,10 @@ html(lang='en' xmlns='https://www.w3.org/1999/xhtml' xmlns:o='urn:schemas-micros
                     td(style='text-align:center;padding-top:20px')
                       p(style='margin:0;text-align:center;')
                         a.button_link(href=`${callToActionUrl}` style='background: #3d8f44; text-decoration: none; ; color: #ffffff; border-radius: 8px; display:inline-block; mso-padding-alt:0;text-underline-color:none;font-size:Arial, sans-serif;letter-spacing:3.2px;font-size:12px;')
-                          //if mso
-                            i(style='letter-spacing: 25px;mso-font-width:-100%;mso-text-raise:20pt')  
-                          span(style='mso-text-raise:10pt;font-weight:normal;') FINISH SIGNING UP
+                          if existingUser
+                            span(style='mso-text-raise:10pt;font-weight:normal;') ACCEPT INVITATION
+                          else
+                            span(style='mso-text-raise:10pt;font-weight:normal;') FINISH SIGNING UP
                           //if mso
                             i(style='letter-spacing: 25px;mso-font-width:-100%')  
                   tr
