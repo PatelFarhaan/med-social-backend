@@ -449,22 +449,23 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
     if (DBpost.author_id !== user.id) {
       const DBpostAuthor = await DBpost.getAuthor()
       const notificationSetting = await user.getNotificationSetting()
-      // FIXME: Need new flag?
-      await notify(
-        notificationTypes.REPLIED_TO_POST,
-        notificationCategories.REPLIES,
-        {
-          toFirstName: DBpostAuthor.firstName,
-          fromName: user.firstName,
-          PostId: DBpost.id,
-          ColumnSlug: column.slug,
-          actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(column.slug, DBpost.id)}`
-        },
-        user,
-        [DBpostAuthor.id],
-        DBpost,
-        column
-      )
+      if (notificationSetting.repliesAndQuotes) {
+        await notify(
+          notificationTypes.REPLIED_TO_POST,
+          notificationCategories.REPLIES,
+          {
+            toFirstName: DBpostAuthor.firstName,
+            fromName: user.firstName,
+            PostId: DBpost.id,
+            ColumnSlug: column.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(column.slug, DBpost.id)}`
+          },
+          user,
+          [DBpostAuthor.id],
+          DBpost,
+          column
+        )
+      }
     }
     DBpost.comments += 1
     await DBpost.save()
