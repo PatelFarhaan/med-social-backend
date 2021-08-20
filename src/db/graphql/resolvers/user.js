@@ -226,7 +226,7 @@ module.exports = {
         await stripeService.attachPaymentMethod(user.stripeCustomerId, paymentMethod)
         const DBPaymentMethod = {
           id: paymentMethod.id,
-          name: `${user.firstName} ${user.lastName}`,
+          name: paymentMethod.billing_details.name,
           brend: paymentMethod.card.brand,
           brand: paymentMethod.card.brand,
           expire_year: paymentMethod.card.exp_year,
