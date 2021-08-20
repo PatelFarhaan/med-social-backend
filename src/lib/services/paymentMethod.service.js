@@ -46,7 +46,6 @@ const deletePaymentMethod = async ({ id, user, force = false }) => {
 
   await stripeService.deletePaymentMethod(paymentMethod)
   await paymentMethod.destroy()
-
   return {
     status: 204,
     message: 'Successfully Deleted'
