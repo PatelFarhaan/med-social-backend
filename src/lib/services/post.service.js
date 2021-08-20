@@ -388,7 +388,7 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
       if (quotedPost.author_id !== user.id) {
         const quotedPostAuthor = await quotedPost.getAuthor({ attributes: ['firstName'] })
         const notificationSetting = await user.getNotificationSetting()
-        if (notificationSetting.repliesAndQuotes){
+        if (notificationSetting.repliesAndQuotes) {
           await notify(
             notificationTypes.QUOTED_POST,
             notificationCategories.REPLIES,
@@ -523,6 +523,7 @@ const votePost = async (
     const postAuthor = await post.getAuthor()
     const postColumn = await post.getColumn()
     const columnExpertise = await postColumn.getExpertise()
+    const notificationSetting = await user.getNotificationSetting()
     if (existingVote) {
       const userExpertise = await UserExpertise.findOne({ where: { UserId: postAuthor.id, ExpertiseId: columnExpertise.id } })
       await Reputation.destroy({
@@ -554,8 +555,8 @@ const votePost = async (
               authorId: user.id
             }
           })
-          const notificationSetting = await user.getNotificationSetting()
-          if (notificationSetting.upVote){
+
+          if (notificationSetting.upVote) {
             await notify(
               notificationTypes.UPVOTED,
               notificationCategories.VOTES,
@@ -576,23 +577,20 @@ const votePost = async (
       await post.addUserVote(user, { through: { type, points } })
       voteValue = await updateVoteValue(type, points, post)
       await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
-      if (voteValue > 0 && postAuthor.id !== user.id) {
-        const notificationSetting = await user.getNotificationSetting()
-        if (notificationSetting.upVote){
-          await notify(
-            notificationTypes.UPVOTED,
-            notificationCategories.VOTES,
-            {
-              PostId: post.id,
-              ColumnSlug: postColumn.slug,
-              actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
-            },
-            user,
-            [postAuthor.id],
-            post,
-            postColumn
-          )
-        }
+      if (voteValue > 0 && postAuthor.id !== user.id && notificationSetting.upVote) {
+        await notify(
+          notificationTypes.UPVOTED,
+          notificationCategories.VOTES,
+          {
+            PostId: post.id,
+            ColumnSlug: postColumn.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
+          },
+          user,
+          [postAuthor.id],
+          post,
+          postColumn
+        )
       }
     }
   } catch (e) {
@@ -637,7 +635,7 @@ const bookmarkPost = async (
       if (postAuthor.id !== user.id) {
         await calculatePoints(postAuthor, columnExpertise, reputationSources.BOOKMARKED, post, postColumn, user)
         const notificationSetting = await user.getNotificationSetting()
-        if (notificationSetting.bookmark){
+        if (notificationSetting.bookmark) {
           await notify(
             notificationTypes.BOOKMARKED_POST,
             notificationCategories.BOOKMARKS,
