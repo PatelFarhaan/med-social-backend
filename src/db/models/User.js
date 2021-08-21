@@ -86,6 +86,16 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'UserId'
     })
 
+    User.hasMany(models.Dispatch, {
+      as: 'dispatches',
+      foreignKey: 'UserId'
+    })
+
+    User.hasMany(models.News, {
+      as: 'news',
+      foreignKey: 'UserId'
+    })
+
     User.hasMany(models.Subscription)
 
     User.belongsToMany(models.Post, {

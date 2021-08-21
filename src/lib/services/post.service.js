@@ -387,21 +387,24 @@ const createPost = async ({ body: { column, stackedPosts = [], files = [], ...po
       const quotedPost = await post.getQuotedPost()
       if (quotedPost.author_id !== user.id) {
         const quotedPostAuthor = await quotedPost.getAuthor({ attributes: ['firstName'] })
-        await notify(
-          notificationTypes.QUOTED_POST,
-          notificationCategories.REPLIES,
-          {
-            toFirstName: quotedPostAuthor.firstName,
-            fromName: user.firstName,
-            PostId: post.id,
-            ColumnSlug: existingColumn.slug,
-            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(existingColumn.slug, post.id)}`
-          },
-          user,
-          [quotedPost.author_id],
-          post,
-          existingColumn
-        )
+        const notificationSetting = await user.getNotificationSetting()
+        if (notificationSetting.repliesAndQuotes) {
+          await notify(
+            notificationTypes.QUOTED_POST,
+            notificationCategories.REPLIES,
+            {
+              toFirstName: quotedPostAuthor.firstName,
+              fromName: user.firstName,
+              PostId: post.id,
+              ColumnSlug: existingColumn.slug,
+              actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(existingColumn.slug, post.id)}`
+            },
+            user,
+            [quotedPost.author_id],
+            post,
+            existingColumn
+          )
+        }
       }
     }
   } catch (e) {
@@ -445,21 +448,24 @@ const createComment = async ({ body: { id, content = '', files = [] } }, user, P
     }
     if (DBpost.author_id !== user.id) {
       const DBpostAuthor = await DBpost.getAuthor()
-      await notify(
-        notificationTypes.REPLIED_TO_POST,
-        notificationCategories.REPLIES,
-        {
-          toFirstName: DBpostAuthor.firstName,
-          fromName: user.firstName,
-          PostId: DBpost.id,
-          ColumnSlug: column.slug,
-          actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(column.slug, DBpost.id)}`
-        },
-        user,
-        [DBpostAuthor.id],
-        DBpost,
-        column
-      )
+      const notificationSetting = await user.getNotificationSetting()
+      if (notificationSetting.repliesAndQuotes) {
+        await notify(
+          notificationTypes.REPLIED_TO_POST,
+          notificationCategories.REPLIES,
+          {
+            toFirstName: DBpostAuthor.firstName,
+            fromName: user.firstName,
+            PostId: DBpost.id,
+            ColumnSlug: column.slug,
+            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(column.slug, DBpost.id)}`
+          },
+          user,
+          [DBpostAuthor.id],
+          DBpost,
+          column
+        )
+      }
     }
     DBpost.comments += 1
     await DBpost.save()
@@ -517,6 +523,7 @@ const votePost = async (
     const postAuthor = await post.getAuthor()
     const postColumn = await post.getColumn()
     const columnExpertise = await postColumn.getExpertise()
+    const notificationSetting = await user.getNotificationSetting()
     if (existingVote) {
       const userExpertise = await UserExpertise.findOne({ where: { UserId: postAuthor.id, ExpertiseId: columnExpertise.id } })
       await Reputation.destroy({
@@ -548,26 +555,29 @@ const votePost = async (
               authorId: user.id
             }
           })
-          await notify(
-            notificationTypes.UPVOTED,
-            notificationCategories.VOTES,
-            {
-              PostId: post.id,
-              ColumnSlug: postColumn.slug,
-              actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
-            },
-            user,
-            [postAuthor.id],
-            post,
-            postColumn
-          )
+
+          if (notificationSetting.upVote) {
+            await notify(
+              notificationTypes.UPVOTED,
+              notificationCategories.VOTES,
+              {
+                PostId: post.id,
+                ColumnSlug: postColumn.slug,
+                actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
+              },
+              user,
+              [postAuthor.id],
+              post,
+              postColumn
+            )
+          }
         }
       }
     } else {
       await post.addUserVote(user, { through: { type, points } })
       voteValue = await updateVoteValue(type, points, post)
       await calculatePoints(postAuthor, columnExpertise, reputationSources.VOTED, post, postColumn, user, voteValue)
-      if (voteValue > 0 && postAuthor.id !== user.id) {
+      if (voteValue > 0 && postAuthor.id !== user.id && notificationSetting.upVote) {
         await notify(
           notificationTypes.UPVOTED,
           notificationCategories.VOTES,
@@ -624,19 +634,22 @@ const bookmarkPost = async (
       await post.addUserBookmark(user)
       if (postAuthor.id !== user.id) {
         await calculatePoints(postAuthor, columnExpertise, reputationSources.BOOKMARKED, post, postColumn, user)
-        await notify(
-          notificationTypes.BOOKMARKED_POST,
-          notificationCategories.BOOKMARKS,
-          {
-            PostId: post.id,
-            ColumnSlug: postColumn.slug,
-            actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
-          },
-          user,
-          [postAuthor.id],
-          post,
-          postColumn
-        )
+        const notificationSetting = await user.getNotificationSetting()
+        if (notificationSetting.bookmark) {
+          await notify(
+            notificationTypes.BOOKMARKED_POST,
+            notificationCategories.BOOKMARKS,
+            {
+              PostId: post.id,
+              ColumnSlug: postColumn.slug,
+              actionLink: `${process.env.MOCK_WEBCLIENT_HOST}/${POSTS_SINGLE_PAGE(postColumn.slug, post.id)}`
+            },
+            user,
+            [postAuthor.id],
+            post,
+            postColumn
+          )
+        }
       }
     }
   } catch (e) {
