@@ -111,7 +111,7 @@ const approveInvitation = async (email, user, Invitation = db.Invitation, Subscr
     invitation.token = token
     invitation.approved_by = user.id
 
-    let waitlistFlag = moment(invitation.createdAt).isBefore(moment('31/07/2020', 'DD/MM/YYYY'))
+    let waitlistFlag = moment(invitation.createdAt).isBefore(moment('31/07/2021', 'DD/MM/YYYY'))
 
     savedInvitation = await invitation.save()
     const columnUser = await User.findOne({ where: { email } })
