@@ -136,6 +136,24 @@ module.exports = {
         count: rawUsers.count
       }
     }),
+    getAdminUsers: async (_parent, _args, { db }) =>
+      db.User.findAll({
+        distinct: true,
+        attributes: publicFields,
+        include: [
+          {
+            model: db.Role,
+            as: 'role',
+            attributes: ['id', 'type'],
+            required: false
+          }
+        ],
+        where: {
+          roleId: {
+            [Op.or]: [1, 2]
+          }
+        }
+      }),
     socialLogin: async (_parent, { provider, token }, { db }) => {
       if (!['google'].includes(provider)) throw new Error(JSON.stringify({ status: 400, message: 'Provider not supported' }))
       const ticket = await socialService.googleTokenVerify(token)
@@ -190,10 +208,10 @@ module.exports = {
     },
     listPaymentMethods: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, args, { req }) => {
       const rawPaymentMethods = await paymentMethodService.getUserPaymentMethods({ ...args, user: req.user })
-      const paymentMethods = rawPaymentMethods.rows.map(paymentMethod => exportSafeUser(paymentMethod))
+      const paymentMethods = rawPaymentMethods.map(paymentMethod => exportSafeUser(paymentMethod))
       return {
         list: paymentMethods,
-        count: paymentMethods.count
+        count: paymentMethods.length
       }
     })
   },
@@ -208,7 +226,7 @@ module.exports = {
         await stripeService.attachPaymentMethod(user.stripeCustomerId, paymentMethod)
         const DBPaymentMethod = {
           id: paymentMethod.id,
-          name: `${user.firstName} ${user.lastName}`,
+          name: paymentMethod.billing_details.name,
           brend: paymentMethod.card.brand,
           brand: paymentMethod.card.brand,
           expire_year: paymentMethod.card.exp_year,
@@ -412,7 +430,8 @@ module.exports = {
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getUserExpertises({ [EXPECTED_OPTIONS_KEY]: context })
     },
-    notificationSetting: (user, _args, { db }) => {
+    notificationSetting: (user, _args, { db, req }) => {
+      if (!req.user) return null
       const dbUser = db.User.build(exportSafeModel(user))
       return dbUser.getNotificationSetting()
     },
@@ -427,6 +446,11 @@ module.exports = {
       const dbUser = db.User.build(exportSafeModel(user))
       const subscriber = await dbUser.getSubscribers({ where: { UserId: req.user.id } })
       return subscriber.length === 1
+    },
+    columnSubscriptions: async (user, { limit = 10, page = 1 }, { db, req, EXPECTED_OPTIONS_KEY, context }) => {
+      if (!req.user) return null
+      const dbUser = db.User.build(exportSafeModel(user))
+      return dbUser.getSubscriptions({ where: { type: 'COLUMN' }, limit, page, [EXPECTED_OPTIONS_KEY]: context })
     }
   },
   UserExpertise: {

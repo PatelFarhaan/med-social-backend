@@ -28,6 +28,9 @@ module.exports = {
       const invitation = await invitationService.approveInvitation(email)
       return exportSafeModel(invitation)
     }),
+    acceptInvitation: can(['standard', 'admin', 'superadmin']).createResolver(async (_parent, { token }, { req }) =>
+      invitationService.acceptInvitation(token, req.user)
+    ),
     payForApproval: async (_parent, body) => {
       const invitation = await invitationService.payForApproval(body)
       return invitation

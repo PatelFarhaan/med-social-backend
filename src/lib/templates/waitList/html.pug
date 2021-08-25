@@ -1,0 +1,31 @@
+extends ../newBasicEmailOne
+
+block large_content
+  div.font_size(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Times,sans-serif;color:#000000;')
+    p(style='margin-top:0;')
+      | YOU’RE OFF THE
+      br
+      | COLUMN/ WAITING LIST! 
+
+block text_content
+  div(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Arial,sans-serif;font-size:20px;line-height:32px;color:#666666;')
+    p(style='margin-top:0px')
+      | It look a long time because it was a long list but we’re really looking forward to seeing you on Column/.
+    p(style='margin-top:0px')
+      |  Once you’re a member anyone you invite gets to skip the waitlist.
+
+block button_content
+  p(style='margin:0;text-align:center;')
+    a.button_link(href=`${callToActionUrl}` style='background: #3d8f44; text-decoration: none; ; color: #ffffff; border-radius: 8px; display:inline-block; mso-padding-alt:0;text-underline-color:none;font-size:Arial, sans-serif;letter-spacing:3.2px;font-size:12px;')
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%;mso-text-raise:20pt')  
+      span(style='mso-text-raise:10pt;font-weight:normal;') FINISH SIGNING UP
+      //if mso
+        i(style='letter-spacing: 25px;mso-font-width:-100%')
+
+block text_content_two
+  div(style='display:inline-block;width:90%;max-width:590px;vertical-align:top;font-family:Arial,sans-serif;font-size:20px;line-height:32px;color:#666666;')
+    p(style='margin-top:0px')
+      | Column/ is a new social network dedicated to signal over noise. If Twitter is a library crossed with a civil war, we’re a library crossed with a dinner party.
+    p(style='margin-top:0px')
+      | Can't wait to see you there!

@@ -8,9 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       name: { type: DataTypes.STRING },
       brend: { type: DataTypes.STRING },
       brand: { type: DataTypes.STRING },
-      expireYear: { type: DataTypes.INTEGER, field: 'expire_year' },
-      expireMonth: { type: DataTypes.INTEGER, field: 'expire_month' },
-      lastDigits: { type: DataTypes.STRING, field: 'last_digits' },
+      expire_year: { type: DataTypes.INTEGER, field: 'expire_year' },
+      expire_month: { type: DataTypes.INTEGER, field: 'expire_month' },
+      last_digits: { type: DataTypes.STRING, field: 'last_digits' },
       stripe: { type: DataTypes.JSONB },
       createdAt: types.get('createdAt'),
       updatedAt: types.get('updatedAt')
