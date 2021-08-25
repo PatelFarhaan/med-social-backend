@@ -252,12 +252,23 @@ const banUser = async ({ body: { column, bannedUser } }, user) => {
   }
 }
 
-const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Column = db.Column) => {
+const getPopularColumns = async ({ page = 1, limit = 10, sortBy, sortDirection }, user, loaderOpts, Column = db.Column) => {
+  let order = [['createdAt', 'DESC']]
+  const sortFilters = {
+    postCount: direction => [[db.sequelize.literal('"PostCount"'), direction.toUpperCase()]],
+    createdAt: direction => [['createdAt', direction.toUpperCase()]]
+  }
+
+  if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
+    order = sortFilters[sortBy](sortDirection)
+  }
+
   const rawUserSubscriptions = await user.getSubscriptions({ attributes: ['ColumnSlug'] })
   const userSubscriptions = rawUserSubscriptions.map(item => item.ColumnSlug)
   return Column.findAndCountAll({
     limit,
     offset: limit * (page - 1),
+    order,
     ...loaderOpts,
     where: {
       slug: {
@@ -278,8 +289,8 @@ const getPopularColumns = async ({ page = 1, limit = 10 }, user, loaderOpts, Col
       'ExpertiseId',
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Subscription" WHERE "Subscription"."ColumnSlug" = slug)'), 'MemberCount'],
       [db.sequelize.literal('(SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" = slug)'), 'PostCount']
-    ],
-    order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
+    ]
+    // order: [[db.sequelize.literal('"PostCount"'), 'DESC']]
   })
 }
 
@@ -289,11 +300,11 @@ const getPopularcolumnists = async () =>
     `SELECT *, "User".* FROM (
      SELECT DISTINCT ON (t."authorId") *  FROM (
      SELECT  *,  (SELECT COUNT(*) FROM "Post" WHERE "Post"."ColumnSlug" =  "Column"."slug") AS "PostCount"
-     FROM "Column" 
+     FROM "Column"
      WHERE "state" = 'APPROVED'
      ORDER BY "PostCount" DESC
      ) AS t ) AS t2 LEFT JOIN "User" ON t2."authorId" = "User"."id"
-     ORDER BY "PostCount" DESC  
+     ORDER BY "PostCount" DESC
      LIMIT 10`,
     { type: QueryTypes.SELECT }
   )
