@@ -253,15 +253,15 @@ const banUser = async ({ body: { column, bannedUser } }, user) => {
 }
 
 const getPopularColumns = async ({ page = 1, limit = 10, sortBy, sortDirection }, user, loaderOpts, Column = db.Column) => {
-  let order = [['createdAt', 'DESC']]
-  const sortFilters = {
-    postCount: direction => [[db.sequelize.literal('"PostCount"'), direction.toUpperCase()]],
-    createdAt: direction => [['createdAt', direction.toUpperCase()]]
-  }
+  const order = [['createdAt', 'DESC']]
+  // const sortFilters = {
+  //   postCount: direction => [[db.sequelize.literal('"PostCount"'), direction.toUpperCase()]],
+  //   createdAt: direction => [['createdAt', direction.toUpperCase()]]
+  // }
 
-  if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
-    order = sortFilters[sortBy](sortDirection)
-  }
+  // if (Object.hasOwnProperty.call(sortFilters, sortBy)) {
+  //   order = sortFilters[sortBy](sortDirection)
+  // }
 
   const rawUserSubscriptions = await user.getSubscriptions({ attributes: ['ColumnSlug'] })
   const userSubscriptions = rawUserSubscriptions.map(item => item.ColumnSlug)
